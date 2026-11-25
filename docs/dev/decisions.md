@@ -69,3 +69,24 @@ code and tests.
 
 [PROTOCOL]: Add a new decision when a choice affects future implementation,
 deployment, product behavior, or contributor workflow.
+
+
+## D007 - AI Provider Credentials Are Session-Only
+
+Provider API keys and the Tavily search key must not be written to persistent
+browser storage. Keep them in application memory for the current page session;
+users re-enter them after a reload.
+
+Reasons:
+
+- Persistent localStorage exposes long-lived credentials to any same-origin
+  script that can read browser storage.
+- The app is a browser-only client and sends requests directly to the selected
+  AI/search provider; it does not need to retain credentials across reloads.
+- Non-secret preferences (provider choice, model, base URL, and feature toggles)
+  can remain persisted.
+
+Consequence: persisted settings must redact credentials during writes and
+migration/hydration. This reduces at-rest exposure but does not protect keys from
+XSS or malicious browser extensions while the app is running. A server-side
+proxy with secret management is required for stronger credential isolation.
