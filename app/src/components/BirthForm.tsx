@@ -124,10 +124,9 @@ export function BirthForm() {
     <form
       onSubmit={handleSubmit}
       className="
-        relative w-full max-w-lg p-8
-        bg-gradient-to-br from-white/[0.06] to-white/[0.02]
-        backdrop-blur-xl border border-white/[0.08] rounded-2xl
-        shadow-[0_8px_40px_rgba(0,0,0,0.3)]
+        relative w-full max-w-5xl p-6 sm:p-8
+        bg-white border border-slate-200 rounded-3xl
+        shadow-[0_18px_60px_rgba(15,23,42,0.08)]
       "
     >
       {/* 顶部发光线 */}
@@ -140,7 +139,7 @@ export function BirthForm() {
       />
 
       {/* 标题区域 */}
-      <div className="text-center mb-8">
+      <div className="text-left mb-8">
         <h2
           className="
             text-2xl font-semibold mb-2
@@ -211,7 +210,7 @@ export function BirthForm() {
                   cursor-pointer transition-all duration-200
                   ${gender === opt.value
                     ? 'bg-gradient-to-r from-star to-star-dark text-white shadow-[0_4px_20px_rgba(124,58,237,0.3)]'
-                    : 'bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.12]'
+                    : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-violet-50 hover:border-violet-200'
                   }
                 `}
               >
@@ -263,7 +262,7 @@ export function BirthForm() {
         <label
           className="
             flex items-center justify-between gap-4 rounded-xl
-            bg-white/[0.04] border border-white/[0.08]
+            bg-slate-50 border border-slate-200
             px-4 py-3 cursor-pointer
           "
         >
@@ -284,12 +283,12 @@ export function BirthForm() {
         {/* 分隔线 */}
         <div className="relative py-2">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-white/[0.06]" />
+            <div className="w-full border-t border-slate-200" />
           </div>
         </div>
 
         {submitError && (
-          <p role="alert" aria-live="polite" className="text-sm text-rose-400">
+          <p role="alert" aria-live="polite" className="text-sm text-rose-700">
             {submitError}
           </p>
         )}
