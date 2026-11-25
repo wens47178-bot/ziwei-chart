@@ -101,4 +101,6 @@ or notable verification run.
 - Reviewing Zustand settings persistence because provider and Tavily API keys were included in the `ziwei-settings` localStorage payload.
 - A proposed change on branch `security/keep-api-keys-out-of-local-storage` removes API credentials from persisted browser storage while retaining non-secret preferences.
 - Credentials will remain in app memory for the current page session and need to be entered again after a reload.
-- This change is not merged until migration behavior, tests, lint, and production build pass CI.
+- CI passed on 2026-11-25 after the versioned Zustand persist generic fix: dependency installation, ESLint, all 34 Vitest tests, and TypeScript/Vite production build.
+- PR #3 remains open for merge at the time of this update.
+- The same `npm ci` run reported 20 dependency audit findings (1 low, 7 moderate, 12 high). These are dependency advisories, not test failures; a separate lockfile/advisory review is now a priority.
