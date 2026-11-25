@@ -62,8 +62,8 @@ const BRIGHTNESS_MAP: Record<string, string> = {
 const BRIGHTNESS_STYLE: Record<string, string> = {
   '庙': 'text-fortune',
   '旺': 'text-gold',
-  '得': 'text-violet-700',
-  '利': 'text-star-light',
+  '得': 'text-[#8a7653]',
+  '利': 'text-[#92784e]',
   '平': 'text-slate-500',
   '不': 'text-rose-700/70',
   '陷': 'text-misfortune',
@@ -111,7 +111,7 @@ function StarTag({ star, showBrightness = true }: StarTagProps) {
   const mutagenStyle = {
     '禄': 'bg-gradient-to-r from-fortune/20 to-fortune/10 text-fortune',
     '权': 'bg-gradient-to-r from-gold/20 to-gold/10 text-gold',
-    '科': 'bg-gradient-to-r from-star/20 to-star/10 text-star-light',
+    '科': 'bg-gradient-to-r from-star/20 to-star/10 text-[#92784e]',
     '忌': 'bg-gradient-to-r from-misfortune/20 to-misfortune/10 text-misfortune',
   }[mutagen || ''] || ''
 
@@ -154,9 +154,9 @@ function PalaceCard({
         group relative p-2 lg:p-3 h-full min-h-[130px] lg:min-h-[170px] flex flex-col
         bg-white border border-slate-200 rounded-xl shadow-sm
         transition-all duration-300 cursor-pointer
-        hover:bg-violet-50/60 hover:border-violet-200
+        hover:bg-[#f8f6f1] hover:border-[#d9cfbb]
         ${isLife ? 'ring-1 ring-amber-300 bg-amber-50/70' : ''}
-        ${isBody ? 'ring-1 ring-violet-300 bg-violet-50/70' : ''}
+        ${isBody ? 'ring-1 ring-[#d9cfbb] bg-[#f8f6f1]' : ''}
         ${isSelected ? 'ring-2 ring-star' : ''}
       `}
     >
@@ -170,7 +170,7 @@ function PalaceCard({
           <span className={`
             px-1 py-0.5 rounded font-medium
             ${isLife ? 'bg-amber-100 text-amber-800' : ''}
-            ${isBody ? 'bg-violet-100 text-violet-800' : ''}
+            ${isBody ? 'bg-[#f5f0e5] text-[#6f5d3c]' : ''}
             ${!isLife && !isBody ? 'text-slate-700' : ''}
           `}>
             {name}
@@ -235,7 +235,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
     <div className="
       relative h-full min-h-[280px] lg:min-h-[360px] p-3 lg:p-4
       flex flex-col items-center justify-center
-      bg-gradient-to-br from-white/[0.04] to-white/[0.02]
+      bg-white
       bg-white border border-slate-200 shadow-sm rounded-xl
     ">
       {/* 背景装饰 */}
@@ -246,7 +246,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
       {/* 标题 */}
       <h3 className="
         text-lg lg:text-xl font-semibold mb-3
-        bg-gradient-to-r from-gold via-gold-light to-gold bg-clip-text text-transparent
+        text-[#8a7653]
       " style={{ fontFamily: 'var(--font-serif)' }}>
         紫微斗数命盘
       </h3>
@@ -286,14 +286,14 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
           <span className="
             px-2 py-0.5 rounded-full text-xs
             bg-gradient-to-r from-star/20 to-gold/20
-            text-star-light font-medium border border-star/20
+            text-[#92784e] font-medium border border-star/20
           ">
             {chart.fiveElementsClass}
           </span>
         </div>
         <div className="flex justify-center gap-4 text-xs">
           <p><span className="text-text-muted">命主</span> <span className="text-gold">{chart.soul}</span></p>
-          <p><span className="text-text-muted">身主</span> <span className="text-star-light">{chart.body}</span></p>
+          <p><span className="text-text-muted">身主</span> <span className="text-[#92784e]">{chart.body}</span></p>
         </div>
         <div className="flex justify-center gap-4 text-xs mt-1">
           <p><span className="text-text-muted">生肖</span> <span className="text-text">{chart.zodiac}</span></p>
@@ -426,7 +426,7 @@ export function ChartDisplay() {
         <div className="flex items-center gap-1">
           <span className="text-fortune">禄</span>
           <span className="text-gold">权</span>
-          <span className="text-star-light">科</span>
+          <span className="text-[#92784e]">科</span>
           <span className="text-misfortune">忌</span>
           <span className="text-text-muted">四化</span>
         </div>

@@ -6,6 +6,7 @@
 import { getStarInfo, type StarInfo } from './stars/majorStars'
 import { getSihuaInfo, type SihuaInfo } from './sihua'
 import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
+import { createLocalCalendarDate } from '@/lib/horoscope'
 
 /* ------------------------------------------------------------
    知识上下文类型
@@ -200,7 +201,7 @@ export function extractKnowledge(chart: FunctionalAstrolabe, birthYear?: number)
 
     for (let year = startYear; year <= endYear; year++) {
       try {
-        const horoscope = chart.horoscope(new Date(`${year}-6-15`))
+        const horoscope = chart.horoscope(createLocalCalendarDate(year, 6, 15))
         const yearly = horoscope.yearly
 
         context.流年.push({
@@ -247,42 +248,44 @@ function getDecadalMutagens(stem: string): string[] {
    格局检测（简化版）
    ------------------------------------------------------------ */
 
-function detectPatterns(chart: FunctionalAstrolabe): string[] {
+export function detectPatterns(chart: FunctionalAstrolabe): string[] {
   const patterns: string[] = []
   const palaces = chart.palaces || []
-
-  // 找命宫
   const lifePalace = palaces.find(p => p.name === '命宫')
   if (!lifePalace) return patterns
 
-  const majorStarNames = (lifePalace.majorStars || []).map(s => s.name as string)
+  const lifeStars = (lifePalace.majorStars || []).map(star => String(star.name))
+  const hasLifeStar = (name: string) => lifeStars.includes(name)
 
-  // 紫府同宫
-  if (majorStarNames.includes('紫微') && majorStarNames.includes('天府')) {
-    patterns.push('紫府同宫：紫微与天府同在命宫，帝星与财库星同宫，富贵格局。')
+  if (hasLifeStar('紫微') && hasLifeStar('天府')) {
+    patterns.push('紫府同宫：紫微与天府同坐命宫。此处仅确认同宫组合，不单凭这一项判定整体格局吉凶。')
   }
 
-  // 紫杀同宫
-  if (majorStarNames.includes('紫微') && majorStarNames.includes('七杀')) {
-    patterns.push('紫杀同宫：紫微与七杀同宫，权威与冲劲结合，有开创能力。')
+  if (hasLifeStar('紫微') && hasLifeStar('七杀')) {
+    patterns.push('紫杀同宫：紫微与七杀同坐命宫。需结合三方四正、四化与星曜亮度进一步判断。')
   }
 
-  // 机月同梁
-  const hasJiyue = majorStarNames.includes('天机') || majorStarNames.includes('太阴')
-  const hasTongliang = majorStarNames.includes('天同') || majorStarNames.includes('天梁')
-  if (hasJiyue && hasTongliang) {
-    patterns.push('机月同梁：文星组合，适合公职、文教、服务类工作。')
+  // 机月同梁须在命宫三方（命、财帛、官禄）合看四星，
+  // 不能仅凭命宫中任意出现两颗星就判定。
+  const lifeIndex = lifePalace.index
+  const lifeTrines = palaces.filter(p =>
+    [0, 4, 8].includes((p.index - lifeIndex + 12) % 12)
+  )
+  const trineMajorStars = new Set(
+    lifeTrines.flatMap(p => (p.majorStars || []).map(star => String(star.name)))
+  )
+  const jiYueTongLiang = ['天机', '太阴', '天同', '天梁']
+  if (jiYueTongLiang.every(name => trineMajorStars.has(name))) {
+    patterns.push('机月同梁：天机、太阴、天同、天梁齐见于命宫三方。此为组合提示，仍需结合各星所在宫位、亮度与四化复核。')
   }
 
-  // 空宫
-  if (majorStarNames.length === 0) {
-    patterns.push('命宫无主星：需借对宫星曜论断，人生较多变化。')
+  if (lifeStars.length === 0) {
+    patterns.push('命宫无主星：当前命宫未见主星，需结合对宫及三方四正星曜一并观察。')
   }
 
-  // 检查化忌入命
   for (const star of lifePalace.majorStars || []) {
     if (String(star.mutagen) === '化忌') {
-      patterns.push(`${star.name}化忌入命：需特别关注该星所主事项，有执着与困扰。`)
+      patterns.push(`${star.name}化忌入命：记录本命化忌星曜落在命宫；具体含义需结合星曜性质与全盘结构解读。`)
     }
   }
 

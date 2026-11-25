@@ -1,5 +1,4 @@
-/* 天衍主应用：白色简约布局，功能统一收纳于左侧导航 */
-
+/* 天衍：参考图驱动的独立功能工作台 */
 import { useState, type ReactNode } from 'react'
 import { Analytics } from '@vercel/analytics/react'
 import { BirthForm } from '@/components/BirthForm'
@@ -8,218 +7,138 @@ import { AIInterpretation } from '@/components/AIInterpretation'
 import { SettingsPanel } from '@/components/SettingsPanel'
 import { YearlyFortune } from '@/components/fortune'
 import { LifeKLine } from '@/components/kline'
-import { KLineIcon } from '@/components/icons/KLineIcon'
 import { MatchAnalysis } from '@/components/match'
-import { OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
 import { ShareCard } from '@/components/share'
+import { AdvancedAnalysis, type AdvancedMode } from '@/components/AdvancedAnalysis'
+import { LunarMonthlyKLine } from '@/components/kline/LunarMonthlyKLine'
 import { useChartStore } from '@/stores'
 
-type TabType = 'chart' | 'fortune' | 'kline' | 'match' | 'share'
+type PageKey = 'birth' | 'chart' | 'palaces' | 'sihua' | 'decadal' | 'stars' | 'patterns' | 'trines' | 'fortune' | 'lunar' | 'kline' | 'match' | 'ai' | 'share'
+type PageMeta = { key: PageKey; label: string; en: string; title: string; subtitle: string; note: string; icon: string }
 
-const TABS: Array<{ key: TabType; label: string; icon: ReactNode }> = [
-  { key: 'chart', label: '命盘解读', icon: '☰' },
-  { key: 'fortune', label: '年度运势', icon: '◎' },
-  { key: 'kline', label: '人生K线', icon: <KLineIcon className="h-4 w-4" /> },
-  { key: 'match', label: '双人合盘', icon: '⚭' },
-  { key: 'share', label: '分享卡片', icon: '◈' },
+const PAGES: PageMeta[] = [
+  { key: 'birth', label: '起紫微命盘', en: '01 / DESTINY ENGINE', title: '起紫微命盘', subtitle: '输入出生年月日時', note: '以准确的出生资料为起点，建立专属命盘。', icon: '✳' },
+  { key: 'chart', label: '本命十二宫', en: '02 / NATAL CHART', title: '本命十二宫', subtitle: '十二宫位 · 星曜结构 · 命身格局', note: '从十二宫与星曜落点，逐层认识本命结构。', icon: '⌘' },
+  { key: 'palaces', label: '十二宫详解', en: '03 / TWELVE PALACES', title: '十二宫深度解析', subtitle: '宫位结构 · 星曜组合 · 宫干信息', note: '逐宫检视星曜配置与宫位结构，查看命盘细节。', icon: '▦' },
+  { key: 'sihua', label: '四化飞星', en: '04 / FOUR TRANSFORMATIONS', title: '四化飞星', subtitle: '本命四化 · 大限四化 · 流年四化', note: '区分不同盘层的禄权科忌，查看实际落宫。', icon: '✧' },
+  { key: 'decadal', label: '大限运程', en: '05 / DECADAL CYCLES', title: '大限运程', subtitle: '十年运限 · 大限命宫 · 流年叠宫', note: '指定年份定位大限，观察大限与流年的盘层关系。', icon: '◷' },
+  { key: 'stars', label: '星曜图鉴', en: '06 / STAR ATLAS', title: '星曜图鉴', subtitle: '主星 · 辅星 · 星曜落宫', note: '从命盘实际出现的星曜进入知识说明与落宫查看。', icon: '✦' },
+  { key: 'patterns', label: '命盘格局', en: '07 / CHART PATTERNS', title: '命盘格局提示', subtitle: '星曜组合 · 格局依据 · 判断边界', note: '展示当前规则可以核对的格局线索，并保留判断依据。', icon: '✥' },
+  { key: 'trines', label: '三方四正', en: '08 / TRIANGLE & OPPOSITION', title: '三方四正', subtitle: '本宫 · 三合宫 · 对宫', note: '查看选定宫位的三合与对宫星曜结构。', icon: '⌘' },
+  { key: 'fortune', label: '年度运势', en: '09 / YEARLY ALMANAC', title: '年度运势', subtitle: '流年主题 · 重点宫位 · 行动提醒', note: '查看当年运势重点与阶段变化。', icon: '◷' },
+  { key: 'lunar', label: '农历流月', en: '10 / LUNAR MONTHLY CYCLES', title: '农历流月趋势', subtitle: '农历月份 · 闰月拆分 · 流日四化', note: '独立查看农历月份与闰月区间的趋势变化。', icon: '☾' },
+  { key: 'kline', label: '人生趋势', en: '11 / LIFE TIMELINE', title: '人生趋势 K 线', subtitle: '大限走势 · 年度变化 · 农历流月', note: '以时间轴与数据图表观察人生不同阶段。', icon: '⌁' },
+  { key: 'match', label: '双人合盘', en: '12 / SYNASTRY', title: '双人合盘', subtitle: '双方资料 · 宫位关联 · 互动主题', note: '并列比较两张命盘，理解彼此的互动结构。', icon: '◉' },
+  { key: 'ai', label: 'AI 深度解读', en: '13 / AI INTERPRETATION', title: 'AI 深度解读', subtitle: '命格批注 · 事业财帛 · 情感人际', note: '基于命盘资料与知识上下文生成辅助解读。', icon: '✧' },
+  { key: 'share', label: '命盘典藏卡', en: '14 / PERSONAL KEEPSAKE', title: '命盘典藏卡', subtitle: '命盘摘要 · 专属金句 · 保存分享', note: '将命盘重点整理成可保存与分享的个人卡片。', icon: '◇' },
 ]
 
 export default function App() {
-  const { chart } = useChartStore()
+  const { chart, birthInfo } = useChartStore()
+  const [activePage, setActivePage] = useState<PageKey>('birth')
   const [showSettings, setShowSettings] = useState(false)
-  const [activeTab, setActiveTab] = useState<TabType>('chart')
+  const page = PAGES.find((item) => item.key === activePage) ?? PAGES[0]
+
+  const renderWorkspace = (): ReactNode => {
+    if (activePage === 'birth') return <BirthForm onSuccess={() => setActivePage('chart')} />
+    if (activePage === 'chart') return chart ? <ChartDisplay /> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'palaces' || activePage === 'sihua' || activePage === 'decadal' || activePage === 'stars' || activePage === 'patterns' || activePage === 'trines') return chart ? <AdvancedAnalysis mode={activePage as AdvancedMode} /> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'fortune') return chart ? <YearlyFortune /> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'lunar') return chart ? <LunarMonthlyKLine chart={chart} /> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'kline') return chart ? <LifeKLine /> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'match') return <MatchAnalysis />
+    if (activePage === 'ai') return chart ? <AIInterpretation /> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'share') return chart ? <ShareCard /> : <PageEmpty onClick={() => setActivePage('birth')} />
+    return null
+  }
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-900">
-
-      {/* 头部 - 毛玻璃导航 */}
-      {/* 左侧功能导航：桌面端纵向固定，窄屏保留左侧图标栏 */}
-      <aside className="sticky top-0 z-40 flex h-screen w-[76px] shrink-0 flex-col border-r border-slate-200 bg-white px-2 py-5 shadow-sm sm:w-[220px] sm:px-4 lg:w-[248px]">
-        <div className="mb-8 flex items-center justify-center gap-3 px-1 sm:justify-start sm:px-2">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-100 bg-violet-50 text-xl text-violet-700">✦</div>
-          <div className="hidden min-w-0 sm:block">
-            <h1 className="truncate text-lg font-semibold tracking-wide text-slate-900" style={{ fontFamily: 'var(--font-serif)' }}>天衍</h1>
-            <p className="text-xs text-slate-500">紫微命理与人生分析</p>
-          </div>
+    <div className="min-h-screen bg-[#fff] text-[#211f1b]">
+      <header className="reference-header">
+        <button className="brand-lockup" onClick={() => setActivePage('birth')} aria-label="天衍首页">
+          <span className="brand-word">天衍</span><span className="brand-mark">✳</span>
+          <span className="brand-caption">ZIWEI DESTINY STUDIO</span>
+        </button>
+        <div className="header-account">
+          <span className="account-avatar">T</span>
+          <span className="account-name">个人空间</span>
+          <span className="account-divider">·</span>
+          <span className="account-tier">标准版</span>
+          <button className="account-menu" onClick={() => setShowSettings(true)} aria-label="打开设置">⌄</button>
         </div>
-        <p className="mb-2 hidden px-3 text-[11px] font-semibold tracking-[0.16em] text-slate-400 sm:block">功能导航</p>
-        <nav aria-label="主功能" className="flex flex-1 flex-col gap-1">
-          {TABS.map((tab) => (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)} aria-current={activeTab === tab.key ? 'page' : undefined}
-              className={`group flex w-full items-center justify-center gap-3 rounded-xl px-2 py-3 text-sm font-medium transition-colors sm:justify-start sm:px-3
-                ${activeTab === tab.key ? 'bg-violet-50 text-violet-800 ring-1 ring-inset ring-violet-100' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}>
-              <span className={`inline-flex h-5 w-5 shrink-0 items-center justify-center text-base ${activeTab === tab.key ? 'text-violet-700' : 'text-slate-400 group-hover:text-slate-600'}`}>{tab.icon}</span>
-              <span className="hidden sm:inline">{tab.label}</span>
-              {activeTab === tab.key && <span className="ml-auto hidden h-1.5 w-1.5 rounded-full bg-violet-600 sm:block" />}
-            </button>
-          ))}
-        </nav>
-        <div className="mt-5 border-t border-slate-100 pt-4">
-          <button onClick={() => setShowSettings(true)} title="设置" className="flex w-full items-center justify-center gap-3 rounded-xl px-2 py-3 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 sm:justify-start sm:px-3">
-            <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            <span className="hidden sm:inline">设置</span>
-          </button>
-          <div className="mt-2 hidden px-3 text-[11px] leading-5 text-slate-400 sm:block">知命 · 观势 · 行动</div>
-        </div>
-      </aside>
+      </header>
 
-      {/* 主内容 */}
-      <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
-        <div className="max-w-[1600px] mx-auto">
-          {/* 命盘解读标签 */}
-          {activeTab === 'chart' && (
-            !chart ? (
-              <div className="mx-auto flex min-h-[70vh] max-w-4xl flex-col items-center justify-center gap-7 py-10">
-                <div className="w-full max-w-2xl text-center">
-                  <p className="text-xs font-semibold tracking-[0.24em] text-violet-700">YOUR PERSONAL STAR MAP</p>
-                  <h2 className="mt-3 text-3xl font-semibold tracking-wide text-slate-900 sm:text-4xl" style={{ fontFamily: 'var(--font-serif)' }}>从了解自己开始</h2>
-                  <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-slate-500">输入出生资料，生成专属命盘。以清晰的星曜结构与人生时间线，开启一场关于自我的探索。</p>
-                </div>
-                <BirthForm />
-              </div>
-            ) : (
-              <div className="animate-fade-in space-y-8">
-                <section className="mb-2 rounded-2xl border border-violet-100 bg-violet-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-violet-700">NATAL CHART</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">命盘解读</h2><p className="mt-1 text-sm text-slate-600">十二宫位星图 · 星曜四化 · 命身结构</p></section>
-                {/* 命盘 - 横向展开 */}
-                <div className="w-full">
-                  <ChartDisplay />
-                </div>
+      <main className="reference-layout">
+        <section className="editorial-panel">
+          <div className="editorial-inner">
+            <p className="eyebrow">{page.en}</p>
+            <h1>{page.title}</h1>
+            <p className="editorial-subtitle">{page.subtitle}</p>
+            <div className="gold-rule" />
+            <div className="editorial-description">{page.note}</div>
 
-                {/* AI 解读 - 下方展示，与命盘等宽 */}
-                <div className="w-full max-w-6xl mx-auto">
-                  <AIInterpretation />
+            {chart && birthInfo && (
+              <section className="recent-chart">
+                <div className="section-heading">
+                  <span>最近命盘 <span className="recent-count">1</span></span>
+                  <span className="saved-label">已保存在本机</span>
                 </div>
+                <button className="recent-entry" onClick={() => setActivePage('chart')}>
+                  <span>
+                    <strong>{birthInfo.year}年{birthInfo.month}月{birthInfo.day}日 · {birthInfo.hour}时</strong>
+                    <small>{birthInfo.gender === 'male' ? '男' : '女'} · {birthInfo.birthplace || '未填写出生地'}</small>
+                  </span>
+                  <span className="recent-arrow">›</span>
+                </button>
+                <button className="clear-chart" onClick={() => { useChartStore.getState().clear(); setActivePage('birth') }}>清空当前命盘</button>
+              </section>
+            )}
 
-                {/* 重新输入按钮 */}
-                <div className="text-center">
-                  <button
-                    onClick={() => useChartStore.getState().clear()}
-                    className="
-                      inline-flex items-center gap-2 px-4 py-2 rounded-lg
-                      text-sm text-slate-500
-                      hover:text-slate-900 hover:bg-slate-100
-                      transition-all duration-200
-                    "
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    重新输入
+            <div className="feature-index">
+              <div className="feature-index-heading">功能目录 <span>EXPLORE</span></div>
+              <nav aria-label="功能目录">
+                {PAGES.map((item, index) => (
+                  <button key={item.key} onClick={() => setActivePage(item.key)} className={activePage === item.key ? 'feature-link active' : 'feature-link'} aria-current={activePage === item.key ? 'page' : undefined}>
+                    <span className="feature-number">{String(index + 1).padStart(2, '0')}</span>
+                    <span className="feature-icon">{item.icon}</span>
+                    <span className="feature-label">{item.label}</span>
+                    <span className="feature-chevron">›</span>
                   </button>
-                </div>
-              </div>
-            )
-          )}
+                ))}
+              </nav>
+            </div>
+            <div className="editorial-footer">知命 · 观势 · 行动 <span>天衍命理探索</span></div>
+          </div>
+        </section>
 
-          {/* 年度运势标签 */}
-          {activeTab === 'fortune' && (
-            !chart ? (
-              <div className="flex items-center justify-center min-h-[60vh]">
-                <EmptyState
-                  message="请先在「命盘解读」中输入您的生辰信息"
-                  action={() => setActiveTab('chart')}
-                  actionLabel="前往输入"
-                />
-              </div>
-            ) : (
-              <><section className="mb-6 rounded-2xl border border-amber-100 bg-amber-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-amber-700">YEARLY ALMANAC</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">年度运势</h2><p className="mt-1 text-sm text-slate-600">年度主题 · 重点宫位 · 行动提醒</p></section><YearlyFortune /></>
-            )
-          )}
-
-          {/* 人生K线标签 */}
-          {activeTab === 'kline' && (
-            !chart ? (
-              <div className="flex items-center justify-center min-h-[60vh]">
-                <EmptyState
-                  message="请先在「命盘解读」中输入您的生辰信息"
-                  action={() => setActiveTab('chart')}
-                  actionLabel="前往输入"
-                />
-              </div>
-            ) : (
-              <><section className="mb-6 rounded-2xl border border-emerald-100 bg-emerald-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-emerald-700">LIFE TIMELINE</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">人生 K 线</h2><p className="mt-1 text-sm text-slate-600">人生阶段 · 趋势曲线 · 农历流月数据</p></section><LifeKLine /></>
-            )
-          )}
-
-          {/* 双人合盘标签 */}
-          {activeTab === "match" && <><section className="mb-6 rounded-2xl border border-rose-100 bg-rose-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-rose-700">SYNASTRY</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">双人合盘</h2><p className="mt-1 text-sm text-slate-600">双方资料 · 宫位关联 · 互动主题</p></section><MatchAnalysis /></>}
-
-          {/* 分享卡片标签 */}
-          {activeTab === 'share' && (
-            !chart ? (
-              <div className="flex items-center justify-center min-h-[60vh]">
-                <EmptyState
-                  message="请先在「命盘解读」中输入您的生辰信息"
-                  action={() => setActiveTab('chart')}
-                  actionLabel="前往输入"
-                />
-              </div>
-            ) : (
-              <div className="max-w-3xl mx-auto"><section className="mb-6 rounded-2xl border border-indigo-100 bg-indigo-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-indigo-700">PERSONAL KEEPSAKE</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">分享卡片</h2><p className="mt-1 text-sm text-slate-600">命盘摘要 · 专属金句 · 典藏分享</p></section>
-                <ShareCard />
-              </div>
-            )
-          )}
-        </div>
+        <section className="workspace-panel" aria-label={page.label}>
+          <div className="workspace-topline">
+            <div><span className="workspace-kicker">YOUR PERSONAL STAR MAP</span><span className="workspace-current">{page.label}</span></div>
+            <button className="workspace-settings" onClick={() => setShowSettings(true)}>偏好设置 <span>↗</span></button>
+          </div>
+          <div className={activePage === 'birth' ? 'workspace-content birth-workspace' : 'workspace-content'}>
+            {renderWorkspace()}
+          </div>
+        </section>
       </main>
 
-      {/* 设置弹窗 */}
       {showSettings && (
-        <div
-          className="
-            fixed inset-0 z-50
-            bg-black/60 backdrop-blur-sm
-            flex items-center justify-center p-4
-          "
-          onClick={(e) => e.target === e.currentTarget && setShowSettings(false)}
-        >
-          <div className="animate-fade-in">
-            <SettingsPanel onClose={() => setShowSettings(false)} />
-          </div>
+        <div className="settings-overlay" onClick={(event) => event.target === event.currentTarget && setShowSettings(false)}>
+          <div><SettingsPanel onClose={() => setShowSettings(false)} /></div>
         </div>
       )}
-
-      <div className="sr-only"><OpenSourceFooterLinks /></div>
-
       <Analytics />
     </div>
   )
 }
 
-/* ------------------------------------------------------------
-   空状态组件
-   ------------------------------------------------------------ */
-
-interface EmptyStateProps {
-  message: string
-  action: () => void
-  actionLabel: string
-}
-
-function EmptyState({ message, action, actionLabel }: EmptyStateProps) {
+function PageEmpty({ onClick }: { onClick: () => void }) {
   return (
-    <div
-      className="
-        w-full max-w-xl text-center p-8 rounded-2xl
-        bg-white border border-slate-200 shadow-sm
-      "
-    >
-      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-2xl text-violet-700">✦</div>
-      <p className="mb-5 text-slate-600">{message}</p>
-      <button
-        onClick={action}
-        className="
-          inline-flex items-center gap-2
-          px-4 py-2 rounded-lg
-          bg-violet-700 text-white shadow-sm
-          hover:bg-violet-800 transition-colors
-        "
-      >
-        {actionLabel}
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-        </svg>
-      </button>
+    <div className="page-empty">
+      <span className="empty-symbol">✳</span>
+      <h2>先建立你的专属命盘</h2>
+      <p>完成出生资料后，即可使用这项分析功能。</p>
+      <button onClick={onClick}>前往填写出生资料 <span>→</span></button>
     </div>
   )
 }
