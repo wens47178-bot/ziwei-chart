@@ -1,3 +1,4 @@
+import type { PageKey } from '@/App'
 import { useState } from 'react'
 
 type Entry = { label: string; key: string }
@@ -16,7 +17,7 @@ const GROUPS: { title: string; en: string; items: Entry[] }[] = [
   { title: '命盘典藏', en: 'ARCHIVE', items: [{ label: '命盘典藏卡', key: 'share' }] },
 ]
 
-export function HomeLanding({ onEnter, onSettings }: { onEnter: (key: any) => void; onSettings: () => void }) {
+export function HomeLanding({ onEnter, onSettings }: { onEnter: (key: PageKey | 'home') => void; onSettings: () => void }) {
   const [expanded, setExpanded] = useState('紫微命盘')
   return <div className="tianyan-home">
     <header className="home-header">
