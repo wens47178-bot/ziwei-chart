@@ -132,12 +132,12 @@ export default function App() {
                 />
               </div>
             ) : (
-              <LifeKLine />
+              <section className="mb-6 rounded-2xl border border-emerald-100 bg-emerald-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-emerald-700">LIFE TIMELINE</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">人生 K 线</h2><p className="mt-1 text-sm text-slate-600">人生阶段 · 趋势曲线 · 农历流月数据</p></section><LifeKLine />
             )
           )}
 
           {/* 双人合盘标签 */}
-          {activeTab === 'match' && <MatchAnalysis />}
+          {activeTab === "match" && <><section className="mb-6 rounded-2xl border border-rose-100 bg-rose-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-rose-700">SYNASTRY</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">双人合盘</h2><p className="mt-1 text-sm text-slate-600">双方资料 · 宫位关联 · 互动主题</p></section><MatchAnalysis /></>}
 
           {/* 分享卡片标签 */}
           {activeTab === 'share' && (
@@ -150,7 +150,7 @@ export default function App() {
                 />
               </div>
             ) : (
-              <div className="max-w-xl mx-auto">
+              <div className="max-w-3xl mx-auto"><section className="mb-6 rounded-2xl border border-indigo-100 bg-indigo-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-indigo-700">PERSONAL KEEPSAKE</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">分享卡片</h2><p className="mt-1 text-sm text-slate-600">命盘摘要 · 专属金句 · 典藏分享</p></section>
                 <ShareCard />
               </div>
             )
