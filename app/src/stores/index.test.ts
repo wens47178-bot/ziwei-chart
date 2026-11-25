@@ -53,7 +53,7 @@ describe('sanitizePersistedSettings', () => {
   it('falls back safely when persisted settings are malformed', () => {
     const sanitized = sanitizePersistedSettings(null)
 
-    expect(sanitized.provider).toBe('kimi')
+    expect(sanitized.provider).toBe('gemini')
     expect(sanitized.providerSettings?.kimi.apiKey).toBe('')
     expect(sanitized.searchApiKey).toBe('')
   })

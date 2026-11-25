@@ -168,7 +168,7 @@ export function sanitizePersistedSettings(persistedState: unknown): Partial<Sett
 
   const provider = persisted.provider && SETTINGS_PROVIDERS.includes(persisted.provider)
     ? persisted.provider
-    : 'kimi'
+    : 'gemini'
 
   return {
     provider,
@@ -182,7 +182,7 @@ export function sanitizePersistedSettings(persistedState: unknown): Partial<Sett
 export const useSettingsStore = create<SettingsState>()(
   persist<SettingsState, [], [], Partial<SettingsState>>(
     (set, get) => ({
-      provider: 'kimi',
+      provider: 'gemini',
       providerSettings: {
         kimi: { ...DEFAULT_PROVIDER_SETTINGS },
         gemini: { ...DEFAULT_PROVIDER_SETTINGS },
