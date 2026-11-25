@@ -782,8 +782,7 @@ export function generateLunarMonthlyKLines(
     const [startDay, endDay] = period.dayRange
     const sampleDays = [...new Set([
       startDay,
-      Math.round(startDay + (endDay - startDay) / 3),
-      Math.round(startDay + (endDay - startDay) * 2 / 3),
+      Math.round(startDay + (endDay - startDay) / 2),
       endDay,
     ])]
     const samples = sampleDays.map((day) => {
@@ -791,13 +790,21 @@ export function generateLunarMonthlyKLines(
         `${year}-${period.month}-${day}`,
         period.isLeapMonth
       ).toString()
-      const horoscope = chart.horoscope(solarDate, timeIndex)
-      const dimensions = normalizeDimensions(calculateRawDimensions(horoscope, 'monthly'))
-      const score = Math.max(15, Math.min(95, weightedDimensionTotal(dimensions)))
-      return { score, dimensions }
+      return chart.horoscope(solarDate, timeIndex)
     })
-    const scores = samples.map((sample) => sample.score)
-    const middle = samples[Math.floor(samples.length / 2)]
+    // The monthly scope is the period baseline; daily-scope samples provide
+    // the intra-period OHLC movement without pretending the monthly chart changes daily.
+    const monthlyDimensions = normalizeDimensions(
+      calculateRawDimensions(samples[1], 'monthly')
+    )
+    const monthlyScore = Math.max(
+      15,
+      Math.min(95, weightedDimensionTotal(calculateRawDimensions(samples[1], 'monthly')))
+    )
+    const dailyScores = samples.map((horoscope) => Math.max(
+      15,
+      Math.min(95, weightedDimensionTotal(calculateRawDimensions(horoscope, 'daily')))
+    ))
     const monthLabel = period.isLeapMonth
       ? `闰${period.month}月${period.part === 'first' ? '上半月' : period.part === 'second' ? '下半月' : ''}`
       : `农历${period.month}月`
@@ -805,14 +812,14 @@ export function generateLunarMonthlyKLines(
     return {
       period: `${monthLabel}（初${startDay}至${endDay}）`,
       type: 'monthly' as const,
-      open: scores[0],
-      high: Math.max(...scores),
-      low: Math.min(...scores),
-      close: scores[scores.length - 1],
+      open: dailyScores[0],
+      high: Math.max(...dailyScores),
+      low: Math.min(...dailyScores),
+      close: dailyScores[dailyScores.length - 1],
       score: {
-        total: Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length),
+        total: monthlyScore,
         trend: 'flat' as const,
-        dimensions: middle.dimensions,
+        dimensions: monthlyDimensions,
       },
       events: [],
     }
