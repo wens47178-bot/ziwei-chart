@@ -303,7 +303,7 @@ ${guidanceContext}
       {!currentSettings.apiKey && !displayText && (
         <div className="text-slate-500 text-sm py-8 text-center">
           <div className="text-3xl mb-3 opacity-30">☆</div>
-          请先在设置中配置 AI 模型的 API Key，即可获得深度命盘解读。
+          默认推荐 Gemini 2.5 Flash-Lite 免费模型。首次使用请先 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-[#9a8056] underline underline-offset-4">免费获取 Google AI Studio API Key</a>，再到右上角「设置」中选择 Gemini 并填写。免费额度有限，达到上限后可稍后重试；排盘和其他本地分析功能不受影响。
         </div>
       )}
 
