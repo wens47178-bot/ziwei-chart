@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { sanitizePersistedSettings } from './index'
+import { sanitizePersistedSettings, useChartStore, useContentCacheStore } from './index'
 
 describe('sanitizePersistedSettings', () => {
   it('removes provider and search credentials while preserving non-secret preferences', () => {
@@ -56,5 +56,24 @@ describe('sanitizePersistedSettings', () => {
     expect(sanitized.provider).toBe('kimi')
     expect(sanitized.providerSettings?.kimi.apiKey).toBe('')
     expect(sanitized.searchApiKey).toBe('')
+  })
+})
+
+
+describe('chart-scoped content cache', () => {
+  it('clears AI, yearly, and K-line output when a new chart is set', () => {
+    const cache = useContentCacheStore.getState()
+    cache.setAiInterpretation('old chart interpretation')
+    cache.setYearlyFortune(2026, 'old chart yearly reading')
+    cache.setKlineCache({ lifetime: [], isGenerating: false })
+
+    useChartStore.getState().setChart({} as never)
+
+    const updated = useContentCacheStore.getState()
+    expect(updated.aiInterpretation).toBeNull()
+    expect(updated.yearlyFortune).toEqual({})
+    expect(updated.klineCache).toBeNull()
+
+    useChartStore.getState().clear()
   })
 })
