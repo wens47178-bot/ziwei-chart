@@ -12,7 +12,7 @@ import { ShareCard } from '@/components/share'
 import { AdvancedAnalysis, type AdvancedMode } from '@/components/AdvancedAnalysis'
 import { useChartStore } from '@/stores'
 
-type PageKey = 'birth' | 'chart' | 'palaces' | 'sihua' | 'decadal' | 'stars' | 'fortune' | 'kline' | 'match' | 'ai' | 'share'
+type PageKey = 'birth' | 'chart' | 'palaces' | 'sihua' | 'decadal' | 'stars' | 'patterns' | 'trines' | 'fortune' | 'kline' | 'match' | 'ai' | 'share'
 type PageMeta = { key: PageKey; label: string; en: string; title: string; subtitle: string; note: string; icon: string }
 
 const PAGES: PageMeta[] = [
@@ -22,11 +22,13 @@ const PAGES: PageMeta[] = [
   { key: 'sihua', label: '四化飞星', en: '04 / FOUR TRANSFORMATIONS', title: '四化飞星', subtitle: '本命四化 · 大限四化 · 流年四化', note: '区分不同盘层的禄权科忌，查看实际落宫。', icon: '✧' },
   { key: 'decadal', label: '大限运程', en: '05 / DECADAL CYCLES', title: '大限运程', subtitle: '十年运限 · 大限命宫 · 流年叠宫', note: '指定年份定位大限，观察大限与流年的盘层关系。', icon: '◷' },
   { key: 'stars', label: '星曜图鉴', en: '06 / STAR ATLAS', title: '星曜图鉴', subtitle: '主星 · 辅星 · 星曜落宫', note: '从命盘实际出现的星曜进入知识说明与落宫查看。', icon: '✦' },
-  { key: 'fortune', label: '年度运势', en: '07 / YEARLY ALMANAC', title: '年度运势', subtitle: '流年主题 · 重点宫位 · 行动提醒', note: '查看当年运势重点与阶段变化。', icon: '◷' },
-  { key: 'kline', label: '人生趋势', en: '08 / LIFE TIMELINE', title: '人生趋势 K 线', subtitle: '大限走势 · 年度变化 · 农历流月', note: '以时间轴与数据图表观察人生不同阶段。', icon: '⌁' },
-  { key: 'match', label: '双人合盘', en: '09 / SYNASTRY', title: '双人合盘', subtitle: '双方资料 · 宫位关联 · 互动主题', note: '并列比较两张命盘，理解彼此的互动结构。', icon: '◉' },
-  { key: 'ai', label: 'AI 深度解读', en: '10 / AI INTERPRETATION', title: 'AI 深度解读', subtitle: '命格批注 · 事业财帛 · 情感人际', note: '基于命盘资料与知识上下文生成辅助解读。', icon: '✧' },
-  { key: 'share', label: '命盘典藏卡', en: '11 / PERSONAL KEEPSAKE', title: '命盘典藏卡', subtitle: '命盘摘要 · 专属金句 · 保存分享', note: '将命盘重点整理成可保存与分享的个人卡片。', icon: '◇' },
+  { key: 'patterns', label: '命盘格局', en: '07 / CHART PATTERNS', title: '命盘格局提示', subtitle: '星曜组合 · 格局依据 · 判断边界', note: '展示当前规则可以核对的格局线索，并保留判断依据。', icon: '✥' },
+  { key: 'trines', label: '三方四正', en: '08 / TRIANGLE & OPPOSITION', title: '三方四正', subtitle: '本宫 · 三合宫 · 对宫', note: '查看选定宫位的三合与对宫星曜结构。', icon: '⌘' },
+  { key: 'fortune', label: '年度运势', en: '09 / YEARLY ALMANAC', title: '年度运势', subtitle: '流年主题 · 重点宫位 · 行动提醒', note: '查看当年运势重点与阶段变化。', icon: '◷' },
+  { key: 'kline', label: '人生趋势', en: '10 / LIFE TIMELINE', title: '人生趋势 K 线', subtitle: '大限走势 · 年度变化 · 农历流月', note: '以时间轴与数据图表观察人生不同阶段。', icon: '⌁' },
+  { key: 'match', label: '双人合盘', en: '11 / SYNASTRY', title: '双人合盘', subtitle: '双方资料 · 宫位关联 · 互动主题', note: '并列比较两张命盘，理解彼此的互动结构。', icon: '◉' },
+  { key: 'ai', label: 'AI 深度解读', en: '12 / AI INTERPRETATION', title: 'AI 深度解读', subtitle: '命格批注 · 事业财帛 · 情感人际', note: '基于命盘资料与知识上下文生成辅助解读。', icon: '✧' },
+  { key: 'share', label: '命盘典藏卡', en: '13 / PERSONAL KEEPSAKE', title: '命盘典藏卡', subtitle: '命盘摘要 · 专属金句 · 保存分享', note: '将命盘重点整理成可保存与分享的个人卡片。', icon: '◇' },
 ]
 
 export default function App() {
@@ -38,7 +40,7 @@ export default function App() {
   const renderWorkspace = (): ReactNode => {
     if (activePage === 'birth') return <BirthForm onSuccess={() => setActivePage('chart')} />
     if (activePage === 'chart') return chart ? <ChartDisplay /> : <PageEmpty onClick={() => setActivePage('birth')} />
-    if (activePage === 'palaces' || activePage === 'sihua' || activePage === 'decadal' || activePage === 'stars') return chart ? <AdvancedAnalysis mode={activePage as AdvancedMode} /> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'palaces' || activePage === 'sihua' || activePage === 'decadal' || activePage === 'stars' || activePage === 'patterns' || activePage === 'trines') return chart ? <AdvancedAnalysis mode={activePage as AdvancedMode} /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'fortune') return chart ? <YearlyFortune /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'kline') return chart ? <LifeKLine /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'match') return <MatchAnalysis />
