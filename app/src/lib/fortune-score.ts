@@ -200,6 +200,34 @@ const PALACE_WEIGHTS: Record<keyof FortuneScore['dimensions'], HoroscopePalaceNa
    ============================================================ */
 
 /**
+ * Stable pseudo-random values keep heuristic K-line variation repeatable
+ * for the same chart and period. They are presentation variation, not
+ * additional astrological evidence.
+ */
+function deterministicUnit(seed: string): number {
+  let hash = 2166136261
+  for (let index = 0; index < seed.length; index++) {
+    hash = Math.imul(hash ^ seed.charCodeAt(index), 16777619)
+  }
+  return (hash >>> 0) / 0x100000000
+}
+
+function deterministicNoise(seed: string, amplitude: number): number {
+  return (deterministicUnit(seed) - 0.5) * amplitude
+}
+
+function getChartSeed(chart: FunctionalAstrolabe): string {
+  return [
+    chart.solarDate,
+    chart.lunarDate,
+    chart.time,
+    chart.gender,
+    chart.fiveElementsClass,
+  ].join('|')
+}
+
+
+/**
  * 计算单个宫位的得分
  */
 function calculatePalaceScore(palace: {
@@ -373,6 +401,18 @@ function normalize(score: number): number {
    ============================================================ */
 
 /**
+ * 将 iztro 的虚岁大限范围换算为对应的农历年份序列。
+ * 虚岁 1 岁对应出生农历年。
+ */
+export function getDecadalYearRange(
+  lunarBirthYear: number,
+  startAge: number,
+  endAge: number
+): [number, number] {
+  return [lunarBirthYear + startAge - 1, lunarBirthYear + endAge - 1]
+}
+
+/**
  * 生成大限 K 线数据
  * 每个大限的 OHLC 基于该大限期间内10年的真实数据
  */
@@ -381,8 +421,8 @@ export function generateDecadalKLines(
 ): KLineData[] {
   const klines: KLineData[] = []
   const palaces = chart.palaces
-  const currentYear = new Date().getFullYear()
-  const birthYear = currentYear - 30 // 假设用户约30岁，可从birthInfo获取
+  // iztro's nominal age and decadal year ranges are based on the lunar birth year.
+  const birthYear = chart.rawDates.lunarDate.lunarYear
 
   // 遍历每个宫位的大限
   for (const palace of palaces) {
@@ -391,9 +431,8 @@ export function generateDecadalKLines(
 
     const [startAge, endAge] = decadal.range
 
-    // 计算该大限对应的年份范围
-    const startYear = birthYear + startAge
-    const endYear = birthYear + endAge
+    // 年龄 1 对应出生农历年，因此大限年龄需减 1 后换算公历年序。
+    const [startYear, endYear] = getDecadalYearRange(birthYear, startAge, endAge)
 
     // 计算该大限期间内每年的分数
     const yearlyScores: number[] = []
@@ -549,14 +588,19 @@ function calculatePalaceBaseScore(palace: { majorStars: Array<{ name: unknown; b
 /**
  * 计算大限四维度分数
  */
-function calculateDecadalDimensions(palace: { majorStars: Array<{ name: unknown; brightness?: unknown; mutagen?: unknown }>; minorStars: Array<{ name: unknown }> }): FortuneScore['dimensions'] {
+function calculateDecadalDimensions(palace: { name?: unknown; majorStars: Array<{ name: unknown; brightness?: unknown; mutagen?: unknown }>; minorStars: Array<{ name: unknown }> }): FortuneScore['dimensions'] {
   const base = calculatePalaceBaseScore(palace)
+  const palaceSeed = [
+    String(palace.name || ''),
+    palace.majorStars.map(star => String(star.name)).join(','),
+    palace.minorStars.map(star => String(star.name)).join(','),
+  ].join('|')
 
   return {
-    career: normalize(base + (Math.random() - 0.5) * 15),
-    wealth: normalize(base * 0.9 + (Math.random() - 0.5) * 15),
-    relationship: normalize(base * 0.85 + (Math.random() - 0.5) * 15),
-    health: normalize(base * 0.95 + (Math.random() - 0.5) * 15),
+    career: normalize(base + deterministicNoise(`${palaceSeed}|career`, 15)),
+    wealth: normalize(base * 0.9 + deterministicNoise(`${palaceSeed}|wealth`, 15)),
+    relationship: normalize(base * 0.85 + deterministicNoise(`${palaceSeed}|relationship`, 15)),
+    health: normalize(base * 0.95 + deterministicNoise(`${palaceSeed}|health`, 15)),
   }
 }
 
@@ -986,8 +1030,8 @@ function calculateYearlyModifier(
     // 忽略错误
   }
 
-  // 随机波动
-  modifier += (Math.random() - 0.5) * 15
+  // Stable variation prevents the same chart/year from changing on regeneration.
+  modifier += deterministicNoise(`${getChartSeed(chart)}|yearly|${year}`, 15)
 
   return { modifier, mutagens }
 }
@@ -1007,6 +1051,7 @@ export function generateLifetimeKLines(
 
   // 上一年收盘价，用于连接 K 线
   let prevClose = 50
+  const chartSeed = getChartSeed(chart)
 
   for (let age = 1; age <= 100; age++) {
     const year = birthYear + age - 1
@@ -1030,17 +1075,17 @@ export function generateLifetimeKLines(
 
     // ─── 收盘向目标分靠拢，但有波动 ───
     // 每年向目标分移动 30-70%，加上随机波动
-    const moveRatio = 0.3 + Math.random() * 0.4
+    const moveRatio = 0.3 + deterministicUnit(`${chartSeed}|${age}|move`) * 0.4
     const closeBase = open + (yearTarget - open) * moveRatio
-    const close = closeBase + (Math.random() - 0.5) * 15
+    const close = closeBase + deterministicNoise(`${chartSeed}|${age}|close`, 15)
 
     // ─── 年内高低点 ───
     // 基于开盘收盘，加上月度波动产生影线
     const midPoint = (open + close) / 2
-    const volatility = Math.abs(yearTarget - open) * 0.3 + Math.random() * 10
+    const volatility = Math.abs(yearTarget - open) * 0.3 + deterministicUnit(`${chartSeed}|${age}|volatility`) * 10
 
-    let high = Math.max(open, close) + volatility * (0.5 + Math.random() * 0.5)
-    let low = Math.min(open, close) - volatility * (0.5 + Math.random() * 0.5)
+    let high = Math.max(open, close) + volatility * (0.5 + deterministicUnit(`${chartSeed}|${age}|high`) * 0.5)
+    let low = Math.min(open, close) - volatility * (0.5 + deterministicUnit(`${chartSeed}|${age}|low`) * 0.5)
 
     // 确保 high/low 在合理范围
     high = Math.min(100, high)
@@ -1054,10 +1099,10 @@ export function generateLifetimeKLines(
 
     // ─── 四维度评分 ───
     const dimensions = {
-      career: normalize(midPoint + (Math.random() - 0.5) * 15),
-      wealth: normalize(midPoint * 0.95 + (Math.random() - 0.5) * 15),
-      relationship: normalize(midPoint * 0.9 + (Math.random() - 0.5) * 15),
-      health: normalize(midPoint * 0.92 + (Math.random() - 0.5) * 15),
+      career: normalize(midPoint + deterministicNoise(`${chartSeed}|${age}|career`, 15)),
+      wealth: normalize(midPoint * 0.95 + deterministicNoise(`${chartSeed}|${age}|wealth`, 15)),
+      relationship: normalize(midPoint * 0.9 + deterministicNoise(`${chartSeed}|${age}|relationship`, 15)),
+      health: normalize(midPoint * 0.92 + deterministicNoise(`${chartSeed}|${age}|health`, 15)),
     }
 
     klines.push({
@@ -1280,6 +1325,7 @@ export async function generateKLinesWithLLM(
 
   // 转换为 LifetimeKLinePoint 格式
   const klines: LifetimeKLinePoint[] = []
+  const chartSeed = getChartSeed(chart)
 
   for (let age = 1; age <= 100; age++) {
     const llmItem = llmData.find(d => d.age === age)
@@ -1306,10 +1352,10 @@ export async function generateKLinesWithLLM(
       score: Math.max(0, Math.min(100, score)),
       reason: llmItem?.brief,
       dimensions: {
-        career: normalize(score + (Math.random() - 0.5) * 10),
-        wealth: normalize(score * 0.95 + (Math.random() - 0.5) * 10),
-        relationship: normalize(score * 0.9 + (Math.random() - 0.5) * 10),
-        health: normalize(score * 0.92 + (Math.random() - 0.5) * 10),
+        career: normalize(score + deterministicNoise(`${chartSeed}|llm|${age}|career`, 10)),
+        wealth: normalize(score * 0.95 + deterministicNoise(`${chartSeed}|llm|${age}|wealth`, 10)),
+        relationship: normalize(score * 0.9 + deterministicNoise(`${chartSeed}|llm|${age}|relationship`, 10)),
+        health: normalize(score * 0.92 + deterministicNoise(`${chartSeed}|llm|${age}|health`, 10)),
       },
       yearlyMutagens: [],
     })
