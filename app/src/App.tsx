@@ -63,7 +63,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#fff] text-[#211f1b]">
       <header className="reference-header">
-        <button className="brand-lockup" onClick={() => setActivePage('birth')} aria-label="天衍首页">
+        <button className="brand-lockup" onClick={() => setActivePage('home')} aria-label="天衍首页">
           <span className="brand-word">天衍</span><span className="brand-mark">✳</span>
           <span className="brand-caption">ZIWEI DESTINY STUDIO</span>
         </button>
