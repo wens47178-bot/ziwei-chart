@@ -219,6 +219,18 @@ const PALACE_WEIGHTS: Record<keyof FortuneScore['dimensions'], HoroscopePalaceNa
   health: ['疾厄', '父母', '命宫'],
 }
 
+/**
+ * Build a local-calendar Date for iztro. Its horoscope implementation reads
+ * dates through local-time getters, so parsing an ISO date-only string
+ * (UTC) can shift the calendar day in negative UTC offsets.
+ * Noon also avoids rare midnight DST transitions.
+ */
+export function createLocalCalendarDate(year: number, month: number, day: number): Date {
+  const date = new Date(0)
+  date.setFullYear(year, month - 1, day)
+  date.setHours(12, 0, 0, 0)
+  return date
+}
 /* ============================================================
    核心评分函数
    ============================================================ */
@@ -309,7 +321,7 @@ export function calculatePeriodScore(
   chart: FunctionalAstrolabe,
   year: number
 ): FortuneScore {
-  return calculateHoroscopePeriodScore(chart.horoscope(new Date(`${year}-6-15`)))
+  return calculateHoroscopePeriodScore(chart.horoscope(createLocalCalendarDate(year, 6, 15)))
 }
 
 function calculateHoroscopePeriodScore(horoscope: Horoscope): FortuneScore {
@@ -567,7 +579,7 @@ function calculateRealMonthlyScoresForDecadal(
 
   for (let month = 1; month <= 12; month++) {
     try {
-      const date = new Date(`${year}-${String(month).padStart(2, '0')}-15`)
+      const date = createLocalCalendarDate(year, month, 15)
       const horoscope = chart.horoscope(date)
 
       let monthScore = palaceBaseScore
@@ -770,7 +782,7 @@ function calculateRealMonthlyScores(
   const scores: number[] = []
 
   for (let month = 1; month <= 12; month++) {
-    const date = new Date(`${year}-${String(month).padStart(2, '0')}-15`)
+    const date = createLocalCalendarDate(year, month, 15)
     const horoscope = chart.horoscope(date)
     const monthlyDimensions = calculateRawDimensions(horoscope, 'monthly')
 
@@ -794,7 +806,7 @@ function calculateWeeklyVariation(
 
   for (let week = 1; week <= 4; week++) {
     const day = Math.min(week * 7, 28)
-    const date = new Date(`${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`)
+    const date = createLocalCalendarDate(year, month, day)
 
     try {
       const horoscope = chart.horoscope(date)
@@ -828,7 +840,7 @@ export function calculateMonthlyDimensions(
   year: number,
   month: number
 ): FortuneScore['dimensions'] {
-  const date = new Date(`${year}-${String(month).padStart(2, '0')}-15`)
+  const date = createLocalCalendarDate(year, month, 15)
   const horoscope = chart.horoscope(date)
 
   return normalizeDimensions(calculateRawDimensions(horoscope, 'monthly'))
@@ -843,7 +855,7 @@ function generateMonthlyEvents(
   month: number
 ): EventData[] {
   const events: EventData[] = []
-  const date = new Date(`${year}-${String(month).padStart(2, '0')}-15`)
+  const date = createLocalCalendarDate(year, month, 15)
 
   try {
     const horoscope = chart.horoscope(date)
@@ -1039,7 +1051,7 @@ export function calculateDecadalBaseScore(
   const [startAge, endAge] = palace.decadal.range
   if (age >= startAge && age <= endAge) {
     const decadalYear = chart.rawDates.lunarDate.lunarYear + startAge - 1
-    const horoscope = chart.horoscope(new Date(`${decadalYear}-06-15`))
+    const horoscope = chart.horoscope(createLocalCalendarDate(decadalYear, 6, 15))
     if (horoscope.decadal.index === palace.index) {
       score += calculateScopeMutagenBonus(
         horoscope,
@@ -1069,7 +1081,7 @@ function calculateYearlyModifier(
   })
 
   try {
-    const horoscope = chart.horoscope(new Date(`${year}-06-15`))
+    const horoscope = chart.horoscope(createLocalCalendarDate(year, 6, 15))
     mutagens.push(...(horoscope.yearly.mutagen || []).map(String))
 
     // The yearly total already accounts for yearly-scope palace placement and
