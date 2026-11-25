@@ -93,3 +93,12 @@ or notable verification run.
 - Added a focused Vitest regression test for Gemini streaming authentication.
 - Added a pull-request CI workflow to run `npm ci`, lint, tests, and the production build on Node.js 22.
 - This proposal is not merged. Fresh CI results are required before treating the change as verified or deployed.
+
+
+## 2026-11-25 Gemini streaming protocol fix
+
+- Updated Gemini \`streamGenerateContent\` to request the documented Server-Sent Events format with \`alt=sse\`.
+- Replaced the fragile brace/regex parser with event-boundary parsing, JSON payload decoding, multi-part text extraction, and final-buffer flushing.
+- Added regression coverage for API-key header authentication, SSE chunk boundaries, CRLF separators, escaped quotes, multiple text parts, and a final event without a trailing blank line.
+- Official protocol reference: Google Gemini REST streaming requires \`alt=sse\` and emits \`data:\` events containing \`candidates[0].content.parts[].text\`.
+- Changes are on a review branch and require CI before merge.
