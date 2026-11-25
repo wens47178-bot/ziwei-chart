@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { useChartStore } from '@/stores'
 import { createLocalCalendarDate } from '@/lib/horoscope'
-import { getStarInfo } from '@/knowledge'
+import { extractKnowledge, getStarInfo } from '@/knowledge'
 
-export type AdvancedMode = 'palaces' | 'sihua' | 'decadal' | 'stars'
+export type AdvancedMode = 'palaces' | 'sihua' | 'decadal' | 'stars' | 'patterns' | 'trines'
 
 const MUTAGENS = ['禄', '权', '科', '忌'] as const
 const PALACE_ORDER = ['命宫', '兄弟宫', '夫妻宫', '子女宫', '财帛宫', '疾厄宫', '迁移宫', '交友宫', '官禄宫', '田宅宫', '福德宫', '父母宫']
@@ -13,6 +13,8 @@ const MODE_META: Record<AdvancedMode, { title: string; subtitle: string }> = {
   sihua: { title: '四化飞星', subtitle: '分别查看本命、大限与流年四化，追踪禄权科忌落宫' },
   decadal: { title: '大限运程', subtitle: '按指定年份定位当前大限，并核对大限宫位与四化' },
   stars: { title: '星曜图鉴', subtitle: '从本命盘实际出现的星曜进入星性与宫位说明' },
+  patterns: { title: '命盘格局提示', subtitle: '根据命盘星曜位置筛选可核对的组合提示，并展示判断依据' },
+  trines: { title: '三方四正', subtitle: '以选定宫位为中心，查看三合宫与对宫的实际星曜配置' },
 }
 
 function SectionHeading({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
@@ -34,6 +36,18 @@ export function AdvancedAnalysis({ mode }: { mode: AdvancedMode }) {
     if (!chart) return null
     try { return chart.horoscope(createLocalCalendarDate(targetYear, 6, 15)) } catch { return null }
   }, [chart, targetYear])
+
+  const patternHints = useMemo(() => chart ? extractKnowledge(chart, birthInfo?.year).格局提示 : [], [chart, birthInfo?.year])
+  const trinePalaces = useMemo(() => {
+    if (!selected) return []
+    const byIndex = (offset: number) => palaces.find((palace) => palace.index === (selected.index + offset + 12) % 12)
+    return [
+      { label: '本宫', palace: selected },
+      { label: '三合宫一', palace: byIndex(4) },
+      { label: '三合宫二', palace: byIndex(8) },
+      { label: '对宫', palace: byIndex(6) },
+    ].filter((item) => item.palace)
+  }, [palaces, selected])
 
   const observedStars = useMemo(() => {
     const names = new Set<string>()
@@ -92,6 +106,17 @@ export function AdvancedAnalysis({ mode }: { mode: AdvancedMode }) {
         </div>}
         {horoscope && <div className="mt-5 rounded-xl bg-[#faf9f6] p-5"><h3 className="font-semibold text-[#554b39]">当前大限十二宫映射</h3><div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">{horoscope.decadal.palaceNames.map((name, i) => <div key={i} className="rounded-lg border border-[#ebe6dc] bg-white px-3 py-2 text-xs text-[#6e6658]"><span className="mr-2 text-[#b19a6e]">{String(i + 1).padStart(2, '0')}</span>{name}</div>)}</div></div>}
         {!horoscope && <p className="mt-4 text-sm text-[#8c8579]">当前年份无法取得运限资料，请检查年份后重试。</p>}
+      </>}
+
+      {mode === 'patterns' && <>
+        <div className="rounded-xl bg-[#faf9f6] p-4 text-xs leading-6 text-[#898273]">以下为规则筛选提示，不等同于完整古法格局定论。每条结果均需结合全盘、亮度、四化与流派规则复核；未满足规则时不会强行生成格局。</div>
+        <div className="mt-4 space-y-3">{patternHints.map((hint, i) => <div key={i} className="rounded-xl border border-[#e9e5dc] p-4"><div className="flex items-start gap-3"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#f5f0e5] text-xs text-[#92794f]">{String(i + 1).padStart(2, '0')}</span><p className="text-sm leading-7 text-[#5f594e]">{hint}</p></div></div>)}{patternHints.length === 0 && <div className="rounded-xl border border-dashed border-[#ded8cc] p-8 text-center text-sm text-[#8c8579]">当前规则未检出已收录的格局提示。未检出不代表命盘没有其他格局。</div>}</div>
+      </>}
+
+      {mode === 'trines' && <>
+        <div className="flex flex-wrap gap-2">{PALACE_ORDER.map((name) => <button key={name} onClick={() => setSelectedPalace(name)} className={`rounded-xl border px-3 py-2 text-sm ${selectedPalace === name ? 'border-[#bda77e] bg-[#f8f5ee] text-[#5f4d2f]' : 'border-[#e8e5df] text-[#777166]'}`}>{name}</button>)}</div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">{trinePalaces.map(({ label, palace }) => palace && <div key={label} className="rounded-xl border border-[#e9e5dc] p-4"><div className="flex items-center justify-between"><span className="text-xs tracking-wider text-[#a58a5d]">{label}</span><Pill>{palace.heavenlyStem}{palace.earthlyBranch}</Pill></div><h3 className="mt-2 text-lg font-semibold text-[#302b23]">{palace.name}{palace.isBodyPalace ? ' · 身宫' : ''}</h3><div className="mt-3 flex flex-wrap gap-2">{[...(palace.majorStars ?? []), ...(palace.minorStars ?? [])].map((star, i) => <Pill key={i}>{star.name}{star.brightness ? ` · ${star.brightness}` : ''}{star.mutagen ? ` · 化${star.mutagen}` : ''}</Pill>)}{!(palace.majorStars?.length || palace.minorStars?.length) && <span className="text-xs text-[#9a9387]">当前宫位未记录主星或辅星</span>}</div></div>)}</div>
+        <p className="mt-4 rounded-xl bg-[#faf9f6] p-4 text-xs leading-6 text-[#898273]">此处按排盘数组的十二宫索引展示三合（相隔四宫）与对宫（相隔六宫）位置，提供结构核对，不直接推断吉凶。</p>
       </>}
 
       {mode === 'stars' && <>
