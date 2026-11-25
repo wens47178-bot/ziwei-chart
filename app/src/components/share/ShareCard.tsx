@@ -113,7 +113,7 @@ export function ShareCard() {
       await document.fonts.ready
 
       const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: '#0a0a12',
+        backgroundColor: '#fffdf8',
         scale: 2,
         useCORS: true,
         logging: true,  // 开启日志
@@ -307,7 +307,7 @@ export function ShareCard() {
           {/* 底部水印 */}
           <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid rgba(152, 112, 46, 0.18)', textAlign: 'center' }}>
             <p style={{ color: 'rgba(212, 175, 55, 0.3)', fontSize: '12px', letterSpacing: '0.2em', margin: 0 }}>
-              ─── 紫微知道 ───
+              ─── 天衍 · 命理探索 ───
             </p>
           </div>
         </div>
