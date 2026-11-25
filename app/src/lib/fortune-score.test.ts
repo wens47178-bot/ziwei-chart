@@ -77,12 +77,15 @@ describe('K-line scoring', () => {
       }],
       horoscope: () => ({
         yearly: { mutagen: [], index: 0 },
+        palace: () => ({ majorStars: [], minorStars: [], adjectiveStars: [] }),
+        hasHoroscopeMutagen: () => false,
       }),
     } as unknown as FunctionalAstrolabe
 
-    expect(generateLifetimeKLines(chart, 2000)).toEqual(
-      generateLifetimeKLines(chart, 2000)
-    )
+    const lifetime = generateLifetimeKLines(chart, 2000)
+
+    expect(lifetime).toEqual(generateLifetimeKLines(chart, 2000))
+    expect(lifetime[0].dimensions).toEqual(calculatePeriodScore(chart, 2000).dimensions)
   })
 
 })

@@ -285,7 +285,10 @@ export function calculatePeriodScore(
   chart: FunctionalAstrolabe,
   year: number
 ): FortuneScore {
-  const horoscope = chart.horoscope(new Date(`${year}-6-15`))
+  return calculateHoroscopePeriodScore(chart.horoscope(new Date(`${year}-6-15`)))
+}
+
+function calculateHoroscopePeriodScore(horoscope: Horoscope): FortuneScore {
   const rawDimensions = calculateRawDimensions(horoscope, 'yearly')
 
   return {
@@ -992,48 +995,35 @@ function calculateDecadalBaseScore(
 function calculateYearlyModifier(
   chart: FunctionalAstrolabe,
   year: number
-): { modifier: number; mutagens: string[] } {
-  let modifier = 0
+): { modifier: number; mutagens: string[]; dimensions: FortuneScore['dimensions'] } {
   const mutagens: string[] = []
+  const fallbackDimensions = normalizeDimensions({
+    career: 50,
+    wealth: 50,
+    relationship: 50,
+    health: 50,
+  })
 
   try {
-    const date = new Date(`${year}-06-15`)
-    const horoscope = chart.horoscope(date)
+    const horoscope = chart.horoscope(new Date(`${year}-06-15`))
+    mutagens.push(...(horoscope.yearly.mutagen || []).map(String))
 
-    // ─── 流年四化 (主要波动来源) ───
-    const yearlyMutagen = horoscope.yearly.mutagen || []
-    for (const star of yearlyMutagen) {
-      const starName = String(star)
-      mutagens.push(starName)
+    // The yearly total already accounts for yearly-scope palace placement and
+    // transformation location. Use it as a bounded adjustment to the decadal base.
+    const yearlyScore = calculateHoroscopePeriodScore(horoscope)
 
-      if (starName.includes('禄')) modifier += 20
-      else if (starName.includes('权')) modifier += 16
-      else if (starName.includes('科')) modifier += 12
-      else if (starName.includes('忌')) modifier -= 25
+    return {
+      modifier: (yearlyScore.total - 50) * 0.5,
+      mutagens,
+      dimensions: yearlyScore.dimensions,
     }
-
-    // ─── 流年命宫位置 ───
-    const yearlyPalaceIndex = horoscope.yearly.index
-    const yearlyPalace = chart.palaces[yearlyPalaceIndex]
-    if (yearlyPalace) {
-      for (const star of yearlyPalace.majorStars) {
-        const baseScore = STAR_BASE_SCORE[star.name] || 0
-        modifier += baseScore * 0.5
-      }
-      for (const star of yearlyPalace.minorStars) {
-        const baseScore = STAR_BASE_SCORE[star.name] || 0
-        modifier += baseScore * 0.3
-      }
-    }
-
   } catch {
-    // 忽略错误
+    return {
+      modifier: 0,
+      mutagens,
+      dimensions: fallbackDimensions,
+    }
   }
-
-  // Stable variation prevents the same chart/year from changing on regeneration.
-  modifier += deterministicNoise(`${getChartSeed(chart)}|yearly|${year}`, 15)
-
-  return { modifier, mutagens }
 }
 
 /**
@@ -1065,7 +1055,7 @@ export function generateLifetimeKLines(
     const decadalBase = decadalScores.get(daYunRange) || 50
 
     // ─── 流年修正 ───
-    const { modifier: yearlyModifier, mutagens } = calculateYearlyModifier(chart, year)
+    const { modifier: yearlyModifier, mutagens, dimensions } = calculateYearlyModifier(chart, year)
 
     // ─── 年度目标分 (大运 + 流年修正) ───
     const yearTarget = decadalBase + yearlyModifier
@@ -1073,15 +1063,14 @@ export function generateLifetimeKLines(
     // ─── 当年开盘 = 前一年收盘 (K线连贯的关键) ───
     const open = prevClose
 
-    // ─── 收盘向目标分靠拢，但有波动 ───
-    // 每年向目标分移动 30-70%，加上随机波动
+    // ─── 收盘向目标分靠拢，并加入可复现的有界波动 ───
+    // 每年向目标分移动 30-70%，再加入稳定的种子扰动
     const moveRatio = 0.3 + deterministicUnit(`${chartSeed}|${age}|move`) * 0.4
     const closeBase = open + (yearTarget - open) * moveRatio
     const close = closeBase + deterministicNoise(`${chartSeed}|${age}|close`, 15)
 
     // ─── 年内高低点 ───
     // 基于开盘收盘，加上月度波动产生影线
-    const midPoint = (open + close) / 2
     const volatility = Math.abs(yearTarget - open) * 0.3 + deterministicUnit(`${chartSeed}|${age}|volatility`) * 10
 
     let high = Math.max(open, close) + volatility * (0.5 + deterministicUnit(`${chartSeed}|${age}|high`) * 0.5)
@@ -1097,13 +1086,7 @@ export function generateLifetimeKLines(
     // ─── 综合评分 ───
     const score = Math.round((open + close + high + low) / 4)
 
-    // ─── 四维度评分 ───
-    const dimensions = {
-      career: normalize(midPoint + deterministicNoise(`${chartSeed}|${age}|career`, 15)),
-      wealth: normalize(midPoint * 0.95 + deterministicNoise(`${chartSeed}|${age}|wealth`, 15)),
-      relationship: normalize(midPoint * 0.9 + deterministicNoise(`${chartSeed}|${age}|relationship`, 15)),
-      health: normalize(midPoint * 0.92 + deterministicNoise(`${chartSeed}|${age}|health`, 15)),
-    }
+    // 四维度直接采用流年宫位与流年四化落宫评分，避免从总分伪造维度差异。
 
     klines.push({
       age,
@@ -1325,7 +1308,6 @@ export async function generateKLinesWithLLM(
 
   // 转换为 LifetimeKLinePoint 格式
   const klines: LifetimeKLinePoint[] = []
-  const chartSeed = getChartSeed(chart)
 
   for (let age = 1; age <= 100; age++) {
     const llmItem = llmData.find(d => d.age === age)
@@ -1351,12 +1333,7 @@ export async function generateKLinesWithLLM(
       low: Math.round(low),
       score: Math.max(0, Math.min(100, score)),
       reason: llmItem?.brief,
-      dimensions: {
-        career: normalize(score + deterministicNoise(`${chartSeed}|llm|${age}|career`, 10)),
-        wealth: normalize(score * 0.95 + deterministicNoise(`${chartSeed}|llm|${age}|wealth`, 10)),
-        relationship: normalize(score * 0.9 + deterministicNoise(`${chartSeed}|llm|${age}|relationship`, 10)),
-        health: normalize(score * 0.92 + deterministicNoise(`${chartSeed}|llm|${age}|health`, 10)),
-      },
+      dimensions: calculatePeriodScore(chart, year).dimensions,
       yearlyMutagens: [],
     })
   }

@@ -216,3 +216,12 @@ or notable verification run.
 - Corrected decadal year ranges to derive from iztro's lunar birth year and map virtual age 1 to that birth lunar year; e.g. ages 6-15 map to birth lunar year +5 through +14.
 - Added regression coverage for deterministic lifetime K-lines and the virtual-age-to-year conversion.
 - This improves repeatability and date alignment; the displayed K-line remains a heuristic visualization and should not be interpreted as a scientifically validated prediction.
+
+
+## 2026-11-25 Lifetime K-line yearly dimension attribution
+
+- Found that lifetime K-line career, wealth, relationship, and health values were synthetic variations of the overall midpoint, rather than scores derived from the selected year's palace layout.
+- Reused the yearly-scope dimension scorer for both algorithmic and LLM-backed lifetime K-lines. The LLM still supplies the overall OHLC trajectory and brief explanation, while the four dimensions now come from the actual yearly-scope palace and transformation mapping.
+- Replaced the annual global four-transformation bonus (which is the same four fixed bonuses every year) with a bounded adjustment derived from the yearly-scope weighted score.
+- Added a regression assertion that the first lifetime K-line's dimensions match the selected year's yearly-scope dimensions.
+- This improves scope attribution; the underlying score weights remain heuristic and are not doctrinally or scientifically validated.
