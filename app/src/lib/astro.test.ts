@@ -36,7 +36,6 @@ describe('iztro chart engine integration', () => {
 
     const signature = (chart: typeof lateZi) => ({
       lunarDate: chart.lunarDate,
-      time: chart.time,
       fiveElementsClass: chart.fiveElementsClass,
       palaces: chart.palaces.map((palace) => ({
         name: palace.name,
@@ -48,6 +47,8 @@ describe('iztro chart engine integration', () => {
       })),
     })
 
+    expect(lateZi.time).toBe('晚子时')
+    expect(followingEarlyZi.time).toBe('早子时')
     expect(signature(lateZi)).toEqual(signature(followingEarlyZi))
   })
 
