@@ -125,7 +125,7 @@ describe('shichenNameForTimeIndex', () => {
 
 describe('timezone-independent calendar arithmetic', () => {
   it('uses the same wall-clock result regardless of the runtime timezone', () => {
-    const result = resolveBirthTime({
+    const input = {
       year: 2024,
       month: 3,
       day: 10,
@@ -133,13 +133,21 @@ describe('timezone-independent calendar arithmetic', () => {
       birthplace: '乌鲁木齐',
       enabled: true,
       birthplaces: BIRTHPLACE_DATA,
-    })
+    }
 
-    expect(result.year).toBe(2024)
-    expect(result.month).toBe(3)
-    expect(result.day).toBe(10)
-    expect(result.hour).toBeGreaterThanOrEqual(0)
-    expect(result.hour).toBeLessThan(24)
+    const originalTimezone = process.env.TZ
+    try {
+      process.env.TZ = 'UTC'
+      const utcResult = resolveBirthTime(input)
+
+      process.env.TZ = 'America/Los_Angeles'
+      const pacificResult = resolveBirthTime(input)
+
+      expect(pacificResult).toEqual(utcResult)
+    } finally {
+      if (originalTimezone === undefined) delete process.env.TZ
+      else process.env.TZ = originalTimezone
+    }
   })
 
   it('handles leap-day input without relying on local daylight-saving rules', () => {
