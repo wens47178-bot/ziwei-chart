@@ -133,7 +133,7 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
           农历流月 K 线
         </h3>
         <p className="mt-1 text-xs leading-relaxed text-text-muted">
-          按真实农历月份及闰月时段计算，与上方公历月度趋势分开展示。蜡烛 OHLC 取该时段内的流日样本，综合分与维度为流月盘基准；分数仅供参考，不代表事件概率或确定性预测。
+          按真实农历月份及闰月时段计算，与上方公历月度趋势分开展示。蜡烛 OHLC 根据流日四化星的实际落宫调整，综合分与维度为流月盘基准；分数仅供参考，不代表事件概率或确定性预测。
         </p>
       </div>
 
