@@ -763,6 +763,55 @@ export function generateMonthlyKLines(
 }
 
 /**
+ * 以流月盘作为基准，按流日四化星的实际落宫计算日内样本波动。
+ * iztro 的四化星数组顺序固定为禄、权、科、忌；宫位名称通过流日
+ * palaceNames 映射回本命宫位索引，避免把星名误当成四化名称。
+ */
+function calculateLunarDailySampleScore(
+  chart: FunctionalAstrolabe,
+  horoscope: Horoscope
+): number {
+  const dimensions = calculateRawDimensions(horoscope, 'monthly')
+  const adjustments: FortuneScore['dimensions'] = {
+    career: 0,
+    wealth: 0,
+    relationship: 0,
+    health: 0,
+  }
+  const mutagenValues = [
+    MONTHLY_MUTAGEN_MODIFIERS['禄'],
+    MONTHLY_MUTAGEN_MODIFIERS['权'],
+    MONTHLY_MUTAGEN_MODIFIERS['科'],
+    MONTHLY_MUTAGEN_MODIFIERS['忌'],
+  ]
+  const dailyMutagens = horoscope.daily.mutagen || []
+
+  dailyMutagens.forEach((starName, index) => {
+    const natalPalaceIndex = chart.star(starName).palace()?.index
+    if (natalPalaceIndex === undefined) return
+
+    const dailyPalaceName = horoscope.daily.palaceNames[natalPalaceIndex]
+    if (!dailyPalaceName) return
+
+    for (const dimension of Object.keys(PALACE_WEIGHTS) as (keyof FortuneScore['dimensions'])[]) {
+      const dimensionPalaces = PALACE_WEIGHTS[dimension]
+      if (dimensionPalaces.includes(dailyPalaceName as HoroscopePalaceName)) {
+        adjustments[dimension] += mutagenValues[index] / dimensionPalaces.length
+      }
+    }
+  })
+
+  const adjustedDimensions = {
+    career: dimensions.career + adjustments.career,
+    wealth: dimensions.wealth + adjustments.wealth,
+    relationship: dimensions.relationship + adjustments.relationship,
+    health: dimensions.health + adjustments.health,
+  }
+
+  return Math.max(15, Math.min(95, weightedDimensionTotal(adjustedDimensions)))
+}
+
+/**
  * 生成按真实农历月份排列的流月 K 线。
  *
  * 与公历月中点序列分开提供，避免将两种时间口径混为一谈。
@@ -801,10 +850,9 @@ export function generateLunarMonthlyKLines(
       15,
       Math.min(95, weightedDimensionTotal(calculateRawDimensions(samples[1], 'monthly')))
     )
-    const dailyScores = samples.map((horoscope) => Math.max(
-      15,
-      Math.min(95, weightedDimensionTotal(calculateRawDimensions(horoscope, 'daily')))
-    ))
+    const dailyScores = samples.map((horoscope) =>
+      calculateLunarDailySampleScore(chart, horoscope)
+    )
     const monthLabel = period.isLeapMonth
       ? `闰${period.month}月${period.part === 'first' ? '上半月' : period.part === 'second' ? '下半月' : ''}`
       : `农历${period.month}月`
