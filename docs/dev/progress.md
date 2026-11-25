@@ -208,3 +208,11 @@ or notable verification run.
 - Removed random offsets from monthly dimension scores so repeated calculations for the same chart and month produce the same values.
 - Added a repeatability regression for the twelve monthly K-line results.
 - The K-line remains a heuristic score model; this change improves data-scope attribution and repeatability, not doctrinal validation.
+
+
+## 2026-11-25 K-line repeatability and decadal calendar correction
+
+- Removed runtime random-number calls from algorithmic and LLM-backed K-line dimension/volatility generation. Stable chart-and-period seeds preserve bounded variation while making regenerated results reproducible.
+- Corrected decadal year ranges to derive from iztro's lunar birth year and map virtual age 1 to that birth lunar year; e.g. ages 6-15 map to birth lunar year +5 through +14.
+- Added regression coverage for deterministic lifetime K-lines and the virtual-age-to-year conversion.
+- This improves repeatability and date alignment; the displayed K-line remains a heuristic visualization and should not be interpreted as a scientifically validated prediction.
