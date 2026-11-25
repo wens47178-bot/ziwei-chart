@@ -75,7 +75,7 @@ const MarkdownComponents = {
     <h2 className="text-xl font-semibold text-gold/90 mt-5 mb-2">{children}</h2>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
-    <h3 className="text-lg font-medium text-violet-700 mt-4 mb-2">{children}</h3>
+    <h3 className="text-lg font-medium text-[#8a7653] mt-4 mb-2">{children}</h3>
   ),
   p: ({ children }: { children?: React.ReactNode }) => (
     <p className="mb-3 leading-relaxed">{children}</p>
@@ -298,7 +298,7 @@ ${guidanceContext}
       <div
         className="
           relative p-6 lg:p-8
-          bg-white border border-amber-100 rounded-2xl shadow-sm
+          bg-white border border-[#e9e5dc] rounded-2xl shadow-sm
           shadow-sm
         "
       >
@@ -315,8 +315,7 @@ ${guidanceContext}
           <h2
             className="
               text-xl lg:text-2xl font-semibold
-              bg-gradient-to-r from-gold via-gold-light to-gold
-              bg-clip-text text-transparent
+              text-[#8a7653]
             "
             style={{ fontFamily: 'var(--font-serif)' }}
           >
@@ -358,9 +357,9 @@ ${guidanceContext}
       <div
         className="
           relative p-6 lg:p-8
-          bg-gradient-to-br from-white/[0.04] to-transparent
-          border border-amber-100 bg-white rounded-2xl
-          shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+          bg-white
+          border border-[#e9e5dc] bg-white rounded-2xl
+          shadow-sm
         "
       >
         {/* 顶部发光线 */}
