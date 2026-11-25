@@ -22,8 +22,8 @@ describe('K-line scoring', () => {
       trueSolarEnabled: false,
     })
 
-    const firstHoroscope = chart.horoscope(new Date('2000-06-15'))
-    const nextHoroscope = chart.horoscope(new Date('2001-06-15'))
+    const firstHoroscope = chart.horoscope(createLocalCalendarDate(2000, 6, 15))
+    const nextHoroscope = chart.horoscope(createLocalCalendarDate(2001, 6, 15))
 
     expect(firstHoroscope.yearly.palaceNames).not.toEqual(nextHoroscope.yearly.palaceNames)
 
