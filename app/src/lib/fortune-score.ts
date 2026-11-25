@@ -14,6 +14,8 @@
    ============================================================ */
 
 import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
+import { createLocalCalendarDate } from './horoscope'
+export { createLocalCalendarDate } from './horoscope'
 import { extractKnowledge } from '../knowledge'
 import { buildGuidancePromptContext } from '../knowledge-db'
 import { chat, type LLMConfig } from './llm'
@@ -219,18 +221,6 @@ const PALACE_WEIGHTS: Record<keyof FortuneScore['dimensions'], HoroscopePalaceNa
   health: ['疾厄', '父母', '命宫'],
 }
 
-/**
- * Build a local-calendar Date for iztro. Its horoscope implementation reads
- * dates through local-time getters, so parsing an ISO date-only string
- * (UTC) can shift the calendar day in negative UTC offsets.
- * Noon also avoids rare midnight DST transitions.
- */
-export function createLocalCalendarDate(year: number, month: number, day: number): Date {
-  const date = new Date(0)
-  date.setFullYear(year, month - 1, day)
-  date.setHours(12, 0, 0, 0)
-  return date
-}
 /* ============================================================
    核心评分函数
    ============================================================ */
