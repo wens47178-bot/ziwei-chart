@@ -242,3 +242,10 @@ or notable verification run.
 - Constrain natal AI interpretation to the natal data actually supplied; the prompt now forbids inventing decadal/yearly/monthly layers or deterministic health/event predictions when those inputs are absent.
 - Yearly context now distinguishes natal star transformation labels from decadal/yearly transformation destinations, and provides the actual scope-specific palace destinations via iztro's horoscope API.
 - The yearly prompt no longer requests fabricated auspicious/unfavorable months when monthly charts are not supplied.
+
+
+## 2026-11-25 K-line heuristic score disclosure
+
+- Replaced deterministic fortune labels (大吉/吉/平/凶/大凶) with neutral score bands (高位/偏高/中位/偏低/低位).
+- Updated chart legends and axis labels to describe reference-score ranges rather than categorical fate outcomes.
+- Added a visible note that K-line values are heuristic weights for traditional-method study and self-reflection, not event probabilities or scientific predictions.
