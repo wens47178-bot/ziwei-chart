@@ -24,6 +24,49 @@ const SI_SHICHEN = '巳时'
 const ZI_SHICHEN = '子时'
 const BIRTHPLACE_DATA = birthplaceData as Birthplace[]
 
+describe('birth date and time validation', () => {
+  it('rejects an impossible calendar date instead of rolling it into the next month', () => {
+    expect(() => resolveBirthTime({
+      year: 2024,
+      month: 2,
+      day: 30,
+      hour: 12,
+      enabled: false,
+    })).toThrow(RangeError)
+  })
+
+  it('rejects invalid month and hour values', () => {
+    expect(() => resolveBirthTime({
+      year: 2024,
+      month: 13,
+      day: 1,
+      hour: 12,
+      enabled: false,
+    })).toThrow(RangeError)
+    expect(() => resolveBirthTime({
+      year: 2024,
+      month: 1,
+      day: 1,
+      hour: 24,
+      enabled: false,
+    })).toThrow(RangeError)
+  })
+
+  it('handles years below 100 without JavaScript Date.UTC year remapping', () => {
+    const result = resolveBirthTime({
+      year: 24,
+      month: 2,
+      day: 29,
+      hour: 12,
+      enabled: false,
+    })
+
+    expect(result.year).toBe(24)
+    expect(result.month).toBe(2)
+    expect(result.day).toBe(29)
+  })
+})
+
 describe('findBirthplace', () => {
   it('matches common city names from plain birthplace input', () => {
     expect(findBirthplaceInData(SICHUAN_CHENGDU, BIRTHPLACE_DATA)?.name).toBe(CHENGDU_CITY)

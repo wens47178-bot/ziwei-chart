@@ -88,6 +88,7 @@ export async function resolveBirthTimeAsync(input: ResolveBirthTimeInput): Promi
 }
 
 export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): ResolvedBirthTime {
+  validateBirthDateTime(input)
   const originalTimeIndex = hourToTimeIndex(input.hour)
   const originalShichen = shichenNameForTimeIndex(originalTimeIndex)
   const location = findBirthplaceInData(input.birthplace, input.birthplaces ?? [])
@@ -95,7 +96,7 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
 
   // Birth input is a wall-clock time, not a timestamp in the browser's timezone.
   // Use UTC calendar arithmetic so DST and the viewer's timezone cannot shift the chart.
-  const baseDate = new Date(Date.UTC(input.year, input.month - 1, input.day, input.hour, REPRESENTATIVE_MINUTE))
+  const baseDate = createUtcCalendarDate(input.year, input.month, input.day, input.hour)
   const correctionMinutes = shouldApply
     ? getTrueSolarCorrectionMinutes(input.year, input.month, input.day, location.longitude)
     : 0
@@ -198,12 +199,39 @@ function getTrueSolarCorrectionMinutes(year: number, month: number, day: number,
 }
 
 function getEquationOfTimeMinutes(year: number, month: number, day: number): number {
-  const date = new Date(Date.UTC(year, month - 1, day))
-  const start = new Date(Date.UTC(year, 0, 0))
+  const date = createUtcCalendarDate(year, month, day)
+  const start = createUtcCalendarDate(year, 1, 0)
   const dayOfYear = Math.floor((date.getTime() - start.getTime()) / 86_400_000)
   const b = (2 * Math.PI * (dayOfYear - 81)) / 364
 
   return 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b)
+}
+
+function validateBirthDateTime(input: ResolveBirthTimeInput): void {
+  if (!Number.isInteger(input.year) || input.year < 1 || input.year > 9999) {
+    throw new RangeError('Birth year must be an integer between 1 and 9999.')
+  }
+  if (!Number.isInteger(input.month) || input.month < 1 || input.month > 12) {
+    throw new RangeError('Birth month must be an integer between 1 and 12.')
+  }
+  if (!Number.isInteger(input.day) || input.day < 1) {
+    throw new RangeError('Birth day must be a positive integer.')
+  }
+  if (!Number.isInteger(input.hour) || input.hour < 0 || input.hour > 23) {
+    throw new RangeError('Birth hour must be an integer between 0 and 23.')
+  }
+
+  const lastDay = createUtcCalendarDate(input.year, input.month + 1, 0).getUTCDate()
+  if (input.day > lastDay) {
+    throw new RangeError(`Birth day must be between 1 and ${lastDay} for the selected month.`)
+  }
+}
+
+function createUtcCalendarDate(year: number, month: number, day: number, hour = 0): Date {
+  const date = new Date(0)
+  date.setUTCFullYear(year, month - 1, day)
+  date.setUTCHours(hour, REPRESENTATIVE_MINUTE, 0, 0)
+  return date
 }
 
 function hourToTimeIndex(hour: number): number {
