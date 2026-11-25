@@ -93,6 +93,7 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
   const [year, setYear] = useState(String(new Date().getFullYear()))
   const [splitLeap, setSplitLeap] = useState(true)
   const [data, setData] = useState<KLineData[]>([])
+  const [generatedYear, setGeneratedYear] = useState<number | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState('')
 
@@ -108,9 +109,11 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
     window.setTimeout(() => {
       try {
         setData(generateLunarMonthlyKLines(chart, selectedYear, splitLeap))
+        setGeneratedYear(selectedYear)
       } catch (cause) {
         console.error('农历流月 K 线生成失败:', cause)
         setData([])
+        setGeneratedYear(null)
         setError('流月数据生成失败，请检查年份后重试。')
       } finally {
         setIsGenerating(false)
@@ -130,7 +133,7 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
           农历流月 K 线
         </h3>
         <p className="mt-1 text-xs leading-relaxed text-text-muted">
-          按真实农历月份及闰月时段计算，与上方公历月度趋势分开展示。分数为启发式参考，不代表事件概率或确定性预测。
+          按真实农历月份及闰月时段计算，与上方公历月度趋势分开展示。蜡烛 OHLC 取该时段内的流日样本，综合分与维度为流月盘基准；分数仅供参考，不代表事件概率或确定性预测。
         </p>
       </div>
 
@@ -142,7 +145,11 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
             min={1}
             max={9999}
             value={year}
-            onChange={(event) => setYear(event.target.value)}
+            onChange={(event) => {
+              setYear(event.target.value)
+              setData([])
+              setGeneratedYear(null)
+            }}
             className="w-28 rounded-lg border border-white/10 bg-night px-3 py-2 text-sm text-white outline-none focus:border-star/60"
           />
         </label>
@@ -150,7 +157,11 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
           <input
             type="checkbox"
             checked={splitLeap}
-            onChange={(event) => setSplitLeap(event.target.checked)}
+            onChange={(event) => {
+              setSplitLeap(event.target.checked)
+              setData([])
+              setGeneratedYear(null)
+            }}
             className="accent-violet-400"
           />
           闰月拆分为上、下半月
@@ -170,7 +181,7 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
       {chartData.length > 0 ? (
         <>
           <div className="flex flex-wrap items-center gap-3 text-xs text-text-muted">
-            <span>共 {chartData.length} 个农历时段</span>
+            <span>{generatedYear} 年 · 共 {chartData.length} 个农历时段</span>
             <span className="text-green-400">绿色：收盘不低于开盘</span>
             <span className="text-rose-400">红色：收盘低于开盘</span>
           </div>
