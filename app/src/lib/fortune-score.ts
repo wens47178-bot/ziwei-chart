@@ -188,10 +188,10 @@ type Horoscope = ReturnType<FunctionalAstrolabe['horoscope']>
 type HoroscopePalaceName = Parameters<Horoscope['palace']>[0]
 
 const PALACE_WEIGHTS: Record<keyof FortuneScore['dimensions'], HoroscopePalaceName[]> = {
-  career: ['官禄宫', '命宫', '迁移宫'],
-  wealth: ['财帛宫', '福德宫', '田宅宫'],
-  relationship: ['夫妻宫', '子女宫', '兄弟宫'],
-  health: ['疾厄宫', '父母宫', '命宫'],
+  career: ['官禄', '命宫', '迁移'],
+  wealth: ['财帛', '福德', '田宅'],
+  relationship: ['夫妻', '子女', '兄弟'],
+  health: ['疾厄', '父母', '命宫'],
 }
 
 /* ============================================================
