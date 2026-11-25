@@ -82,7 +82,7 @@ const MarkdownComponents = {
     <h2 className="text-xl font-semibold text-amber-800 mt-5 mb-2">{children}</h2>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
-    <h3 className="text-lg font-medium text-violet-700 mt-4 mb-2">{children}</h3>
+    <h3 className="text-lg font-medium text-[#8a7653] mt-4 mb-2">{children}</h3>
   ),
   p: ({ children }: { children?: React.ReactNode }) => (
     <p className="mb-3 leading-relaxed">{children}</p>
@@ -253,7 +253,7 @@ ${guidanceContext}
     <div
       className="
         relative p-6 lg:p-8
-        bg-white border border-violet-100 rounded-2xl shadow-sm
+        bg-white border border-[#e9e5dc] rounded-2xl shadow-sm
       "
     >
       {/* 顶部发光线 */}
