@@ -175,7 +175,7 @@ export function sanitizePersistedSettings(persistedState: unknown): Partial<Sett
 }
 
 export const useSettingsStore = create<SettingsState>()(
-  persist(
+  persist<SettingsState, [], [], Partial<SettingsState>>(
     (set, get) => ({
       provider: 'kimi',
       providerSettings: {
