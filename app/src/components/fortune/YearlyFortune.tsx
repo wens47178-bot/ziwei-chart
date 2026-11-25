@@ -11,7 +11,7 @@ import { streamChat, type ChatMessage, type LLMConfig } from '@/lib/llm'
 import { extractKnowledge, buildPromptContext } from '@/knowledge'
 import { buildGuidancePromptContext } from '@/knowledge-db'
 import { Button, Select } from '@/components/ui'
-import { findPalaceForHoroscopeName } from '@/lib/horoscope'
+import { createLocalCalendarDate, findPalaceForHoroscopeName } from '@/lib/horoscope'
 import type { FunctionalAstrolabe } from '@/lib/astro'
 
 /* ------------------------------------------------------------
@@ -230,7 +230,7 @@ export function YearlyFortune() {
 
     try {
       // 获取流年运限数据
-      const horoscope = chart.horoscope(new Date(`${year}-6-15`))
+      const horoscope = chart.horoscope(createLocalCalendarDate(year, 6, 15))
 
       // 提取本命盘完整信息
       const knowledge = extractKnowledge(chart, birthInfo.year)
