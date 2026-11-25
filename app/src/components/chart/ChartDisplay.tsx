@@ -196,7 +196,7 @@ function PalaceCard({
       {adjectiveStars.length > 0 && (
         <div className="flex flex-wrap gap-0.5 mb-1 flex-1">
           {adjectiveStars.map((name, i) => (
-            <span key={i} className="text-[9px] px-1 py-0.5 rounded bg-white/[0.03] text-text-muted/70">
+            <span key={i} className="text-[9px] px-1 py-0.5 rounded bg-slate-100 text-slate-500">
               {name}
             </span>
           ))}
@@ -204,7 +204,7 @@ function PalaceCard({
       )}
 
       {/* 底部: 十二神 */}
-      <div className="flex justify-between text-[9px] text-text-muted/60 mt-auto pt-1 border-t border-white/[0.04]">
+      <div className="flex justify-between text-[9px] text-text-muted/60 mt-auto pt-1 border-t border-slate-200">
         <span>{changsheng12}</span>
         <span>{boshi12}</span>
       </div>
@@ -236,7 +236,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
       relative h-full min-h-[280px] lg:min-h-[360px] p-3 lg:p-4
       flex flex-col items-center justify-center
       bg-gradient-to-br from-white/[0.04] to-white/[0.02]
-      backdrop-blur-md border border-white/[0.08] rounded-xl
+      bg-white border border-slate-200 shadow-sm rounded-xl
     ">
       {/* 背景装饰 */}
       <div className="absolute inset-0 opacity-[0.02]">
@@ -281,7 +281,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
       </div>
 
       {/* 五行局 + 命主身主 */}
-      <div className="mt-3 pt-3 border-t border-white/[0.06] w-full">
+      <div className="mt-3 pt-3 border-t border-slate-200 w-full">
         <div className="flex justify-center gap-2 mb-2">
           <span className="
             px-2 py-0.5 rounded-full text-xs
@@ -386,7 +386,7 @@ export function ChartDisplay() {
     <div className="
       relative p-3 lg:p-6
       bg-gradient-to-br from-white/[0.04] to-transparent
-      backdrop-blur-xl border border-white/[0.08] rounded-2xl
+      bg-white border border-slate-200 shadow-sm rounded-2xl
       shadow-[0_8px_32px_rgba(0,0,0,0.3)]
       max-w-6xl mx-auto
     ">
@@ -414,7 +414,7 @@ export function ChartDisplay() {
       </div>
 
       {/* 图例 */}
-      <div className="flex flex-wrap items-center justify-center gap-4 mt-3 pt-3 border-t border-white/[0.06] text-[10px]">
+      <div className="flex flex-wrap items-center justify-center gap-4 mt-3 pt-3 border-t border-slate-200 text-[10px]">
         <div className="flex items-center gap-1">
           <span className="w-2 h-2 rounded-full bg-gold" />
           <span className="text-text-muted">命宫</span>
