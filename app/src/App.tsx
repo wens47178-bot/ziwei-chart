@@ -13,8 +13,9 @@ import { AdvancedAnalysis, type AdvancedMode } from '@/components/AdvancedAnalys
 import { LunarMonthlyKLine } from '@/components/kline/LunarMonthlyKLine'
 import { useChartStore } from '@/stores'
 import { HomeLanding } from '@/components/HomeLanding'
+import { AcademicCenter } from '@/components/AcademicCenter'
 
-export type PageKey = 'birth' | 'chart' | 'palaces' | 'sihua' | 'decadal' | 'stars' | 'patterns' | 'trines' | 'fortune' | 'lunar' | 'kline' | 'match' | 'ai' | 'share'
+export type PageKey = 'birth' | 'chart' | 'palaces' | 'sihua' | 'decadal' | 'stars' | 'patterns' | 'trines' | 'fortune' | 'lunar' | 'kline' | 'match' | 'ai' | 'share' | 'academy'
 type PageMeta = { key: PageKey; label: string; en: string; title: string; subtitle: string; note: string; icon: string }
 
 const PAGES: PageMeta[] = [
@@ -32,6 +33,7 @@ const PAGES: PageMeta[] = [
   { key: 'match', label: '双人合盘', en: '12 / SYNASTRY', title: '双人合盘', subtitle: '双方资料 · 宫位关联 · 互动主题', note: '并列比较两张命盘，理解彼此的互动结构。', icon: '◉' },
   { key: 'ai', label: 'AI 深度解读', en: '13 / AI INTERPRETATION', title: 'AI 深度解读', subtitle: '命格批注 · 事业财帛 · 情感人际', note: '基于命盘资料与知识上下文生成辅助解读。', icon: '✧' },
   { key: 'share', label: '命盘典藏卡', en: '14 / PERSONAL KEEPSAKE', title: '命盘典藏卡', subtitle: '命盘摘要 · 专属金句 · 保存分享', note: '将命盘重点整理成可保存与分享的个人卡片。', icon: '◇' },
+  { key: 'academy', label: '学术中心', en: '15 / ACADEMIC LIBRARY', title: '学术中心', subtitle: '命理典籍 · 流派参考 · 研读路径', note: '从书目、知识来源与循序研读路径，系统了解传统命理。', icon: '▤' },
 ]
 
 export default function App() {
@@ -50,6 +52,7 @@ export default function App() {
     if (activePage === 'match') return <MatchAnalysis />
     if (activePage === 'ai') return chart ? <AIInterpretation /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'share') return chart ? <ShareCard /> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'academy') return <AcademicCenter />
     return null
   }
 
