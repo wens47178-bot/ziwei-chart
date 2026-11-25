@@ -76,14 +76,14 @@ function LunarTooltip({
 
   const item = payload[0].payload
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-3 text-sm shadow-xl">
-      <p className="mb-2 font-semibold text-slate-900">{item.period}</p>
+    <div className="rounded-xl border border-[#e9e5dc] bg-white p-3 text-sm shadow-lg">
+      <p className="mb-2 font-semibold text-[#302b23]">{item.period}</p>
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-        <span className="text-slate-500">期初</span><span className="text-right text-slate-900">{item.open}</span>
+        <span className="text-[#918a7e]">期初</span><span className="text-right text-slate-900">{item.open}</span>
         <span className="text-text-muted">期末</span><span className="text-right text-slate-900">{item.close}</span>
-        <span className="text-text-muted">最高</span><span className="text-right text-emerald-700">{item.high}</span>
-        <span className="text-text-muted">最低</span><span className="text-right text-rose-700">{item.low}</span>
-        <span className="text-text-muted">参考分</span><span className="text-right text-amber-700">{item.score.total}</span>
+        <span className="text-text-muted">最高</span><span className="text-right text-[#69866d]">{item.high}</span>
+        <span className="text-text-muted">最低</span><span className="text-right text-[#a56d69]">{item.low}</span>
+        <span className="text-text-muted">参考分</span><span className="text-right text-[#9b8053]">{item.score.total}</span>
       </div>
     </div>
   )
@@ -127,18 +127,18 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
   }))
 
   return (
-    <section className="space-y-4 rounded-2xl border border-emerald-100 bg-white shadow-sm p-4 md:p-6">
+    <section className="space-y-4 rounded-2xl border border-[#e9e5dc] bg-white shadow-sm p-4 md:p-6">
       <div>
         <h3 className="text-lg font-bold text-slate-900" style={{ fontFamily: 'var(--font-serif)' }}>
           农历流月 K 线
         </h3>
-        <p className="mt-1 text-xs leading-relaxed text-text-muted">
+        <p className="mt-1 text-xs leading-relaxed text-[#898273]">
           按真实农历月份及闰月时段计算，与上方公历月度趋势分开展示。蜡烛 OHLC 根据流日四化星的实际落宫调整，综合分与维度为流月盘基准；分数仅供参考，不代表事件概率或确定性预测。
         </p>
       </div>
 
       <div className="flex flex-wrap items-end gap-3">
-        <label className="flex flex-col gap-1 text-xs text-text-muted">
+        <label className="flex flex-col gap-1 text-xs text-[#898273]">
           农历年份
           <input
             type="number"
@@ -150,10 +150,10 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
               setData([])
               setGeneratedYear(null)
             }}
-            className="w-28 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-star/60"
+            className="w-28 rounded-lg border border-[#dedbd5] bg-[#faf9f7] px-3 py-2 text-sm text-[#37332d] outline-none focus:border-[#b8a47f]"
           />
         </label>
-        <label className="flex items-center gap-2 pb-2 text-xs text-text-secondary">
+        <label className="flex items-center gap-2 pb-2 text-xs text-[#766f63]">
           <input
             type="checkbox"
             checked={splitLeap}
@@ -162,7 +162,7 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
               setData([])
               setGeneratedYear(null)
             }}
-            className="accent-violet-400"
+            className="accent-[#a58a5d]"
           />
           闰月拆分为上、下半月
         </label>
@@ -170,43 +170,43 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
           type="button"
           onClick={handleGenerate}
           disabled={isGenerating}
-          className="rounded-lg bg-gradient-to-r from-star to-gold px-4 py-2 text-sm font-medium text-night transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-50"
+          className="rounded-lg bg-[#29251e] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-50"
         >
           {isGenerating ? '正在计算流月…' : '生成农历流月'}
         </button>
       </div>
 
-      {error && <p role="alert" className="text-sm text-rose-400">{error}</p>}
+      {error && <p role="alert" className="text-sm text-[#a56d69]">{error}</p>}
 
       {chartData.length > 0 ? (
         <>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-text-muted">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-[#898273]">
             <span>{generatedYear} 年 · 共 {chartData.length} 个农历时段</span>
-            <span className="text-green-400">绿色：收盘不低于开盘</span>
-            <span className="text-rose-400">红色：收盘低于开盘</span>
+            <span className="text-[#69866d]">绿色：收盘不低于开盘</span>
+            <span className="text-[#a56d69]">红色：收盘低于开盘</span>
           </div>
           <div className="h-[360px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartData} margin={{ top: 12, right: 8, left: -12, bottom: 78 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ebe8e1" />
                 <XAxis
                   dataKey="period"
                   interval={0}
                   angle={-38}
                   textAnchor="end"
                   height={90}
-                  tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.55)' }}
-                  axisLine={{ stroke: 'rgba(255,255,255,0.12)' }}
+                  tick={{ fontSize: 10, fill: '#817a6d' }}
+                  axisLine={{ stroke: '#dedbd5' }}
                   tickLine={false}
                 />
                 <YAxis
                   domain={[0, 100]}
                   ticks={[0, 25, 50, 75, 100]}
-                  tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.45)' }}
+                  tick={{ fontSize: 10, fill: '#918a7e' }}
                   axisLine={false}
                   tickLine={false}
                 />
-                <Tooltip content={<LunarTooltip />} cursor={{ stroke: 'rgba(167,139,250,0.3)' }} />
+                <Tooltip content={<LunarTooltip />} cursor={{ stroke: '#c9b991' }} />
                 <Bar
                   dataKey="bodyRange"
                   shape={<LunarCandleShape />}
@@ -218,7 +218,7 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
           </div>
         </>
       ) : (
-        <p className="rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-text-muted">
+        <p className="rounded-xl border border-dashed border-[#ded8cc] px-4 py-8 text-center text-sm text-[#898273]">
           选择年份后生成农历流月数据。普通年份通常为 12 个时段；闰月年会随拆分设置显示 13 或 14 个时段。
         </p>
       )}
