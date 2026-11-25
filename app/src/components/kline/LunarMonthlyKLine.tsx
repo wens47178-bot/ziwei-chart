@@ -77,13 +77,13 @@ function LunarTooltip({
   const item = payload[0].payload
   return (
     <div className="rounded-xl border border-white/10 bg-night/95 p-3 text-sm shadow-xl">
-      <p className="mb-2 font-semibold text-white">{item.period}</p>
+      <p className="mb-2 font-semibold text-slate-900">{item.period}</p>
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-        <span className="text-text-muted">期初</span><span className="text-right text-white">{item.open}</span>
+        <span className="text-slate-500">期初</span><span className="text-right text-white">{item.open}</span>
         <span className="text-text-muted">期末</span><span className="text-right text-white">{item.close}</span>
-        <span className="text-text-muted">最高</span><span className="text-right text-green-400">{item.high}</span>
-        <span className="text-text-muted">最低</span><span className="text-right text-rose-400">{item.low}</span>
-        <span className="text-text-muted">参考分</span><span className="text-right text-gold">{item.score.total}</span>
+        <span className="text-text-muted">最高</span><span className="text-right text-emerald-700">{item.high}</span>
+        <span className="text-text-muted">最低</span><span className="text-right text-rose-700">{item.low}</span>
+        <span className="text-text-muted">参考分</span><span className="text-right text-amber-700">{item.score.total}</span>
       </div>
     </div>
   )
@@ -127,7 +127,7 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
   }))
 
   return (
-    <section className="space-y-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 md:p-6">
+    <section className="space-y-4 rounded-2xl border border-emerald-100 bg-white shadow-sm p-4 md:p-6">
       <div>
         <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-serif)' }}>
           农历流月 K 线
@@ -218,7 +218,7 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
           </div>
         </>
       ) : (
-        <p className="rounded-xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-text-muted">
+        <p className="rounded-xl border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-text-muted">
           选择年份后生成农历流月数据。普通年份通常为 12 个时段；闰月年会随拆分设置显示 13 或 14 个时段。
         </p>
       )}
