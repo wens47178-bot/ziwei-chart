@@ -233,3 +233,12 @@ or notable verification run.
 - Added natal-index-to-scope-palace resolution and apply decadal, yearly, and monthly transformation modifiers only when the transformed star is in the decadal life palace's corresponding natal position.
 - Added regression coverage for scope-to-natal-palace attribution and decadal transformation contribution.
 - The transformation weights remain heuristic score parameters; this change validates scope mapping, not the doctrinal correctness of the weights.
+
+
+## 2026-11-25 Chart-scoped AI cache and prompt evidence boundaries
+
+- Invalidate all generated content (natal AI reading, yearly readings, and K-line data) whenever a new chart is set, preventing output from a previous birth profile from being reused.
+- Refresh the yearly fortune component's local display when the chart/year/cache changes, including while the component remains mounted.
+- Constrain natal AI interpretation to the natal data actually supplied; the prompt now forbids inventing decadal/yearly/monthly layers or deterministic health/event predictions when those inputs are absent.
+- Yearly context now distinguishes natal star transformation labels from decadal/yearly transformation destinations, and provides the actual scope-specific palace destinations via iztro's horoscope API.
+- The yearly prompt no longer requests fabricated auspicious/unfavorable months when monthly charts are not supplied.
