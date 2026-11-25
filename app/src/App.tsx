@@ -14,7 +14,7 @@ import { LunarMonthlyKLine } from '@/components/kline/LunarMonthlyKLine'
 import { useChartStore } from '@/stores'
 import { HomeLanding } from '@/components/HomeLanding'
 
-type PageKey = 'birth' | 'chart' | 'palaces' | 'sihua' | 'decadal' | 'stars' | 'patterns' | 'trines' | 'fortune' | 'lunar' | 'kline' | 'match' | 'ai' | 'share'
+export type PageKey = 'birth' | 'chart' | 'palaces' | 'sihua' | 'decadal' | 'stars' | 'patterns' | 'trines' | 'fortune' | 'lunar' | 'kline' | 'match' | 'ai' | 'share'
 type PageMeta = { key: PageKey; label: string; en: string; title: string; subtitle: string; note: string; icon: string }
 
 const PAGES: PageMeta[] = [
