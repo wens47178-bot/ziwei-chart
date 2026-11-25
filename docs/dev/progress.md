@@ -176,8 +176,8 @@ or notable verification run.
 ## 2026-11-25 Leap-month correction reference fixture
 
 - Added a regression case for 2023-04-10, a date in the 2023 second leap lunar month.
-- Asserted both `fixLeap: true` and `fixLeap: false` chart outcomes against the upstream iztro `bySolar()` tests, including soul/body palace branches, soul star, five-elements class, and Zi Wei palace.
-- This verifies the current solar-date integration and that the `fixLeap` option is actually forwarded through `generateChart()`.
+- Asserted both `fixLeap: true` and `fixLeap: false` chart outcomes against the upstream iztro `bySolar()` reference, including soul/body palace branches, five-elements class, and Zi Wei palace.
+- The test verifies that the `fixLeap` option is forwarded through `generateChart()` under the app's configured Zhongzhou algorithm.
 - The current BirthForm intentionally accepts solar dates only; a lunar-date input flow (including an explicit leap-month selector) is not implemented and must not be implied by the engine's `byLunar()` capability.
 
 
