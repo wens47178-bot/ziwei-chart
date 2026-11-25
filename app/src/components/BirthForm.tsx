@@ -38,13 +38,8 @@ export function BirthForm() {
     let active = true
     const trimmedBirthplace = birthplace.trim()
 
-    if (!trueSolarEnabled || !trimmedBirthplace) {
-      setMatchedBirthplace(null)
-      setMatchingBirthplace(false)
-      return
-    }
+    if (!trueSolarEnabled || !trimmedBirthplace) return
 
-    setMatchedBirthplace(null)
     findBirthplaceAsync(trimmedBirthplace)
       .then((place) => {
         if (active) setMatchedBirthplace(place)
@@ -63,11 +58,13 @@ export function BirthForm() {
 
   const handleBirthplaceChange = (value: string) => {
     setBirthplace(value)
+    setMatchedBirthplace(null)
     setMatchingBirthplace(trueSolarEnabled && value.trim().length > 0)
   }
 
   const handleTrueSolarToggle = (enabled: boolean) => {
     setTrueSolarEnabled(enabled)
+    setMatchedBirthplace(null)
     setMatchingBirthplace(enabled && birthplace.trim().length > 0)
   }
 
