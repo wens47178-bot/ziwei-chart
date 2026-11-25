@@ -74,6 +74,7 @@ export default function App() {
               </div>
             ) : (
               <div className="animate-fade-in space-y-8">
+                <section className="mb-2 rounded-2xl border border-violet-100 bg-violet-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-violet-700">NATAL CHART</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">命盘解读</h2><p className="mt-1 text-sm text-slate-600">十二宫位星图 · 星曜四化 · 命身结构</p></section>
                 {/* 命盘 - 横向展开 */}
                 <div className="w-full">
                   <ChartDisplay />
@@ -116,7 +117,7 @@ export default function App() {
                 />
               </div>
             ) : (
-              <YearlyFortune />
+              <section className="mb-6 rounded-2xl border border-amber-100 bg-amber-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-amber-700">YEARLY ALMANAC</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">年度运势</h2><p className="mt-1 text-sm text-slate-600">年度主题 · 重点宫位 · 行动提醒</p></section><YearlyFortune />
             )
           )}
 
