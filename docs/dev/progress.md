@@ -85,3 +85,11 @@ known and is not by itself a failure.
 
 [PROTOCOL]: Update this file after each feature, fix, release, deployment change,
 or notable verification run.
+
+
+## 2026-11-25 Security and CI Proposal
+
+- Added a proposed hardening change on branch `security/gemini-api-key-header-ci`: Gemini API keys are sent via the `x-goog-api-key` header instead of URL query parameters in both keyword extraction and streaming requests.
+- Added a focused Vitest regression test for Gemini streaming authentication.
+- Added a pull-request CI workflow to run `npm ci`, lint, tests, and the production build on Node.js 22.
+- This proposal is not merged. Fresh CI results are required before treating the change as verified or deployed.
