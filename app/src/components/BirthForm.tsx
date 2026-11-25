@@ -31,6 +31,7 @@ export function BirthForm() {
   const [matchedBirthplace, setMatchedBirthplace] = useState<Birthplace | null>(null)
   const [matchingBirthplace, setMatchingBirthplace] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   const dayOptions = getDayOptions(year, month)
 
@@ -81,6 +82,7 @@ export function BirthForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setSubmitError('')
 
     try {
       const safeDay = clampDayToMonth(year, month, day)
@@ -108,6 +110,11 @@ export function BirthForm() {
       setChart(chart)
     } catch (error) {
       console.error('排盘失败:', error)
+      setSubmitError(
+        error instanceof RangeError
+          ? '出生日期或时间无效，请检查后重试。'
+          : '排盘失败，请稍后重试。'
+      )
     } finally {
       setLoading(false)
     }
@@ -280,6 +287,12 @@ export function BirthForm() {
             <div className="w-full border-t border-white/[0.06]" />
           </div>
         </div>
+
+        {submitError && (
+          <p role="alert" aria-live="polite" className="text-sm text-rose-400">
+            {submitError}
+          </p>
+        )}
 
         {/* 提交按钮 */}
         <Button
