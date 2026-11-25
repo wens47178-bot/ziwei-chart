@@ -5,3 +5,5 @@
 export { LifeKLine } from './LifeKLine'
 export { EventCard } from './EventCard'
 export { ScoreRadar } from './ScoreRadar'
+
+export { LunarMonthlyKLine } from './LunarMonthlyKLine'
