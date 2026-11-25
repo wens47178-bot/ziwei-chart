@@ -69,6 +69,36 @@ describe('iztro chart engine integration', () => {
     expect(unadjusted.soul).toBe('文曲')
   })
 
+
+  it('enumerates lunar months and leap-month segments from iztro', () => {
+    const chart = generateChart({
+      year: 2000,
+      month: 8,
+      day: 16,
+      hour: 4,
+      gender: 'female',
+      trueSolarEnabled: false,
+    })
+
+    const adjustedLeapYear = chart.monthlyList(2023, true)
+    const unadjustedLeapYear = chart.monthlyList(2023, false)
+    const regularYear = chart.monthlyList(2024, true)
+    const leapSegments = adjustedLeapYear.filter((period) => period.isLeapMonth)
+
+    expect(adjustedLeapYear).toHaveLength(14)
+    expect(unadjustedLeapYear).toHaveLength(13)
+    expect(regularYear).toHaveLength(12)
+    expect(leapSegments).toHaveLength(2)
+    expect(leapSegments.map((period) => period.part)).toEqual(['first', 'second'])
+    expect(leapSegments.map((period) => period.dayRange)).toEqual([
+      [1, 15],
+      [16, expect.any(Number)],
+    ])
+    expect(unadjustedLeapYear.filter((period) => period.isLeapMonth)).toMatchObject([
+      { month: 2, part: 'normal' },
+    ])
+  })
+
   it('treats late zi hour as the following civil day under the configured day boundary', () => {
     const lateZi = generateChart({
       year: 1990,
