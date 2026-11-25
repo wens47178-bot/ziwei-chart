@@ -418,7 +418,14 @@ async function* streamGemini(
   })
 
   if (!response.ok) {
-    throw new Error(`Gemini API Error: ${response.status}`)
+    const detail = await response.text().catch(() => '')
+    if (response.status === 429) {
+      throw new Error('Gemini 免费额度或请求频率已达到上限。请稍后再试，或在设置中切换其他可用模型。')
+    }
+    if (response.status === 400 || response.status === 404) {
+      throw new Error(`Gemini 请求配置有误（${response.status}）：${detail.slice(0, 240)}`)
+    }
+    throw new Error(`Gemini API 请求失败（${response.status}）：${detail.slice(0, 240)}`)
   }
 
   const reader = response.body?.getReader()
