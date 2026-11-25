@@ -32,6 +32,43 @@ describe('iztro chart engine integration', () => {
     expect(chart.chineseDate).toBe('庚辰 甲申 丙午 庚寅')
   })
 
+  it('matches upstream leap-month correction behavior for the same solar date', () => {
+    const adjusted = generateChart({
+      year: 2023,
+      month: 4,
+      day: 10,
+      hour: 8,
+      gender: 'female',
+      trueSolarEnabled: false,
+      fixLeap: true,
+    })
+    const unadjusted = generateChart({
+      year: 2023,
+      month: 4,
+      day: 10,
+      hour: 8,
+      gender: 'female',
+      trueSolarEnabled: false,
+      fixLeap: false,
+    })
+
+    // Reference values are taken from iztro's bySolar() leap-month tests.
+    expect(adjusted.earthlyBranchOfSoulPalace).toBe('子')
+    expect(adjusted.earthlyBranchOfBodyPalace).toBe('申')
+    expect(adjusted.fiveElementsClass).toBe('金四局')
+    expect(adjusted.star('紫微')?.palace()).toHaveProperty('name', '迁移')
+
+    expect(unadjusted.earthlyBranchOfSoulPalace).toBe('亥')
+    expect(unadjusted.earthlyBranchOfBodyPalace).toBe('未')
+    expect(unadjusted.fiveElementsClass).toBe('水二局')
+    expect(unadjusted.star('紫微')?.palace()).toHaveProperty('name', '命宫')
+    // The upstream fixture resets iztro to its default algorithm; this app deliberately uses Zhongzhou.
+    // In this fixture the soul-star label remains 文曲 in both modes, while palace placement and
+    // five-elements class capture the leap-month correction behavior for this algorithm.
+    expect(adjusted.soul).toBe('文曲')
+    expect(unadjusted.soul).toBe('文曲')
+  })
+
   it('treats late zi hour as the following civil day under the configured day boundary', () => {
     const lateZi = generateChart({
       year: 1990,

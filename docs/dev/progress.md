@@ -171,3 +171,14 @@ or notable verification run.
 - Added an application-level regression fixture for 2000-08-16 (female, 寅时), asserting the solar date, converted lunar date, and four-pillar Ganzhi string.
 - Expected values are copied from the upstream iztro `bySolar()` integration test, so this checks the application's integration against a concrete engine reference rather than only checking that a 12-palace chart exists.
 - This fixture does not claim to independently validate every Zi Wei school convention or leap-month interpretation; those require separate domain references and boundary fixtures.
+
+
+## 2026-11-25 Leap-month correction reference fixture
+
+- Added a regression case for 2023-04-10, a date in the 2023 second leap lunar month.
+- Asserted both `fixLeap: true` and `fixLeap: false` chart outcomes against the upstream iztro `bySolar()` tests, including soul/body palace branches, soul star, five-elements class, and Zi Wei palace.
+- This verifies the current solar-date integration and that the `fixLeap` option is actually forwarded through `generateChart()`.
+- The current BirthForm intentionally accepts solar dates only; a lunar-date input flow (including an explicit leap-month selector) is not implemented and must not be implied by the engine's `byLunar()` capability.
+
+
+- Fixture refinement: upstream's test suite resets iztro to its default algorithm before each test, whereas this application explicitly configures the Zhongzhou algorithm. Therefore the upstream default-algorithm soul-star labels are not valid expected values for this app. Keep shared calendar/palace-placement expectations and assert that enabling/disabling leap correction changes the algorithm-specific soul result, rather than copying incompatible labels.
