@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { generateChart } from './astro'
-import { createLocalCalendarDate, calculateDecadalBaseScore, calculateMonthlyDimensions, calculatePeriodScore, calculateScopeMutagenBonus, generateLifetimeKLines, getDecadalYearRange } from './fortune-score'
+import { createLocalCalendarDate, calculateDecadalBaseScore, calculateMonthlyDimensions, calculatePeriodScore, calculateScopeMutagenBonus, generateLifetimeKLines, generateMonthlyKLines, getDecadalYearRange } from './fortune-score'
 import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
 
 describe('K-line scoring', () => {
@@ -60,6 +60,24 @@ describe('K-line scoring', () => {
     expect(calculateMonthlyDimensions(chart, 2023, 1)).toEqual(
       calculateMonthlyDimensions(chart, 2023, 1)
     )
+  })
+
+
+  it('labels monthly K-line samples as Gregorian months', () => {
+    const chart = generateChart({
+      year: 2000,
+      month: 8,
+      day: 16,
+      hour: 4,
+      gender: 'female',
+      trueSolarEnabled: false,
+    })
+
+    const monthly = generateMonthlyKLines(chart, 2023)
+
+    expect(monthly).toHaveLength(12)
+    expect(monthly[0].period).toBe('公历1月')
+    expect(monthly[11].period).toBe('公历12月')
   })
 
   it('maps decadal virtual-age ranges to the correct lunar birth-year sequence', () => {
