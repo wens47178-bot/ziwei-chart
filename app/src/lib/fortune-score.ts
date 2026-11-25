@@ -763,6 +763,55 @@ export function generateMonthlyKLines(
 }
 
 /**
+ * 以流月盘作为基准，按流日四化星的实际落宫计算日内样本波动。
+ * iztro 的四化星数组顺序固定为禄、权、科、忌；宫位名称通过流日
+ * palaceNames 映射回本命宫位索引，避免把星名误当成四化名称。
+ */
+function calculateLunarDailySampleScore(
+  chart: FunctionalAstrolabe,
+  horoscope: Horoscope
+): number {
+  const dimensions = calculateRawDimensions(horoscope, 'monthly')
+  const adjustments: FortuneScore['dimensions'] = {
+    career: 0,
+    wealth: 0,
+    relationship: 0,
+    health: 0,
+  }
+  const mutagenValues = [
+    MONTHLY_MUTAGEN_MODIFIERS['禄'],
+    MONTHLY_MUTAGEN_MODIFIERS['权'],
+    MONTHLY_MUTAGEN_MODIFIERS['科'],
+    MONTHLY_MUTAGEN_MODIFIERS['忌'],
+  ]
+  const dailyMutagens = horoscope.daily.mutagen || []
+
+  dailyMutagens.forEach((starName, index) => {
+    const natalPalaceIndex = chart.star(starName).palace()?.index
+    if (natalPalaceIndex === undefined) return
+
+    const dailyPalaceName = horoscope.daily.palaceNames[natalPalaceIndex]
+    if (!dailyPalaceName) return
+
+    for (const dimension of Object.keys(PALACE_WEIGHTS) as (keyof FortuneScore['dimensions'])[]) {
+      const dimensionPalaces = PALACE_WEIGHTS[dimension]
+      if (dimensionPalaces.includes(dailyPalaceName as HoroscopePalaceName)) {
+        adjustments[dimension] += mutagenValues[index] / dimensionPalaces.length
+      }
+    }
+  })
+
+  const adjustedDimensions = {
+    career: dimensions.career + adjustments.career,
+    wealth: dimensions.wealth + adjustments.wealth,
+    relationship: dimensions.relationship + adjustments.relationship,
+    health: dimensions.health + adjustments.health,
+  }
+
+  return Math.max(15, Math.min(95, weightedDimensionTotal(adjustedDimensions)))
+}
+
+/**
  * 生成按真实农历月份排列的流月 K 线。
  *
  * 与公历月中点序列分开提供，避免将两种时间口径混为一谈。
@@ -782,8 +831,7 @@ export function generateLunarMonthlyKLines(
     const [startDay, endDay] = period.dayRange
     const sampleDays = [...new Set([
       startDay,
-      Math.round(startDay + (endDay - startDay) / 3),
-      Math.round(startDay + (endDay - startDay) * 2 / 3),
+      Math.round(startDay + (endDay - startDay) / 2),
       endDay,
     ])]
     const samples = sampleDays.map((day) => {
@@ -791,13 +839,20 @@ export function generateLunarMonthlyKLines(
         `${year}-${period.month}-${day}`,
         period.isLeapMonth
       ).toString()
-      const horoscope = chart.horoscope(solarDate, timeIndex)
-      const dimensions = normalizeDimensions(calculateRawDimensions(horoscope, 'monthly'))
-      const score = Math.max(15, Math.min(95, weightedDimensionTotal(dimensions)))
-      return { score, dimensions }
+      return chart.horoscope(solarDate, timeIndex)
     })
-    const scores = samples.map((sample) => sample.score)
-    const middle = samples[Math.floor(samples.length / 2)]
+    // The monthly scope is the period baseline; daily-scope samples provide
+    // the intra-period OHLC movement without pretending the monthly chart changes daily.
+    const monthlyDimensions = normalizeDimensions(
+      calculateRawDimensions(samples[1], 'monthly')
+    )
+    const monthlyScore = Math.max(
+      15,
+      Math.min(95, weightedDimensionTotal(calculateRawDimensions(samples[1], 'monthly')))
+    )
+    const dailyScores = samples.map((horoscope) =>
+      calculateLunarDailySampleScore(chart, horoscope)
+    )
     const monthLabel = period.isLeapMonth
       ? `闰${period.month}月${period.part === 'first' ? '上半月' : period.part === 'second' ? '下半月' : ''}`
       : `农历${period.month}月`
@@ -805,14 +860,14 @@ export function generateLunarMonthlyKLines(
     return {
       period: `${monthLabel}（初${startDay}至${endDay}）`,
       type: 'monthly' as const,
-      open: scores[0],
-      high: Math.max(...scores),
-      low: Math.min(...scores),
-      close: scores[scores.length - 1],
+      open: dailyScores[0],
+      high: Math.max(...dailyScores),
+      low: Math.min(...dailyScores),
+      close: dailyScores[dailyScores.length - 1],
       score: {
-        total: Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length),
+        total: monthlyScore,
         trend: 'flat' as const,
-        dimensions: middle.dimensions,
+        dimensions: monthlyDimensions,
       },
       events: [],
     }
