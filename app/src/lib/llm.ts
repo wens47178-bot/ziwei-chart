@@ -378,7 +378,7 @@ async function* streamGemini(
   // 系统消息作为 systemInstruction
   const systemMessage = messages.find(m => m.role === 'system')
 
-  const url = `${baseUrl || providerConfig.baseUrl}/models/${modelName}:streamGenerateContent`
+  const url = `${baseUrl || providerConfig.baseUrl}/models/${modelName}:streamGenerateContent?alt=sse`
 
   // 构建请求体
   const requestBody: Record<string, unknown> = {
@@ -409,28 +409,62 @@ async function* streamGemini(
 
   const decoder = new TextDecoder()
   let buffer = ''
+  const eventBoundary = /\r?\n\r?\n/
+
+  const consumeEvent = (event: string): string[] => {
+    const data = event
+      .split(/\r?\n/)
+      .filter((line) => line.startsWith('data:'))
+      .map((line) => line.slice(5).replace(/^ /, ''))
+      .join('\n')
+
+    if (!data || data === '[DONE]') return []
+
+    const payload = JSON.parse(data) as {
+      error?: { message?: string }
+      candidates?: Array<{
+        content?: {
+          parts?: Array<{ text?: string }>
+        }
+      }>
+    }
+
+    if (payload.error) {
+      throw new Error(payload.error.message || 'Gemini stream returned an error')
+    }
+
+    return (payload.candidates?.[0]?.content?.parts ?? [])
+      .map((part) => part.text)
+      .filter((text): text is string => typeof text === 'string' && text.length > 0)
+  }
+
+  const drainEvents = async function* (flush = false): AsyncGenerator<string> {
+    while (true) {
+      const match = eventBoundary.exec(buffer)
+      if (!match) break
+
+      const event = buffer.slice(0, match.index)
+      buffer = buffer.slice(match.index + match[0].length)
+      for (const text of consumeEvent(event)) yield text
+    }
+
+    if (flush && buffer.trim()) {
+      const finalEvent = buffer
+      buffer = ''
+      for (const text of consumeEvent(finalEvent)) yield text
+    }
+  }
 
   while (true) {
     const { done, value } = await reader.read()
-    if (done) break
+    if (done) {
+      buffer += decoder.decode()
+      yield* drainEvents(true)
+      break
+    }
 
     buffer += decoder.decode(value, { stream: true })
-
-    // Gemini 返回的是 JSON 数组流
-    try {
-      const matches = buffer.match(/\{[^{}]*"text"\s*:\s*"[^"]*"[^{}]*\}/g)
-      if (matches) {
-        for (const match of matches) {
-          const json = JSON.parse(match)
-          if (json.text) {
-            yield json.text
-            buffer = buffer.replace(match, '')
-          }
-        }
-      }
-    } catch {
-      // 继续读取
-    }
+    yield* drainEvents()
   }
 }
 
