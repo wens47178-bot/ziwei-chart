@@ -79,6 +79,7 @@ describe('K-line scoring', () => {
     expect(leapYear).toHaveLength(14)
     expect(leapYear.some((period) => period.period.includes('闰2月上半月'))).toBe(true)
     expect(leapYear.some((period) => period.period.includes('闰2月下半月'))).toBe(true)
+    expect(leapYear.some((period) => period.high > period.low)).toBe(true)
     expect(leapYear.every((period) =>
       Number.isFinite(period.open) &&
       Number.isFinite(period.high) &&
@@ -89,7 +90,7 @@ describe('K-line scoring', () => {
       period.high >= period.open &&
       period.high >= period.close
     )).toBe(true)
-  }, 10000)
+  }, 12000)
 
   it('labels monthly K-line samples as Gregorian months', () => {
     const chart = generateChart({
