@@ -190,3 +190,12 @@ or notable verification run.
 - Added an index-based resolver using iztro's `yearly.palaceNames` mapping and applied it when building yearly AI context.
 - Added unit coverage for correct scope-name-to-natal-index mapping and missing palace handling.
 - This corrects the palace/star context supplied to the AI; it does not change the underlying iztro chart calculation.
+
+
+## 2026-11-25 Yearly K-line scope-aware scoring
+
+- Found that annual K-line dimension scores were calculated from the same natal palace-name buckets for every year, while annual transformations were added as one global bonus rather than attributed to the palace containing each transformed star.
+- Updated annual dimension scoring to resolve each palace through iztro's `horoscope.palace(name, 'yearly')` API, which maps the yearly palace name to its natal palace index.
+- Apply yearly transformation modifiers only to the yearly-scope palace that contains the transformed star, using iztro's `hasHoroscopeMutagen` API.
+- Added regression coverage that checks annual palace rotation changes dimension scores and that a repeated score calculation for the same chart/year is deterministic.
+- This adjusts the K-line's engineering-level data mapping; the heuristic weights are still product scoring assumptions, not a validated or universally accepted Zi Wei Dou Shu doctrine.

@@ -184,7 +184,10 @@ const SIHUA_MODIFIER: Record<string, number> = {
    宫位权重 (用于分维度计算)
    ============================================================ */
 
-const PALACE_WEIGHTS = {
+type Horoscope = ReturnType<FunctionalAstrolabe['horoscope']>
+type HoroscopePalaceName = Parameters<Horoscope['palace']>[0]
+
+const PALACE_WEIGHTS: Record<keyof FortuneScore['dimensions'], HoroscopePalaceName[]> = {
   career: ['官禄', '命宫', '迁移'],
   wealth: ['财帛', '福德', '田宅'],
   relationship: ['夫妻', '子女', '兄弟'],
@@ -254,71 +257,26 @@ export function calculatePeriodScore(
   year: number
 ): FortuneScore {
   const horoscope = chart.horoscope(new Date(`${year}-6-15`))
-  const palaces = chart.palaces
 
-  // 计算各宫位得分
-  const palaceScores: Record<string, number> = {}
-
-  for (const palace of palaces) {
-    // 转换 mutagen 类型: iztro 返回 string | string[] | undefined，统一为 string[]
-    const normalizeMutagen = (m: unknown): string[] | undefined => {
-      if (!m) return undefined
-      if (Array.isArray(m)) return m as string[]
-      if (typeof m === 'string') return [m]
-      return undefined
-    }
-
-    const palaceData = {
-      majorStars: palace.majorStars.map(s => ({
-        name: String(s.name),
-        brightness: s.brightness ? String(s.brightness) : undefined,
-        mutagen: normalizeMutagen(s.mutagen),
-      })),
-      minorStars: palace.minorStars.map(s => ({
-        name: String(s.name),
-        mutagen: normalizeMutagen(s.mutagen),
-      })),
-      adjectiveStars: palace.adjectiveStars?.map(s => ({ name: String(s.name) })),
-    }
-    palaceScores[palace.name] = calculatePalaceScore(palaceData)
-  }
-
-  // 流年四化加成
-  const yearlyMutagen = horoscope.yearly.mutagen || []
-  let yearlyBonus = 0
-  for (const star of yearlyMutagen) {
-    const mutagen = star.includes('禄') ? '禄'
-                  : star.includes('权') ? '权'
-                  : star.includes('科') ? '科'
-                  : star.includes('忌') ? '忌' : null
-    if (mutagen) {
-      yearlyBonus += SIHUA_MODIFIER[mutagen] || 0
-    }
-  }
-
-  // 计算分维度得分
+  // Each scope palace name maps to a natal palace index. Ask iztro for the
+  // yearly-scope palace instead of scoring natal palace names directly.
   const dimensions = {
-    career: calculateDimensionScore(palaceScores, PALACE_WEIGHTS.career),
-    wealth: calculateDimensionScore(palaceScores, PALACE_WEIGHTS.wealth),
-    relationship: calculateDimensionScore(palaceScores, PALACE_WEIGHTS.relationship),
-    health: calculateDimensionScore(palaceScores, PALACE_WEIGHTS.health),
+    career: calculateDimensionScore(horoscope, PALACE_WEIGHTS.career),
+    wealth: calculateDimensionScore(horoscope, PALACE_WEIGHTS.wealth),
+    relationship: calculateDimensionScore(horoscope, PALACE_WEIGHTS.relationship),
+    health: calculateDimensionScore(horoscope, PALACE_WEIGHTS.health),
   }
 
-  // 综合得分 = 各维度加权平均 + 流年加成
   const total = Math.round(
-    (dimensions.career * 0.3 +
-     dimensions.wealth * 0.25 +
-     dimensions.relationship * 0.25 +
-     dimensions.health * 0.2 +
-     yearlyBonus)
+    dimensions.career * 0.3 +
+    dimensions.wealth * 0.25 +
+    dimensions.relationship * 0.25 +
+    dimensions.health * 0.2
   )
 
-  // 归一化到 0-100
-  const normalizedTotal = Math.max(0, Math.min(100, total))
-
   return {
-    total: normalizedTotal,
-    trend: 'flat',  // 后续根据前后对比计算
+    total: Math.max(0, Math.min(100, total)),
+    trend: 'flat', // 后续根据前后对比计算
     dimensions: {
       career: normalize(dimensions.career),
       wealth: normalize(dimensions.wealth),
@@ -329,20 +287,56 @@ export function calculatePeriodScore(
 }
 
 /**
- * 计算维度得分
+ * 计算指定运限下的维度得分，并将该运限四化计入实际落宫。
  */
 function calculateDimensionScore(
-  palaceScores: Record<string, number>,
-  palaceNames: string[]
+  horoscope: Horoscope,
+  palaceNames: HoroscopePalaceName[]
 ): number {
   let sum = 0
   let count = 0
-  for (const name of palaceNames) {
-    if (palaceScores[name] !== undefined) {
-      sum += palaceScores[name]
-      count++
+
+  for (const palaceName of palaceNames) {
+    const palace = horoscope.palace(palaceName, 'yearly')
+    if (!palace) continue
+
+    const normalizeMutagen = (mutagen: unknown): string[] | undefined => {
+      if (!mutagen) return undefined
+      if (Array.isArray(mutagen)) return mutagen.map(String)
+      if (typeof mutagen === 'string') return [mutagen]
+      return undefined
     }
+
+    const score = calculatePalaceScore({
+      majorStars: palace.majorStars.map(star => ({
+        name: String(star.name),
+        brightness: star.brightness ? String(star.brightness) : undefined,
+        mutagen: normalizeMutagen(star.mutagen),
+      })),
+      minorStars: palace.minorStars.map(star => ({
+        name: String(star.name),
+        mutagen: normalizeMutagen(star.mutagen),
+      })),
+      adjectiveStars: palace.adjectiveStars?.map(star => ({
+        name: String(star.name),
+      })),
+    })
+
+    // A yearly transformation belongs to the palace containing its transformed
+    // star, not to every dimension as a global bonus.
+    const yearlyMutagenBonus = (['禄', '权', '科', '忌'] as const).reduce(
+      (bonus, mutagen) => bonus + (
+        horoscope.hasHoroscopeMutagen(palaceName, 'yearly', mutagen)
+          ? SIHUA_MODIFIER[mutagen]
+          : 0
+      ),
+      0
+    )
+
+    sum += score + yearlyMutagenBonus
+    count++
   }
+
   return count > 0 ? sum / count : 50
 }
 
