@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { generateChart } from './astro'
 import { calculateMonthlyKLines, calculatePeriodScore } from './fortune-score'
 
-describe('yearly K-line scoring', () => {
+describe('K-line scoring', () => {
   it('uses the selected year palace layout instead of reusing natal dimensions', () => {
     const chart = generateChart({
       year: 2000,
