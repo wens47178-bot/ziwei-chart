@@ -401,3 +401,43 @@ body {
   background: linear-gradient(90deg, rgba(255,255,255,0.6), transparent);
   transform: translateY(-50%);
 }
+
+
+/* ============================================================
+   Feature identities — a shared editorial system, distinct page moods
+   ============================================================ */
+.feature-page { --feature-accent: #a8844a; --feature-soft: #f7f3eb; width: 100%; min-width: 0; color: #26231f; }
+.feature-eyebrow { margin: 0 0 14px; color: var(--feature-accent); font-size: 11px; font-weight: 600; letter-spacing: .28em; }
+.feature-heading { margin: 4px auto 28px; max-width: 1180px; }
+.feature-heading h2, .birth-editorial h2 { margin: 0; color: #211f1c; font-family: var(--font-serif); font-size: clamp(30px, 4vw, 48px); font-weight: 650; letter-spacing: .04em; }
+.feature-heading > p:last-child { margin: 10px 0 0; color: #898274; font-size: 14px; letter-spacing: .06em; }
+.feature-page--birth { min-height: calc(100vh - 64px); display: grid; grid-template-columns: minmax(280px, .9fr) minmax(440px, 1.1fr); align-items: center; gap: clamp(28px, 6vw, 88px); max-width: 1420px; margin: 0 auto; padding: 24px clamp(4px, 2vw, 28px); }
+.birth-editorial { position: relative; min-height: 520px; display: flex; flex-direction: column; justify-content: center; padding: 48px 0; }
+.birth-editorial h2 { font-size: clamp(44px, 5vw, 76px); letter-spacing: .06em; }
+.birth-lead { max-width: 390px; margin: 20px 0 0; color: #827967; font-size: 17px; line-height: 1.9; letter-spacing: .08em; }
+.birth-rule { width: 110px; height: 1px; margin: 34px 0 22px; background: #d9cbb3; }
+.birth-note { color: #a49a89; font-size: 13px; letter-spacing: .1em; }
+.birth-seal { position: absolute; right: 8%; bottom: 12%; display: grid; width: 90px; height: 90px; place-items: center; border: 1px solid #d8c39d; border-radius: 50%; color: #a8844a; font-family: var(--font-serif); font-size: 32px; opacity: .72; }
+.birth-form-column { width: 100%; max-width: 650px; justify-self: center; }
+.feature-page--birth form { max-width: none !important; padding: clamp(22px, 3vw, 40px) !important; border: 1px solid #e8e4dc !important; border-radius: 22px !important; background: #fff !important; box-shadow: 0 18px 55px rgba(48, 40, 26, .08) !important; color: #39352f !important; }
+.feature-page--birth form > div:first-child { display: none; }
+.feature-page--birth form .text-text, .feature-page--birth form .text-text-secondary, .feature-page--birth form .text-text-muted { color: #756d60 !important; }
+.feature-page--birth form input:not([type=radio]):not([type=checkbox]), .feature-page--birth form select { min-height: 48px; border: 1px solid #dedbd5 !important; border-radius: 12px !important; background: #fbfaf8 !important; color: #38342e !important; }
+.feature-page--birth form label:has(input[type=radio]) { border: 1px solid #e5dfd4; background: #faf8f4; color: #5e5548; }
+.feature-page--birth form label:has(input[type=radio]:checked) { border-color: #c5a56d; background: #f4eddf; color: #765b2c; box-shadow: none; }
+.feature-page--birth form label:has(input[type=checkbox]) { border: 1px solid #e8e2d8; background: #faf9f6; }
+.feature-page--birth form button[type=submit] { min-height: 52px; border-radius: 12px; background: #a8844a; color: white; box-shadow: none; }
+.feature-page--birth form button[type=submit]:hover { background: #8f6e3c; }
+.feature-page--chart { --feature-accent: #8b7658; --feature-soft: #f6f2ea; }
+.feature-page--chart .feature-heading { padding-bottom: 18px; border-bottom: 1px solid #e8e2d8; }
+.feature-page--fortune { --feature-accent: #9b7b43; --feature-soft: #faf5e9; }
+.feature-page--fortune .feature-heading { padding: 22px 26px; border-left: 3px solid #c6a76e; background: linear-gradient(90deg, #faf6ed, transparent); }
+.feature-page--kline { --feature-accent: #477b72; --feature-soft: #eef5f2; }
+.feature-page--kline .feature-heading { padding: 20px 24px; border: 1px solid #dce9e4; border-radius: 18px; background: #f4f8f6; }
+.feature-page--match { --feature-accent: #987080; --feature-soft: #f8f0f4; }
+.feature-page--match .feature-heading { padding: 20px 26px; border-radius: 18px 18px 4px 18px; background: linear-gradient(110deg, #f8f0f4, #fff 75%); }
+.feature-page--share { --feature-accent: #9a824c; --feature-soft: #f7f3e9; }
+.feature-page--share .feature-heading { text-align: center; padding: 12px 0 22px; }
+.feature-page--share .feature-heading::after { content: '✦  ─────────  ✦'; display: block; margin-top: 18px; color: #c5ad7e; font-size: 12px; letter-spacing: .2em; }
+@media (max-width: 900px) { .feature-page--birth { grid-template-columns: 1fr; gap: 12px; padding-top: 12px; } .birth-editorial { min-height: 0; padding: 24px 4px 8px; } .birth-editorial h2 { font-size: 42px; } .birth-seal { right: 4%; bottom: 8%; width: 62px; height: 62px; font-size: 24px; } .birth-form-column { max-width: 680px; } }
+@media (max-width: 520px) { .feature-heading { margin-bottom: 18px; } .feature-heading h2 { font-size: 32px; } .feature-page--birth form { padding: 18px !important; } }
