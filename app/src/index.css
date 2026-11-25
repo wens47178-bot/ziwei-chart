@@ -591,3 +591,47 @@ body { background: #fff; color: var(--ref-ink); }
  .home-featured { display:block; min-height:0; padding-top:22px; }.featured-index { margin:0 0 20px; }.featured-ai { padding:0 0 22px; }.featured-note { padding:20px 0 0; border:0; }.featured-bottom { display:none; }
  .home-footer { flex-wrap:wrap; justify-content:center; padding:16px 20px; text-align:center; }
 }
+
+
+/* Academic Center — quiet library editorial system */
+.academic-center { width:100%; max-width:1080px; margin:0 auto; padding:12px 0 48px; color:#29261f; }
+.academic-hero { padding:24px 0 30px; border-bottom:1px solid #eeeae2; }
+.academic-eyebrow,.academic-section-head small,.academic-note>span { color:#b09565; font-size:9px; letter-spacing:.2em; }
+.academic-hero h2 { margin:13px 0 8px; color:#28251f; font-family:var(--font-serif); font-size:30px; font-weight:500; letter-spacing:.1em; }
+.academic-hero>p { margin:0; color:#898276; font-size:13px; line-height:1.9; }
+.academic-meta { display:flex; align-items:center; gap:13px; margin-top:18px; color:#a49b8d; font-size:10px; letter-spacing:.08em; }
+.academic-meta i { width:3px; height:3px; border-radius:50%; background:#c2a777; }
+.academic-section { padding:30px 0 0; }
+.academic-section-head { display:flex; align-items:end; justify-content:space-between; margin-bottom:17px; }
+.academic-section-head h3 { margin:7px 0 0; color:#302c25; font-family:var(--font-serif); font-size:20px; font-weight:500; letter-spacing:.08em; }
+.academic-section-head>span { padding-bottom:3px; color:#c1b8a8; font-size:9px; letter-spacing:.14em; }
+.academic-book-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; }
+.academic-book { display:grid; grid-template-columns:112px minmax(0,1fr); gap:16px; min-height:160px; padding:14px; border:1px solid #eeeae3; border-radius:7px; background:linear-gradient(135deg,#fff 0%,#fcfbf8 100%); transition:border-color .2s,transform .2s,box-shadow .2s; }
+.academic-book:hover { transform:translateY(-2px); border-color:#d9c9a8; box-shadow:0 9px 24px rgba(44,37,25,.045); }
+.academic-book-cover { position:relative; min-height:132px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:11px; overflow:hidden; padding:12px 9px; background:linear-gradient(155deg,#263b50,#17283f 72%,#101d30); color:#f6f0e3; text-align:center; }
+.academic-book-cover:before,.academic-book-cover:after { position:absolute; content:""; border:1px solid rgba(223,195,139,.32); border-radius:50%; }
+.academic-book-cover:before { width:112px; height:112px; }
+.academic-book-cover:after { width:86px; height:86px; }
+.academic-book-cover>span,.academic-book-cover>strong,.academic-book-cover>small,.academic-book-cover>i { position:relative; z-index:1; }
+.academic-book-cover>span { color:#d4bc8e; font-size:7px; letter-spacing:.12em; }
+.academic-book-cover>strong { max-width:90px; font-family:var(--font-serif); font-size:13px; font-weight:500; line-height:1.7; letter-spacing:.05em; }
+.academic-book-cover>small { color:#d1c8b8; font-size:8px; }
+.academic-book-cover>i { position:absolute; right:8px; bottom:7px; color:rgba(255,255,255,.35); font-size:9px; font-style:normal; }
+.academic-book-info { display:flex; flex-direction:column; align-items:flex-start; min-width:0; padding:2px 0; }
+.academic-book-type { color:#ad956b; font-size:9px; letter-spacing:.08em; }
+.academic-book-info h4 { margin:7px 0 5px; color:#302c25; font-family:var(--font-serif); font-size:14px; font-weight:600; line-height:1.6; }
+.academic-book-info p { display:-webkit-box; overflow:hidden; margin:0; color:#928b80; font-size:10px; line-height:1.75; -webkit-line-clamp:3; -webkit-box-orient:vertical; }
+.academic-book-info a,.academic-no-link { margin-top:auto; padding-top:9px; color:#9d8150; font-size:10px; text-decoration:none; }
+.academic-book-info a:hover { color:#6f5630; }.academic-book-info a b { margin-left:5px; font-weight:400; }
+.academic-disclaimer { margin:13px 0 0; color:#b0a99e; font-size:10px; line-height:1.8; }
+.academic-paths { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border:1px solid #eeeae3; border-radius:7px; }
+.academic-path { display:flex; gap:13px; padding:18px 16px; }.academic-path+.academic-path { border-left:1px solid #eeeae3; }
+.academic-path-no { color:#c5ad82; font-family:var(--font-serif); font-size:22px; }
+.academic-path>div>small { color:#ad956b; font-size:9px; }
+.academic-path h4 { margin:6px 0; color:#39342b; font-family:var(--font-serif); font-size:13px; font-weight:500; }
+.academic-path p { margin:0; color:#918a7e; font-size:10px; line-height:1.8; }
+.academic-path>div>span { display:block; margin-top:9px; color:#b19e7c; font-size:9px; line-height:1.7; }
+.academic-note { margin-top:28px; padding:17px 20px; border-left:2px solid #c3a775; background:#faf9f6; }
+.academic-note p { margin:7px 0 0; color:#898276; font-size:11px; line-height:1.9; }
+@media(max-width:850px) { .academic-book-grid { grid-template-columns:1fr; }.academic-paths { grid-template-columns:1fr; }.academic-path+.academic-path { border-left:0; border-top:1px solid #eeeae3; } }
+@media(max-width:520px) { .academic-center { padding-top:0; }.academic-hero h2 { font-size:25px; }.academic-book { grid-template-columns:88px minmax(0,1fr); gap:12px; padding:10px; }.academic-book-cover { min-height:126px; }.academic-book-cover:before { width:90px;height:90px; }.academic-book-cover:after { width:70px;height:70px; }.academic-book-info p { -webkit-line-clamp:4; } }

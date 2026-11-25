@@ -37,7 +37,7 @@ export function HomeLanding({ onEnter, onSettings }: { onEnter: (key: PageKey | 
             <button key={item.key} onClick={() => onEnter(item.key)}><span>{item.label}</span><b>↗</b></button>
           )}</div>}
         </section>)}
-        <button className="home-academic-link" onClick={() => onEnter('stars')}><span>学术中心</span><small>知识体系与星曜资料 →</small></button>
+        <button className="home-academic-link" onClick={() => onEnter('academy')}><span>学术中心</span><small>知识体系与星曜资料 →</small></button>
       </aside>
       <section className="home-center">
         <button className="home-art-card" onClick={() => onEnter('birth')} aria-label="开始起紫微命盘">
