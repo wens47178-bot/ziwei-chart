@@ -9,19 +9,24 @@ import { YearlyFortune } from '@/components/fortune'
 import { LifeKLine } from '@/components/kline'
 import { MatchAnalysis } from '@/components/match'
 import { ShareCard } from '@/components/share'
+import { AdvancedAnalysis, type AdvancedMode } from '@/components/AdvancedAnalysis'
 import { useChartStore } from '@/stores'
 
-type PageKey = 'birth' | 'chart' | 'fortune' | 'kline' | 'match' | 'ai' | 'share'
+type PageKey = 'birth' | 'chart' | 'palaces' | 'sihua' | 'decadal' | 'stars' | 'fortune' | 'kline' | 'match' | 'ai' | 'share'
 type PageMeta = { key: PageKey; label: string; en: string; title: string; subtitle: string; note: string; icon: string }
 
 const PAGES: PageMeta[] = [
   { key: 'birth', label: '起紫微命盘', en: '01 / DESTINY ENGINE', title: '起紫微命盘', subtitle: '输入出生年月日時', note: '以准确的出生资料为起点，建立专属命盘。', icon: '✳' },
   { key: 'chart', label: '本命十二宫', en: '02 / NATAL CHART', title: '本命十二宫', subtitle: '十二宫位 · 星曜结构 · 命身格局', note: '从十二宫与星曜落点，逐层认识本命结构。', icon: '⌘' },
-  { key: 'fortune', label: '年度运势', en: '03 / YEARLY ALMANAC', title: '年度运势', subtitle: '流年主题 · 重点宫位 · 行动提醒', note: '查看当年运势重点与阶段变化。', icon: '◷' },
-  { key: 'kline', label: '人生趋势', en: '04 / LIFE TIMELINE', title: '人生趋势 K 线', subtitle: '大限走势 · 年度变化 · 农历流月', note: '以时间轴与数据图表观察人生不同阶段。', icon: '⌁' },
-  { key: 'match', label: '双人合盘', en: '05 / SYNASTRY', title: '双人合盘', subtitle: '双方资料 · 宫位关联 · 互动主题', note: '并列比较两张命盘，理解彼此的互动结构。', icon: '◉' },
-  { key: 'ai', label: 'AI 深度解读', en: '06 / AI INTERPRETATION', title: 'AI 深度解读', subtitle: '命格批注 · 事业财帛 · 情感人际', note: '基于命盘资料与知识上下文生成辅助解读。', icon: '✧' },
-  { key: 'share', label: '命盘典藏卡', en: '07 / PERSONAL KEEPSAKE', title: '命盘典藏卡', subtitle: '命盘摘要 · 专属金句 · 保存分享', note: '将命盘重点整理成可保存与分享的个人卡片。', icon: '◇' },
+  { key: 'palaces', label: '十二宫详解', en: '03 / TWELVE PALACES', title: '十二宫深度解析', subtitle: '宫位结构 · 星曜组合 · 宫干信息', note: '逐宫检视星曜配置与宫位结构，查看命盘细节。', icon: '▦' },
+  { key: 'sihua', label: '四化飞星', en: '04 / FOUR TRANSFORMATIONS', title: '四化飞星', subtitle: '本命四化 · 大限四化 · 流年四化', note: '区分不同盘层的禄权科忌，查看实际落宫。', icon: '✧' },
+  { key: 'decadal', label: '大限运程', en: '05 / DECADAL CYCLES', title: '大限运程', subtitle: '十年运限 · 大限命宫 · 流年叠宫', note: '指定年份定位大限，观察大限与流年的盘层关系。', icon: '◷' },
+  { key: 'stars', label: '星曜图鉴', en: '06 / STAR ATLAS', title: '星曜图鉴', subtitle: '主星 · 辅星 · 星曜落宫', note: '从命盘实际出现的星曜进入知识说明与落宫查看。', icon: '✦' },
+  { key: 'fortune', label: '年度运势', en: '07 / YEARLY ALMANAC', title: '年度运势', subtitle: '流年主题 · 重点宫位 · 行动提醒', note: '查看当年运势重点与阶段变化。', icon: '◷' },
+  { key: 'kline', label: '人生趋势', en: '08 / LIFE TIMELINE', title: '人生趋势 K 线', subtitle: '大限走势 · 年度变化 · 农历流月', note: '以时间轴与数据图表观察人生不同阶段。', icon: '⌁' },
+  { key: 'match', label: '双人合盘', en: '09 / SYNASTRY', title: '双人合盘', subtitle: '双方资料 · 宫位关联 · 互动主题', note: '并列比较两张命盘，理解彼此的互动结构。', icon: '◉' },
+  { key: 'ai', label: 'AI 深度解读', en: '10 / AI INTERPRETATION', title: 'AI 深度解读', subtitle: '命格批注 · 事业财帛 · 情感人际', note: '基于命盘资料与知识上下文生成辅助解读。', icon: '✧' },
+  { key: 'share', label: '命盘典藏卡', en: '11 / PERSONAL KEEPSAKE', title: '命盘典藏卡', subtitle: '命盘摘要 · 专属金句 · 保存分享', note: '将命盘重点整理成可保存与分享的个人卡片。', icon: '◇' },
 ]
 
 export default function App() {
@@ -33,6 +38,7 @@ export default function App() {
   const renderWorkspace = (): ReactNode => {
     if (activePage === 'birth') return <BirthForm onSuccess={() => setActivePage('chart')} />
     if (activePage === 'chart') return chart ? <ChartDisplay /> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'palaces' || activePage === 'sihua' || activePage === 'decadal' || activePage === 'stars') return chart ? <AdvancedAnalysis mode={activePage as AdvancedMode} /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'fortune') return chart ? <YearlyFortune /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'kline') return chart ? <LifeKLine /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'match') return <MatchAnalysis />
