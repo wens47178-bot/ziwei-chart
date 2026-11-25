@@ -299,7 +299,7 @@ ${guidanceContext}
         className="
           relative p-6 lg:p-8
           bg-white border border-amber-100 rounded-2xl shadow-sm
-          shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+          shadow-sm
         "
       >
         {/* 顶部发光线 */}
@@ -359,7 +359,7 @@ ${guidanceContext}
         className="
           relative p-6 lg:p-8
           bg-gradient-to-br from-white/[0.04] to-transparent
-          backdrop-blur-xl border border-white/[0.08] rounded-2xl
+          border border-amber-100 bg-white rounded-2xl
           shadow-[0_8px_32px_rgba(0,0,0,0.3)]
         "
       >
@@ -374,7 +374,7 @@ ${guidanceContext}
 
         {/* 未配置提示 */}
         {!currentSettings.apiKey && !fortune && (
-          <div className="text-text-muted text-sm py-8 text-center">
+          <div className="text-slate-500 text-sm py-8 text-center">
             <div className="text-3xl mb-3 opacity-30">◎</div>
             请先在设置中配置 AI 模型的 API Key，即可获得年度运势分析。
           </div>
@@ -390,7 +390,7 @@ ${guidanceContext}
 
         {/* 加载中 */}
         {loading && !fortune && (
-          <div className="flex items-center justify-center gap-3 text-text-muted py-12">
+          <div className="flex items-center justify-center gap-3 text-slate-500 py-12">
             <div className="w-5 h-5 border-2 border-star border-t-transparent rounded-full animate-spin" />
             <span>正在分析 {year} 年运势...</span>
           </div>
