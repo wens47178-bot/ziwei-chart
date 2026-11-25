@@ -57,11 +57,11 @@ function CustomTooltip({ active, payload }: TooltipProps) {
       {/* ─── Header ─── */}
       <div className="flex justify-between items-start mb-3 border-b border-white/10 pb-3">
         <div>
-          <p className="text-xl font-bold text-white" style={{ fontFamily: 'var(--font-serif)' }}>
+          <p className="text-xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-serif)' }}>
             {data.year} {data.ganZhi}年
-            <span className="text-base text-text-muted ml-2">({data.age}岁)</span>
+            <span className="text-base text-slate-500 ml-2">({data.age}岁)</span>
           </p>
-          <p className="text-sm text-star-light font-medium mt-1">
+          <p className="text-sm text-violet-700 font-medium mt-1">
             大运：{data.daYun} ({data.daYunRange})
           </p>
         </div>
@@ -75,7 +75,7 @@ function CustomTooltip({ active, payload }: TooltipProps) {
       </div>
 
       {/* ─── OHLC Grid ─── */}
-      <div className="grid grid-cols-4 gap-2 text-xs mb-4 bg-white/[0.03] p-3 rounded-lg">
+      <div className="grid grid-cols-4 gap-2 text-xs mb-4 bg-emerald-50 border border-emerald-100 p-3 rounded-xl">
         <div className="text-center">
           <span className="block text-text-muted mb-1">年初</span>
           <span className="font-mono text-white font-bold">{data.open}</span>
@@ -86,7 +86,7 @@ function CustomTooltip({ active, payload }: TooltipProps) {
         </div>
         <div className="text-center">
           <span className="block text-text-muted mb-1">年内高</span>
-          <span className="font-mono text-gold font-bold">{data.high}</span>
+          <span className="font-mono text-amber-700 font-bold">{data.high}</span>
         </div>
         <div className="text-center">
           <span className="block text-text-muted mb-1">年内低</span>
@@ -95,7 +95,7 @@ function CustomTooltip({ active, payload }: TooltipProps) {
       </div>
 
       {/* ─── Reason ─── */}
-      <div className="text-sm text-text-secondary leading-relaxed max-h-[120px] overflow-y-auto"
+      <div className="text-sm text-slate-700 leading-relaxed max-h-[120px] overflow-y-auto"
            style={{ fontFamily: 'var(--font-brush)' }}>
         {data.reason || (
           <span className="text-text-muted flex items-center gap-2">
@@ -365,7 +365,7 @@ export function LifeKLine() {
       ) : (
         <>
           {/* ─── K 线图 ─── */}
-          <div className="relative p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-sm">
+          <div className="relative p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
             {/* 顶部发光线 */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-star/50 to-transparent" />
 
@@ -468,7 +468,7 @@ export function LifeKLine() {
 
             {/* 生成状态 */}
             {klineCache.isGenerating && (
-              <div className="absolute bottom-4 right-4 flex items-center gap-2 text-xs text-text-muted bg-night/80 px-3 py-1.5 rounded-lg">
+              <div className="absolute bottom-4 right-4 flex items-center gap-2 text-xs text-text-muted bg-white/95 border border-slate-200 px-3 py-1.5 rounded-lg">
                 <span className="inline-block w-3 h-3 border-2 border-star border-t-transparent rounded-full animate-spin" />
                 AI 正在生成运势解读...
               </div>
