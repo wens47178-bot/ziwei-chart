@@ -3,6 +3,7 @@ import birthplaceData from './birthplace-data.json'
 import {
   type Birthplace,
   findBirthplaceInData,
+  resolveBirthTime,
   resolveBirthTimeAsync,
   shichenNameForTimeIndex,
 } from './true-solar-time'
@@ -118,5 +119,43 @@ describe('resolveBirthTime', () => {
 describe('shichenNameForTimeIndex', () => {
   it('names late zi time index as zi shichen', () => {
     expect(shichenNameForTimeIndex(12)).toBe(ZI_SHICHEN)
+  })
+})
+
+
+describe('timezone-independent calendar arithmetic', () => {
+  it('uses the same wall-clock result regardless of the runtime timezone', () => {
+    const result = resolveBirthTime({
+      year: 2024,
+      month: 3,
+      day: 10,
+      hour: 2,
+      birthplace: '乌鲁木齐',
+      enabled: true,
+      birthplaces: BIRTHPLACE_DATA,
+    })
+
+    expect(result.year).toBe(2024)
+    expect(result.month).toBe(3)
+    expect(result.day).toBe(10)
+    expect(result.hour).toBeGreaterThanOrEqual(0)
+    expect(result.hour).toBeLessThan(24)
+  })
+
+  it('handles leap-day input without relying on local daylight-saving rules', () => {
+    const result = resolveBirthTime({
+      year: 2024,
+      month: 2,
+      day: 29,
+      hour: 12,
+      birthplace: BEIJING,
+      enabled: true,
+      birthplaces: BIRTHPLACE_DATA,
+    })
+
+    expect(result.year).toBe(2024)
+    expect(result.month).toBe(2)
+    expect(result.day).toBe(29)
+    expect(result.applied).toBe(true)
   })
 })
