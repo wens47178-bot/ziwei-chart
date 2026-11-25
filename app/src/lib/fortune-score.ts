@@ -1041,6 +1041,8 @@ export function generateLifetimeKLines(
 
   // 上一年收盘价，用于连接 K 线
   let prevClose = 50
+  const chartSeed = getChartSeed(chart)
+
   for (let age = 1; age <= 100; age++) {
     const year = birthYear + age - 1
     const ganZhi = getYearGanZhi(year)
@@ -1306,7 +1308,6 @@ export async function generateKLinesWithLLM(
 
   // 转换为 LifetimeKLinePoint 格式
   const klines: LifetimeKLinePoint[] = []
-  const chartSeed = getChartSeed(chart)
 
   for (let age = 1; age <= 100; age++) {
     const llmItem = llmData.find(d => d.age === age)
