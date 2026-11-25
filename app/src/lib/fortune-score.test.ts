@@ -60,6 +60,7 @@ describe('K-line scoring', () => {
 
   it('generates repeatable lifetime K-lines for the same chart', () => {
     const chart = {
+      rawDates: { lunarDate: { lunarYear: 2000 } },
       solarDate: '2000-8-16',
       lunarDate: '二〇〇〇年七月十七',
       time: '寅时',
@@ -77,6 +78,7 @@ describe('K-line scoring', () => {
       }],
       horoscope: () => ({
         yearly: { mutagen: [], index: 0 },
+        decadal: { index: 0, palaceNames: ['命宫'] },
         palace: () => ({ majorStars: [], minorStars: [], adjectiveStars: [] }),
         hasHoroscopeMutagen: () => false,
       }),
