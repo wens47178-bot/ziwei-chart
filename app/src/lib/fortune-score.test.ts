@@ -48,8 +48,8 @@ describe('K-line scoring', () => {
       trueSolarEnabled: false,
     })
 
-    const firstRun = calculateMonthlyKLines(chart, 2023)
-    const secondRun = calculateMonthlyKLines(chart, 2023)
+    const firstRun = generateMonthlyKLines(chart, 2023)
+    const secondRun = generateMonthlyKLines(chart, 2023)
 
     expect(firstRun).toHaveLength(12)
     expect(firstRun.map(({ open, high, low, close, score }) => ({
