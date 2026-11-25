@@ -12,6 +12,7 @@ import { extractKnowledge, buildPromptContext } from '@/knowledge'
 import { buildGuidancePromptContext } from '@/knowledge-db'
 import { Button, Select } from '@/components/ui'
 import { findPalaceForHoroscopeName } from '@/lib/horoscope'
+import type { FunctionalAstrolabe } from '@/lib/astro'
 
 /* ------------------------------------------------------------
    年份选项
@@ -31,9 +32,9 @@ const FORTUNE_PROMPT = `# Role
 你是一位精通流年推算的紫微斗数专家。根据提供的命盘信息进行解读。在分析流年时，你严格遵循"本命为体，大限为用，流年为应"的原则，运用"限流叠宫"和"流年四化"技法，精准捕捉该年份的吉凶趋势。
 
 # Analysis Logic
-1.  **叠宫分析**：推演流年命宫叠入本命/大限何宫，以此判断今年的核心际遇（例如：流年命宫叠本命官禄，主事业变动）。
-2.  **四化引动**：重点分析流年天干引发的四化（禄权科忌）落入何宫，指出得失所在。
-3.  **时间应期**：结合月令，指出吉凶可能发生的具体时间段。
+1.  **叠宫分析**：只能依据提供的流年宫名与对应本命宫映射讨论叠宫，不得凭空补全未提供的盘层。
+2.  **四化引动**：分别区分大限与流年四化，并以明确列出的落宫为依据；不得将本命四化标签误认为流年四化。
+3.  **时间应期**：当前未提供逐月流月盘，不得推断或编造具体吉凶农历月份、日期或事件。
 
 # Output Format
 请严格按照以下结构输出分析报告：
@@ -53,8 +54,7 @@ const FORTUNE_PROMPT = `# Role
 * **家宅平安**：流年田宅与父母宫分析。是否涉及房产变动、装修或长辈健康问题。
 
 ### 肆· 月令趋势
-* **吉运月份**：指出运势较顺遂的农历月份，适合开展重要事项。
-* **注意月份**：指出压力较大或易出问题的农历月份，提示需谨慎行事。
+* **月份边界**：本次资料只提供流年与大限盘，没有逐月流月盘。不得编造吉运月份、注意月份或具体应期；请明确说明需要逐月流月盘才能判断。
 
 ### 伍· 锦囊寄语
 * **行事准则**：给出一句针对今年的具体行动建议（如：宜静不宜动，宜守不宜攻）。
@@ -111,17 +111,11 @@ const MarkdownComponents = {
    构建流年盘详细信息
    ------------------------------------------------------------ */
 
-interface HoroscopeData {
-  heavenlyStem: string
-  earthlyBranch: string
-  mutagen: string[]
-  index: number
-  palaceNames: string[]
-}
+type Horoscope = ReturnType<FunctionalAstrolabe['horoscope']>
 
 function buildYearlyContext(
-  chart: { palaces: Array<{ index: number; name: unknown; majorStars: Array<{ name: unknown; brightness?: unknown; mutagen?: unknown }>; minorStars: Array<{ name: unknown; mutagen?: unknown }> }> },
-  horoscope: { yearly: HoroscopeData; decadal: HoroscopeData },
+  chart: FunctionalAstrolabe,
+  horoscope: Horoscope,
   year: number
 ): string {
   const lines: string[] = []
@@ -145,8 +139,28 @@ function buildYearlyContext(
   lines.push(`- 大限命宫位置：${decadal.palaceNames[0]}`)
   lines.push('')
 
+  // List the actual palace destinations of transformations separately by scope.
+  // Do not mistake the natal star mutagen labels below for yearly/decadal changes.
+  lines.push('## 大限与流年四化落宫')
+  for (const scope of ['decadal', 'yearly'] as const) {
+    const scopeData = horoscope[scope]
+    const destinations: string[] = []
+    for (const palaceName of scopeData.palaceNames) {
+      const placed = (['禄', '权', '科', '忌'] as const).filter(mutagen =>
+        horoscope.hasHoroscopeMutagen(
+          palaceName as Parameters<typeof horoscope.hasHoroscopeMutagen>[0],
+          scope as Parameters<typeof horoscope.hasHoroscopeMutagen>[1],
+          mutagen as Parameters<typeof horoscope.hasHoroscopeMutagen>[2]
+        )
+      )
+      if (placed.length > 0) destinations.push(`${placed.join('、')}入${palaceName}`)
+    }
+    lines.push(`- ${scope === 'decadal' ? '大限' : '流年'}：${destinations.join('；') || '未取得四化落宫资料'}`)
+  }
+  lines.push('')
+
   // 流年各宫分析（重点宫位）
-  lines.push('## 流年重点宫位星曜')
+  lines.push('## 流年重点宫位星曜（星曜为本命星曜，宫位按流年宫名映射）')
   const importantPalaces = ['命宫', '财帛宫', '官禄宫', '夫妻宫', '疾厄宫', '迁移宫']
 
   for (const palaceName of importantPalaces) {
@@ -156,17 +170,18 @@ function buildYearlyContext(
     const majorStarsStr = palace.majorStars.map(s => {
       let str = String(s.name)
       if (s.brightness) str += `(${s.brightness})`
-      if (s.mutagen) str += `[${s.mutagen}]`
+      if (s.mutagen) str += `[本命化${s.mutagen}]`
       return str
     }).join('、') || '无主星'
 
     const minorStarsStr = palace.minorStars.map(s => {
       let str = String(s.name)
-      if (s.mutagen) str += `[${s.mutagen}]`
+      if (s.mutagen) str += `[本命化${s.mutagen}]`
       return str
     }).join('、')
 
     lines.push(`### ${palaceName}`)
+    lines.push(`- 对应本命宫：${String(palace.name)}`)
     lines.push(`- 主星：${majorStarsStr}`)
     if (minorStarsStr) lines.push(`- 辅星：${minorStarsStr}`)
     lines.push('')
