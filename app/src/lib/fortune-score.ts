@@ -1061,8 +1061,8 @@ export function generateLifetimeKLines(
     // ─── 当年开盘 = 前一年收盘 (K线连贯的关键) ───
     const open = prevClose
 
-    // ─── 收盘向目标分靠拢，但有波动 ───
-    // 每年向目标分移动 30-70%，加上随机波动
+    // ─── 收盘向目标分靠拢，并加入可复现的有界波动 ───
+    // 每年向目标分移动 30-70%，再加入稳定的种子扰动
     const moveRatio = 0.3 + deterministicUnit(`${chartSeed}|${age}|move`) * 0.4
     const closeBase = open + (yearTarget - open) * moveRatio
     const close = closeBase + deterministicNoise(`${chartSeed}|${age}|close`, 15)
