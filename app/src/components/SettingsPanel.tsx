@@ -205,7 +205,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
         )}
 
         {/* 高级设置折叠区 */}
-        <div className="border-t border-white/10 pt-4">
+        <div className="border-t border-slate-200 pt-4">
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
             className="flex items-center gap-2 text-sm text-text-muted hover:text-text transition-colors w-full"
@@ -237,7 +237,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                     focus:outline-none focus:ring-1
                     ${hasCustomBaseUrl
                       ? 'border-amber/50 focus:border-amber focus:ring-amber/30 text-text'
-                      : 'border-white/10 focus:border-star focus:ring-star/30 text-text-secondary'
+                      : 'border-slate-200 focus:border-violet-400 focus:ring-violet-100 text-slate-700'
                     }
                   `}
                 />
@@ -264,7 +264,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                     focus:outline-none focus:ring-1
                     ${hasCustomModel
                       ? 'border-amber/50 focus:border-amber focus:ring-amber/30 text-text'
-                      : 'border-white/10 focus:border-star focus:ring-star/30 text-text-secondary'
+                      : 'border-slate-200 focus:border-violet-400 focus:ring-violet-100 text-slate-700'
                     }
                   `}
                 />
@@ -346,7 +346,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                       focus:outline-none focus:ring-1
                       ${localSearchApiKey.trim()
                         ? 'border-amber/50 focus:border-amber focus:ring-amber/30 text-text'
-                        : 'border-white/10 focus:border-star focus:ring-star/30 text-text-secondary'
+                        : 'border-slate-200 focus:border-violet-400 focus:ring-violet-100 text-slate-700'
                       }
                     `}
                   />
