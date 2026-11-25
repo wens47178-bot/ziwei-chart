@@ -201,21 +201,21 @@ export function YearlyFortune() {
   const currentSettings = providerSettings[provider]
 
   const [year, setYear] = useState(currentYear)
-  const [fortune, setFortune] = useState(yearlyFortune[currentYear] || '')
+  const [streamingResult, setStreamingResult] = useState<{
+    chart: typeof chart
+    year: number
+    content: string
+  } | null>(null)
+  const fortune = streamingResult?.chart === chart && streamingResult.year === year
+    ? streamingResult.content
+    : yearlyFortune[year] || ''
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // The component can remain mounted while the user replaces the chart.
-  // Refresh its local display from the cache belonging to the current chart.
-  useEffect(() => {
-    setFortune(yearlyFortune[year] || '')
-  }, [chart, year, yearlyFortune])
-
-  // 切换年份时加载缓存
+  // 切换年份时，显示该命盘对应年份的缓存。
   const handleYearChange = useCallback((newYear: number) => {
     setYear(newYear)
-    setFortune(yearlyFortune[newYear] || '')
-  }, [yearlyFortune])
+  }, [])
 
   const handleAnalyze = useCallback(async () => {
     if (!chart || !birthInfo) return
@@ -226,7 +226,7 @@ export function YearlyFortune() {
 
     setLoading(true)
     setError(null)
-    setFortune('')
+    setStreamingResult({ chart, year, content: '' })
 
     try {
       // 获取流年运限数据
@@ -278,7 +278,7 @@ ${guidanceContext}
       let fullText = ''
       for await (const token of streamChat(config, messages)) {
         fullText += token
-        setFortune(fullText)
+        setStreamingResult({ chart, year, content: fullText })
       }
 
       // 保存到全局缓存
