@@ -3,7 +3,7 @@
    基于流年盘分析当年运势
    ============================================================ */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useChartStore, useSettingsStore, useContentCacheStore } from '@/stores'
@@ -189,6 +189,12 @@ export function YearlyFortune() {
   const [fortune, setFortune] = useState(yearlyFortune[currentYear] || '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // The component can remain mounted while the user replaces the chart.
+  // Refresh its local display from the cache belonging to the current chart.
+  useEffect(() => {
+    setFortune(yearlyFortune[year] || '')
+  }, [chart, year, yearlyFortune])
 
   // 切换年份时加载缓存
   const handleYearChange = useCallback((newYear: number) => {
