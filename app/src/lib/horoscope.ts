@@ -1,4 +1,15 @@
 /**
+ * Build a local calendar date without parsing an ISO date-only string as UTC.
+ * Noon avoids crossing the intended calendar day in ordinary timezone offsets.
+ */
+export function createLocalCalendarDate(year: number, month: number, day: number): Date {
+  const date = new Date(0)
+  date.setFullYear(year, month - 1, day)
+  date.setHours(12, 0, 0, 0)
+  return date
+}
+
+/**
  * Resolve the natal palace occupying a named palace position in a given horoscope scope.
  *
  * iztro stores horoscope palace names by natal palace index. The palace's own
