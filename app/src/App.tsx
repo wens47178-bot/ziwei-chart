@@ -69,11 +69,20 @@ export default function App() {
           {/* 命盘解读标签 */}
           {activeTab === 'chart' && (
             !chart ? (
-              <div className="flex items-center justify-center min-h-[60vh]">
-                <BirthForm />
-              </div>
+              <section className="feature-page feature-page--birth">
+                <div className="birth-editorial">
+                  <p className="feature-eyebrow">01 / DESTINY ENGINE</p>
+                  <h2>起紫微命盘</h2>
+                  <p className="birth-lead">从出生的时间与地点出发，展开一张属于你的人生星图。</p>
+                  <div className="birth-rule" />
+                  <p className="birth-note">输入出生年月日时，生成专属命盘与十二宫结构。</p>
+                  <div className="birth-seal" aria-hidden="true">命</div>
+                </div>
+                <div className="birth-form-column"><BirthForm /></div>
+              </section>
             ) : (
-              <div className="animate-fade-in space-y-8">
+              <section className="feature-page feature-page--chart animate-fade-in space-y-8">
+                <header className="feature-heading"><p className="feature-eyebrow">02 / NATAL CHART</p><h2>本命星图</h2><p>十二宫位 · 主辅星曜 · 四化结构</p></header>
                 {/* 命盘 - 横向展开 */}
                 <div className="w-full">
                   <ChartDisplay />
@@ -101,7 +110,7 @@ export default function App() {
                     重新输入
                   </button>
                 </div>
-              </div>
+              </section>
             )
           )}
 
@@ -116,7 +125,7 @@ export default function App() {
                 />
               </div>
             ) : (
-              <YearlyFortune />
+              <section className="feature-page feature-page--fortune"><header className="feature-heading"><p className="feature-eyebrow">03 / YEARLY FORECAST</p><h2>流年纪事</h2><p>以年份为轴，梳理年度节奏与值得关注的主题。</p></header><YearlyFortune /></section>
             )
           )}
 
@@ -131,12 +140,12 @@ export default function App() {
                 />
               </div>
             ) : (
-              <LifeKLine />
+              <section className="feature-page feature-page--kline"><header className="feature-heading"><p className="feature-eyebrow">04 / LIFE MARKET</p><h2>人生趋势图</h2><p>观察人生阶段变化、周期节点与年度趋势。</p></header><LifeKLine /></section>
             )
           )}
 
           {/* 双人合盘标签 */}
-          {activeTab === 'match' && <MatchAnalysis />}
+          {activeTab === 'match' && <section className="feature-page feature-page--match"><header className="feature-heading"><p className="feature-eyebrow">05 / TWO CHARTS, ONE DIALOGUE</p><h2>双人合参</h2><p>并置双方命盘，探索差异、互补与相处议题。</p></header><MatchAnalysis /></section>}
 
           {/* 分享卡片标签 */}
           {activeTab === 'share' && (
@@ -149,9 +158,7 @@ export default function App() {
                 />
               </div>
             ) : (
-              <div className="max-w-xl mx-auto">
-                <ShareCard />
-              </div>
+              <section className="feature-page feature-page--share"><header className="feature-heading"><p className="feature-eyebrow">06 / PERSONAL EDITION</p><h2>命格典藏</h2><p>将命盘中的个人印记，整理成值得保存与分享的卡片。</p></header><div className="max-w-3xl mx-auto"><ShareCard /></div></section>
             )
           )}
         </div>
