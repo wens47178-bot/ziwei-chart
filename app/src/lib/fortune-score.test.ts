@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { generateChart } from './astro'
-import { calculatePeriodScore } from './fortune-score'
+import { calculateMonthlyDimensions, calculatePeriodScore } from './fortune-score'
 
-describe('yearly K-line scoring', () => {
+describe('K-line scoring', () => {
   it('uses the selected year palace layout instead of reusing natal dimensions', () => {
     const chart = generateChart({
       year: 2000,
@@ -38,4 +38,19 @@ describe('yearly K-line scoring', () => {
 
     expect(calculatePeriodScore(chart, 2000)).toEqual(calculatePeriodScore(chart, 2000))
   })
+  it('uses monthly-scope palace scores and produces repeatable monthly dimensions', () => {
+    const chart = generateChart({
+      year: 2000,
+      month: 8,
+      day: 16,
+      hour: 4,
+      gender: 'female',
+      trueSolarEnabled: false,
+    })
+
+    expect(calculateMonthlyDimensions(chart, 2023, 1)).toEqual(
+      calculateMonthlyDimensions(chart, 2023, 1)
+    )
+  })
+
 })

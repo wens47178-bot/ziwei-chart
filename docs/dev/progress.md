@@ -199,3 +199,12 @@ or notable verification run.
 - Apply yearly transformation modifiers only to the yearly-scope palace that contains the transformed star, using iztro's `hasHoroscopeMutagen` API.
 - Added regression coverage that checks annual palace rotation changes dimension scores and that a repeated score calculation for the same chart/year is deterministic.
 - This adjusts the K-line's engineering-level data mapping; the heuristic weights are still product scoring assumptions, not a validated or universally accepted Zi Wei Dou Shu doctrine.
+
+
+## 2026-11-25 Monthly K-line scope scoring review
+
+- Found that monthly K-line totals counted all monthly and yearly transformations as global bonuses, while monthly dimensions used one monthly-life-palace star modifier plus random offsets.
+- Reused the scope-aware palace scoring path for the monthly scope: each dimension now resolves its own monthly palace set through iztro and applies monthly transformations only where the transformed star is actually located.
+- Removed random offsets from monthly dimension scores so repeated calculations for the same chart and month produce the same values.
+- Added a repeatability regression for the twelve monthly K-line results.
+- The K-line remains a heuristic score model; this change improves data-scope attribution and repeatability, not doctrinal validation.
