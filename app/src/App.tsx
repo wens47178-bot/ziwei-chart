@@ -117,7 +117,7 @@ export default function App() {
                 />
               </div>
             ) : (
-              <section className="mb-6 rounded-2xl border border-amber-100 bg-amber-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-amber-700">YEARLY ALMANAC</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">年度运势</h2><p className="mt-1 text-sm text-slate-600">年度主题 · 重点宫位 · 行动提醒</p></section><YearlyFortune />
+              <><section className="mb-6 rounded-2xl border border-amber-100 bg-amber-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-amber-700">YEARLY ALMANAC</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">年度运势</h2><p className="mt-1 text-sm text-slate-600">年度主题 · 重点宫位 · 行动提醒</p></section><YearlyFortune /></>
             )
           )}
 
@@ -132,7 +132,7 @@ export default function App() {
                 />
               </div>
             ) : (
-              <section className="mb-6 rounded-2xl border border-emerald-100 bg-emerald-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-emerald-700">LIFE TIMELINE</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">人生 K 线</h2><p className="mt-1 text-sm text-slate-600">人生阶段 · 趋势曲线 · 农历流月数据</p></section><LifeKLine />
+              <><section className="mb-6 rounded-2xl border border-emerald-100 bg-emerald-50/60 px-6 py-5"><p className="text-xs font-semibold tracking-widest text-emerald-700">LIFE TIMELINE</p><h2 className="mt-1 text-2xl font-semibold text-slate-900">人生 K 线</h2><p className="mt-1 text-sm text-slate-600">人生阶段 · 趋势曲线 · 农历流月数据</p></section><LifeKLine /></>
             )
           )}
 
