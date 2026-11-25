@@ -62,10 +62,10 @@ const BRIGHTNESS_MAP: Record<string, string> = {
 const BRIGHTNESS_STYLE: Record<string, string> = {
   '庙': 'text-fortune',
   '旺': 'text-gold',
-  '得': 'text-star-light',
+  '得': 'text-violet-700',
   '利': 'text-star-light',
-  '平': 'text-text-muted',
-  '不': 'text-misfortune/70',
+  '平': 'text-slate-500',
+  '不': 'text-rose-700/70',
   '陷': 'text-misfortune',
 }
 
@@ -120,7 +120,7 @@ function StarTag({ star, showBrightness = true }: StarTagProps) {
       className={`
         inline-flex items-center gap-0.5 text-[11px] px-1 py-0.5 rounded
         transition-all duration-200
-        ${hasMutagen ? mutagenStyle + ' font-medium' : 'bg-white/5 text-text-secondary hover:bg-white/10'}
+        ${hasMutagen ? mutagenStyle + ' font-medium' : 'bg-slate-100 text-slate-700 hover:bg-violet-50'}
       `}
     >
       {name}
@@ -152,12 +152,11 @@ function PalaceCard({
       onClick={onClick}
       className={`
         group relative p-2 lg:p-3 h-full min-h-[130px] lg:min-h-[170px] flex flex-col
-        bg-white/[0.03] backdrop-blur-sm
-        border border-white/[0.06] rounded-xl
+        bg-white border border-slate-200 rounded-xl shadow-sm
         transition-all duration-300 cursor-pointer
-        hover:bg-white/[0.06] hover:border-white/[0.12]
-        ${isLife ? 'ring-1 ring-gold/50 bg-gold/[0.03]' : ''}
-        ${isBody ? 'ring-1 ring-star/50 bg-star/[0.03]' : ''}
+        hover:bg-violet-50/60 hover:border-violet-200
+        ${isLife ? 'ring-1 ring-amber-300 bg-amber-50/70' : ''}
+        ${isBody ? 'ring-1 ring-violet-300 bg-violet-50/70' : ''}
         ${isSelected ? 'ring-2 ring-star' : ''}
       `}
     >
@@ -166,13 +165,13 @@ function PalaceCard({
         <span className="text-text-muted font-mono">{stem}{branch}</span>
         <div className="flex items-center gap-1">
           {decadalRange && (
-            <span className="text-star-light/60 font-mono">{decadalRange}</span>
+            <span className="text-violet-600 font-mono">{decadalRange}</span>
           )}
           <span className={`
             px-1 py-0.5 rounded font-medium
-            ${isLife ? 'bg-gold/20 text-gold' : ''}
-            ${isBody ? 'bg-star/20 text-star-light' : ''}
-            ${!isLife && !isBody ? 'text-text-secondary' : ''}
+            ${isLife ? 'bg-amber-100 text-amber-800' : ''}
+            ${isBody ? 'bg-violet-100 text-violet-800' : ''}
+            ${!isLife && !isBody ? 'text-slate-700' : ''}
           `}>
             {name}
           </span>
