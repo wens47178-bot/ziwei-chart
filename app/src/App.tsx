@@ -10,7 +10,7 @@ import { YearlyFortune } from '@/components/fortune'
 import { LifeKLine } from '@/components/kline'
 import { KLineIcon } from '@/components/icons/KLineIcon'
 import { MatchAnalysis } from '@/components/match'
-import { GitHubLinkButton, OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
+import { OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
 import { ShareCard } from '@/components/share'
 import { useChartStore } from '@/stores'
 
