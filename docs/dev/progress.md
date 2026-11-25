@@ -111,3 +111,21 @@ or notable verification run.
 - The latest CI dependency installation reported 20 vulnerabilities: 1 low, 7 moderate, and 12 high.
 - Added a non-blocking CI audit-summary step on branch `ci/report-npm-audit-details` so the exact affected packages, vulnerable ranges, advisory titles, and fix availability are visible in workflow logs.
 - This reporting-only change does not alter package versions or the lockfile. Dependency remediation will be handled in a separate reviewed change after examining the advisory output.
+
+
+## 2026-11-25 Dependency update verification
+
+- The compatible dependency update preview uses npm 11 because npm 10 failed with an Arborist `edgesOut` internal error on this lockfile.
+- Updating within the declared semver ranges succeeded under npm 11, but the newer ESLint rules surfaced two existing synchronous state updates inside effects in `BirthForm.tsx` and `AIInterpretation.tsx`.
+- Refactored birthplace matching state transitions into input/toggle handlers and initialized the AI interpretation display from its cache, removing the two effect lint errors without changing chart calculation behavior.
+- Dependency updates are not merged yet; the preview must pass lint, all tests, and production build before a PR is opened.
+
+
+## 2026-11-25 Remaining i18next advisory
+
+- The compatible dependency update preview reduced npm audit findings from 20 (1 low, 7 moderate, 12 high) to 2 moderate findings; all high and low findings were cleared.
+- The remaining advisory is the i18next `deepExtend` prototype-chain recursion issue. The currently published `iztro@2.6.5` metadata still resolves i18next 23.x, but the upstream iztro maintainer merged PR #322 on 2026-11-24 to update its dependency to i18next 26.3.4.
+- Added a scoped npm override for `iztro` to use `i18next@^26.3.4`, matching the upstream maintainer's merged dependency update without changing unrelated packages.
+- Added an integration smoke test that verifies the upgraded iztro engine still generates a 12-palace chart.
+- The override is provisional until fresh dependency audit, lint, all tests, and production build pass.
+- Upstream evidence: https://github.com/SylarLong/iztro/pull/322 and https://github.com/SylarLong/iztro/releases/tag/v2.6.5.

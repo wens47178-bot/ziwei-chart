@@ -38,13 +38,8 @@ export function BirthForm() {
     let active = true
     const trimmedBirthplace = birthplace.trim()
 
-    if (!trueSolarEnabled || !trimmedBirthplace) {
-      setMatchedBirthplace(null)
-      setMatchingBirthplace(false)
-      return
-    }
+    if (!trueSolarEnabled || !trimmedBirthplace) return
 
-    setMatchingBirthplace(true)
     findBirthplaceAsync(trimmedBirthplace)
       .then((place) => {
         if (active) setMatchedBirthplace(place)
@@ -57,6 +52,16 @@ export function BirthForm() {
       active = false
     }
   }, [birthplace, trueSolarEnabled])
+
+  const handleBirthplaceChange = (value: string) => {
+    setBirthplace(value)
+    setMatchingBirthplace(trueSolarEnabled && value.trim().length > 0)
+  }
+
+  const handleTrueSolarToggle = (enabled: boolean) => {
+    setTrueSolarEnabled(enabled)
+    setMatchingBirthplace(enabled && birthplace.trim().length > 0)
+  }
 
   const handleYearChange = (nextYear: number) => {
     setYear(nextYear)
@@ -240,7 +245,7 @@ export function BirthForm() {
               : '已关闭真太阳时校正'
           }
           value={birthplace}
-          onChange={(e) => setBirthplace(e.target.value)}
+          onChange={(e) => handleBirthplaceChange(e.target.value)}
         />
 
         <label
@@ -259,7 +264,7 @@ export function BirthForm() {
           <input
             type="checkbox"
             checked={trueSolarEnabled}
-            onChange={(e) => setTrueSolarEnabled(e.target.checked)}
+            onChange={(e) => handleTrueSolarToggle(e.target.checked)}
             className="h-5 w-5 accent-star"
           />
         </label>

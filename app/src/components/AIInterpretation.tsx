@@ -117,11 +117,11 @@ export function AIInterpretation() {
   const currentSettings = providerSettings[provider]
 
   // 显示的文本（逐字输出）
-  const [displayText, setDisplayText] = useState('')
+  const [displayText, setDisplayText] = useState(() => aiInterpretation ?? '')
   // 完整文本（缓冲区）
-  const fullTextRef = useRef('')
+  const fullTextRef = useRef(aiInterpretation ?? '')
   // 当前显示位置
-  const displayIndexRef = useRef(0)
+  const displayIndexRef = useRef(aiInterpretation?.length ?? 0)
   // 定时器
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   // 是否正在接收（ref 用于定时器闭包）
@@ -130,15 +130,6 @@ export function AIInterpretation() {
   // 是否正在输出动画
   const [animating, setAnimating] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  // 组件挂载时，如果有缓存则直接显示
-  useEffect(() => {
-    if (aiInterpretation && !displayText) {
-      setDisplayText(aiInterpretation)
-      fullTextRef.current = aiInterpretation
-      displayIndexRef.current = aiInterpretation.length
-    }
-  }, [aiInterpretation, displayText])
 
   /* ------------------------------------------------------------
      均匀输出字符的定时器
