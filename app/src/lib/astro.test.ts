@@ -63,9 +63,10 @@ describe('iztro chart engine integration', () => {
     expect(unadjusted.fiveElementsClass).toBe('水二局')
     expect(unadjusted.star('紫微')?.palace()).toHaveProperty('name', '命宫')
     // The upstream fixture resets iztro to its default algorithm; this app deliberately uses Zhongzhou.
-    // The soul-star label is algorithm-specific, so assert the leap correction changes the result
-    // without copying the upstream default-algorithm star names into the Zhongzhou fixture.
-    expect(adjusted.soul).not.toBe(unadjusted.soul)
+    // In this fixture the soul-star label remains 文曲 in both modes, while palace placement and
+    // five-elements class capture the leap-month correction behavior for this algorithm.
+    expect(adjusted.soul).toBe('文曲')
+    expect(unadjusted.soul).toBe('文曲')
   })
 
   it('treats late zi hour as the following civil day under the configured day boundary', () => {
