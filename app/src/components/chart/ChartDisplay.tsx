@@ -387,7 +387,7 @@ export function ChartDisplay() {
       relative p-3 lg:p-6
       bg-gradient-to-br from-white/[0.04] to-transparent
       bg-white border border-slate-200 shadow-sm rounded-2xl
-      shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+      shadow-sm
       max-w-6xl mx-auto
     ">
       {/* 顶部发光线 */}
