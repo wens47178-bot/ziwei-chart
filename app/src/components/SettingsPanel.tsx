@@ -15,7 +15,7 @@ import { PROVIDER_CONFIGS } from '@/lib/llm'
 
 const PROVIDER_OPTIONS: Array<{ value: ModelProvider; label: string }> = [
   { value: 'kimi', label: 'Kimi (月之暗面)' },
-  { value: 'gemini', label: 'Gemini (Google)' },
+  { value: 'gemini', label: 'Gemini 免费版 (Google)' },
   { value: 'claude', label: 'Claude (Anthropic)' },
   { value: 'deepseek', label: 'DeepSeek' },
   { value: 'custom', label: '自定义 (OpenAI 兼容)' },
@@ -173,7 +173,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
 
       {/* 横幅提示 */}
       <div className="mb-4 p-3 rounded-lg bg-star/10 border border-star/20 text-sm text-text-secondary">
-        <span className="text-star">ⓘ</span> 使用中转 API？展开下方「高级设置」修改 URL 和模型
+        <span className="text-star">ⓘ</span> 默认推荐 Gemini 免费模型；输入 Google AI Studio 的 API Key 即可启用。免费额度有限，达到上限后可稍后重试。
       </div>
 
       <div className="space-y-4">
@@ -374,7 +374,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
 
         {/* 隐私提示 */}
         <p className="text-xs text-text-muted text-center">
-          API Key 仅在当前页面内存中保留，不写入浏览器本地存储；刷新页面后需要重新输入。请求会直接发送给所选服务商。
+          API Key 仅保留在当前页面内存，不写入浏览器本地存储；刷新后需重新输入。命盘资料会直接发送给所选模型服务商。Gemini 免费层可能将提交内容用于改进产品，请勿输入真实姓名等不必要的敏感信息。
         </p>
       </div>
     </div>
