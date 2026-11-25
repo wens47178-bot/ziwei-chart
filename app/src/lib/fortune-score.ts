@@ -728,7 +728,7 @@ function calculateWeeklyVariation(
 /**
  * 计算月度四维度分数
  */
-function calculateMonthlyDimensions(
+export function calculateMonthlyDimensions(
   chart: FunctionalAstrolabe,
   year: number,
   month: number
