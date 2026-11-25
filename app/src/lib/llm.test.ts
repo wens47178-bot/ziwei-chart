@@ -87,3 +87,40 @@ describe('Gemini API streaming', () => {
     expect(tokens.join('')).toBe('final chunk')
   })
 })
+
+
+describe('OpenAI-compatible and Claude streaming', () => {
+  it('flushes the final OpenAI-compatible delta without a trailing newline', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(createSSEStream([
+      'data: {"choices":[{"delta":{"content":"final token"}}]}',
+    ]))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const tokens: string[] = []
+    for await (const token of streamChat(
+      { provider: 'deepseek', apiKey: 'test-key' },
+      [{ role: 'user', content: 'Say hello' }],
+    )) {
+      tokens.push(token)
+    }
+
+    expect(tokens.join('')).toBe('final token')
+  })
+
+  it('flushes the final Claude text delta without a trailing newline', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(createSSEStream([
+      'data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"final Claude token"}}',
+    ]))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const tokens: string[] = []
+    for await (const token of streamChat(
+      { provider: 'claude', apiKey: 'test-key' },
+      [{ role: 'user', content: 'Say hello' }],
+    )) {
+      tokens.push(token)
+    }
+
+    expect(tokens.join('')).toBe('final Claude token')
+  })
+})
