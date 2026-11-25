@@ -76,13 +76,13 @@ const CHAR_INTERVAL = 35
 
 const MarkdownComponents = {
   h1: ({ children }: { children?: React.ReactNode }) => (
-    <h1 className="text-2xl font-bold text-gold mt-6 mb-3 first:mt-0">{children}</h1>
+    <h1 className="text-2xl font-bold text-amber-700 mt-6 mb-3 first:mt-0">{children}</h1>
   ),
   h2: ({ children }: { children?: React.ReactNode }) => (
-    <h2 className="text-xl font-semibold text-gold/90 mt-5 mb-2">{children}</h2>
+    <h2 className="text-xl font-semibold text-amber-800 mt-5 mb-2">{children}</h2>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
-    <h3 className="text-lg font-medium text-star-light mt-4 mb-2">{children}</h3>
+    <h3 className="text-lg font-medium text-violet-700 mt-4 mb-2">{children}</h3>
   ),
   p: ({ children }: { children?: React.ReactNode }) => (
     <p className="mb-3 leading-relaxed">{children}</p>
@@ -102,7 +102,7 @@ const MarkdownComponents = {
     </li>
   ),
   blockquote: ({ children }: { children?: React.ReactNode }) => (
-    <blockquote className="border-l-2 border-gold/40 pl-4 my-3 italic text-text-secondary">
+    <blockquote className="border-l-2 border-gold/40 pl-4 my-3 italic text-slate-700">
       {children}
     </blockquote>
   ),
@@ -253,9 +253,7 @@ ${guidanceContext}
     <div
       className="
         relative p-6 lg:p-8
-        bg-gradient-to-br from-white/[0.04] to-transparent
-        backdrop-blur-xl border border-white/[0.08] rounded-2xl
-        shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+        bg-white border border-violet-100 rounded-2xl shadow-sm
       "
     >
       {/* 顶部发光线 */}
@@ -287,7 +285,7 @@ ${guidanceContext}
         >
           {loading ? (
             <span className="flex items-center gap-2">
-              <span className="w-3 h-3 border-2 border-night border-t-transparent rounded-full animate-spin" />
+              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
               解读中
             </span>
           ) : currentSettings.apiKey ? '开始解读' : '请先配置 API'}
@@ -296,14 +294,14 @@ ${guidanceContext}
 
       {/* 错误提示 */}
       {error && (
-        <div className="p-3 rounded-lg bg-misfortune/10 text-misfortune text-sm mb-4 border border-misfortune/20">
+        <div className="p-3 rounded-lg bg-misfortune/10 text-rose-700 text-sm mb-4 border border-misfortune/20">
           {error}
         </div>
       )}
 
       {/* 未配置提示 */}
       {!currentSettings.apiKey && !displayText && (
-        <div className="text-text-muted text-sm py-8 text-center">
+        <div className="text-slate-500 text-sm py-8 text-center">
           <div className="text-3xl mb-3 opacity-30">☆</div>
           请先在设置中配置 AI 模型的 API Key，即可获得深度命盘解读。
         </div>
@@ -313,7 +311,7 @@ ${guidanceContext}
       {displayText && (
         <div
           className="
-            prose prose-invert max-w-none
+            prose max-w-none prose-slate
             text-text-secondary text-lg lg:text-xl leading-loose
           "
           style={{ fontFamily: 'var(--font-brush)' }}
