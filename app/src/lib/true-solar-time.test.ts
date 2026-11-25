@@ -1,24 +1,27 @@
+declare const process: { env: Record<string, string | undefined> }
+
 import { describe, expect, it } from 'vitest'
 import birthplaceData from './birthplace-data.json'
 import {
   type Birthplace,
   findBirthplaceInData,
+  resolveBirthTime,
   resolveBirthTimeAsync,
   shichenNameForTimeIndex,
 } from './true-solar-time'
 
-const SICHUAN_CHENGDU = '\u56db\u5ddd\u6210\u90fd'
-const CHENGDU = '\u6210\u90fd'
-const CHENGDU_CITY = '\u6210\u90fd\u5e02'
-const SHAANXI_YANAN = '\u9655\u897f\u5ef6\u5b89'
-const YANAN_CITY = '\u5ef6\u5b89\u5e02'
-const BEIJING = '\u5317\u4eac'
-const BEIJING_CITY = '\u5317\u4eac\u5e02'
-const URUMQI = '\u4e4c\u9c81\u6728\u9f50'
-const MARS_BASE = '\u706b\u661f\u57fa\u5730'
-const WU_SHICHEN = '\u5348\u65f6'
-const SI_SHICHEN = '\u5df3\u65f6'
-const ZI_SHICHEN = '\u5b50\u65f6'
+const SICHUAN_CHENGDU = '四川成都'
+const CHENGDU = '成都'
+const CHENGDU_CITY = '成都市'
+const SHAANXI_YANAN = '陕西延安'
+const YANAN_CITY = '延安市'
+const BEIJING = '北京'
+const BEIJING_CITY = '北京市'
+const URUMQI = '乌鲁木齐'
+const MARS_BASE = '火星基地'
+const WU_SHICHEN = '午时'
+const SI_SHICHEN = '巳时'
+const ZI_SHICHEN = '子时'
 const BIRTHPLACE_DATA = birthplaceData as Birthplace[]
 
 describe('findBirthplace', () => {
@@ -118,5 +121,50 @@ describe('resolveBirthTime', () => {
 describe('shichenNameForTimeIndex', () => {
   it('names late zi time index as zi shichen', () => {
     expect(shichenNameForTimeIndex(12)).toBe(ZI_SHICHEN)
+  })
+})
+
+describe('timezone-independent calendar arithmetic', () => {
+  it('uses the same wall-clock result regardless of the runtime timezone', () => {
+    const input = {
+      year: 2024,
+      month: 3,
+      day: 10,
+      hour: 2,
+      birthplace: URUMQI,
+      enabled: true,
+      birthplaces: BIRTHPLACE_DATA,
+    }
+
+    const originalTimezone = process.env.TZ
+    try {
+      process.env.TZ = 'UTC'
+      const utcResult = resolveBirthTime(input)
+
+      process.env.TZ = 'America/Los_Angeles'
+      const pacificResult = resolveBirthTime(input)
+
+      expect(pacificResult).toEqual(utcResult)
+    } finally {
+      if (originalTimezone === undefined) delete process.env.TZ
+      else process.env.TZ = originalTimezone
+    }
+  })
+
+  it('handles leap-day input without relying on local daylight-saving rules', () => {
+    const result = resolveBirthTime({
+      year: 2024,
+      month: 2,
+      day: 29,
+      hour: 12,
+      birthplace: BEIJING,
+      enabled: true,
+      birthplaces: BIRTHPLACE_DATA,
+    })
+
+    expect(result.year).toBe(2024)
+    expect(result.month).toBe(2)
+    expect(result.day).toBe(29)
+    expect(result.applied).toBe(true)
   })
 })

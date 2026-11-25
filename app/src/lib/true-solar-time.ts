@@ -93,7 +93,9 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
   const location = findBirthplaceInData(input.birthplace, input.birthplaces ?? [])
   const shouldApply = input.enabled && location !== null
 
-  const baseDate = new Date(input.year, input.month - 1, input.day, input.hour, REPRESENTATIVE_MINUTE)
+  // Birth input is a wall-clock time, not a timestamp in the browser's timezone.
+  // Use UTC calendar arithmetic so DST and the viewer's timezone cannot shift the chart.
+  const baseDate = new Date(Date.UTC(input.year, input.month - 1, input.day, input.hour, REPRESENTATIVE_MINUTE))
   const correctionMinutes = shouldApply
     ? getTrueSolarCorrectionMinutes(input.year, input.month, input.day, location.longitude)
     : 0
@@ -104,10 +106,10 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
   const correctedShichen = shichenNameForTimeIndex(timeIndex)
 
   return {
-    year: correctedDate.getFullYear(),
-    month: correctedDate.getMonth() + 1,
-    day: correctedDate.getDate(),
-    hour: correctedDate.getHours(),
+    year: correctedDate.getUTCFullYear(),
+    month: correctedDate.getUTCMonth() + 1,
+    day: correctedDate.getUTCDate(),
+    hour: correctedDate.getUTCHours(),
     minute: correctedDate.getMinutes(),
     timeIndex,
     originalShichen,
@@ -196,8 +198,8 @@ function getTrueSolarCorrectionMinutes(year: number, month: number, day: number,
 }
 
 function getEquationOfTimeMinutes(year: number, month: number, day: number): number {
-  const date = new Date(year, month - 1, day)
-  const start = new Date(year, 0, 0)
+  const date = new Date(Date.UTC(year, month - 1, day))
+  const start = new Date(Date.UTC(year, 0, 0))
   const dayOfYear = Math.floor((date.getTime() - start.getTime()) / 86_400_000)
   const b = (2 * Math.PI * (dayOfYear - 81)) / 364
 
@@ -211,7 +213,7 @@ function hourToTimeIndex(hour: number): number {
 }
 
 function dateToTimeIndex(date: Date): number {
-  const hour = date.getHours()
+  const hour = date.getUTCHours()
   if (hour === 23) return 12
   if (hour === 0) return 0
   return Math.floor((hour + 1) / 2)
@@ -219,8 +221,8 @@ function dateToTimeIndex(date: Date): number {
 
 function isDifferentDate(input: ResolveBirthTimeInput, date: Date): boolean {
   return (
-    input.year !== date.getFullYear()
-    || input.month !== date.getMonth() + 1
-    || input.day !== date.getDate()
+    input.year !== date.getUTCFullYear()
+    || input.month !== date.getUTCMonth() + 1
+    || input.day !== date.getUTCDate()
   )
 }

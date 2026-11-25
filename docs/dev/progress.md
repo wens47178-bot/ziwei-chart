@@ -141,3 +141,10 @@ or notable verification run.
 - Fixed two React effect lint findings by moving birthplace matching state changes into user event handlers and initializing AI interpretation state from the cache.
 - Removed the temporary dependency-preview workflow after its one-time lockfile update was complete.
 - Deployment mirror synchronization remains source-repository guarded; merging into this fork does not deploy the Vercel site.
+
+
+## 2026-11-25 True-solar-time timezone determinism
+
+- Started branch `fix/true-solar-time-timezone-determinism`.
+- Replaced local-time `Date` construction and getters in true-solar correction with UTC calendar arithmetic. Birth input is a civil wall-clock time; using the browser/runtime timezone could otherwise make the same birth details produce different results across regions or DST transitions.
+- Added regression coverage for a DST-transition date and leap-day input. Changes remain isolated until CI validates the behavior.
