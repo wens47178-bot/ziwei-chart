@@ -69,7 +69,12 @@ export default function App() {
           {/* 命盘解读标签 */}
           {activeTab === 'chart' && (
             !chart ? (
-              <div className="flex items-center justify-center min-h-[60vh]">
+              <div className="mx-auto flex min-h-[70vh] max-w-4xl flex-col items-center justify-center gap-7 py-10">
+                <div className="w-full max-w-2xl text-center">
+                  <p className="text-xs font-semibold tracking-[0.24em] text-violet-700">YOUR PERSONAL STAR MAP</p>
+                  <h2 className="mt-3 text-3xl font-semibold tracking-wide text-slate-900 sm:text-4xl" style={{ fontFamily: 'var(--font-serif)' }}>从了解自己开始</h2>
+                  <p className="mx-auto mt-3 max-w-lg text-sm leading-7 text-slate-500">输入出生资料，生成专属命盘。以清晰的星曜结构与人生时间线，开启一场关于自我的探索。</p>
+                </div>
                 <BirthForm />
               </div>
             ) : (
@@ -91,8 +96,8 @@ export default function App() {
                     onClick={() => useChartStore.getState().clear()}
                     className="
                       inline-flex items-center gap-2 px-4 py-2 rounded-lg
-                      text-sm text-text-muted
-                      hover:text-text hover:bg-white/[0.04]
+                      text-sm text-slate-500
+                      hover:text-slate-900 hover:bg-slate-100
                       transition-all duration-200
                     "
                   >
@@ -195,19 +200,19 @@ function EmptyState({ message, action, actionLabel }: EmptyStateProps) {
   return (
     <div
       className="
-        text-center p-8 rounded-2xl
-        bg-white/[0.02] border border-white/[0.06]
+        w-full max-w-xl text-center p-8 rounded-2xl
+        bg-white border border-slate-200 shadow-sm
       "
     >
-      <div className="text-4xl mb-4 opacity-30">☆</div>
-      <p className="text-text-muted mb-4">{message}</p>
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-2xl text-violet-700">✦</div>
+      <p className="mb-5 text-slate-600">{message}</p>
       <button
         onClick={action}
         className="
           inline-flex items-center gap-2
           px-4 py-2 rounded-lg
-          bg-star/20 text-star-light
-          hover:bg-star/30 transition-colors
+          bg-violet-700 text-white shadow-sm
+          hover:bg-violet-800 transition-colors
         "
       >
         {actionLabel}
