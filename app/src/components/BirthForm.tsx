@@ -44,6 +44,9 @@ export function BirthForm() {
       .then((place) => {
         if (active) setMatchedBirthplace(place)
       })
+      .catch(() => {
+        if (active) setMatchedBirthplace(null)
+      })
       .finally(() => {
         if (active) setMatchingBirthplace(false)
       })
@@ -55,11 +58,13 @@ export function BirthForm() {
 
   const handleBirthplaceChange = (value: string) => {
     setBirthplace(value)
+    setMatchedBirthplace(null)
     setMatchingBirthplace(trueSolarEnabled && value.trim().length > 0)
   }
 
   const handleTrueSolarToggle = (enabled: boolean) => {
     setTrueSolarEnabled(enabled)
+    setMatchedBirthplace(null)
     setMatchingBirthplace(enabled && birthplace.trim().length > 0)
   }
 
