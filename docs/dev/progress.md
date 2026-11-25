@@ -111,3 +111,11 @@ or notable verification run.
 - The latest CI dependency installation reported 20 vulnerabilities: 1 low, 7 moderate, and 12 high.
 - Added a non-blocking CI audit-summary step on branch `ci/report-npm-audit-details` so the exact affected packages, vulnerable ranges, advisory titles, and fix availability are visible in workflow logs.
 - This reporting-only change does not alter package versions or the lockfile. Dependency remediation will be handled in a separate reviewed change after examining the advisory output.
+
+
+## 2026-11-25 Dependency update verification
+
+- The compatible dependency update preview uses npm 11 because npm 10 failed with an Arborist `edgesOut` internal error on this lockfile.
+- Updating within the declared semver ranges succeeded under npm 11, but the newer ESLint rules surfaced two existing synchronous state updates inside effects in `BirthForm.tsx` and `AIInterpretation.tsx`.
+- Refactored birthplace matching state transitions into input/toggle handlers and initialized the AI interpretation display from its cache, removing the two effect lint errors without changing chart calculation behavior.
+- Dependency updates are not merged yet; the preview must pass lint, all tests, and production build before a PR is opened.
