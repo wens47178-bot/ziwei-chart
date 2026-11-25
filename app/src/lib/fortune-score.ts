@@ -186,6 +186,7 @@ const SIHUA_MODIFIER: Record<string, number> = {
 
 type Horoscope = ReturnType<FunctionalAstrolabe['horoscope']>
 type HoroscopePalaceName = Parameters<Horoscope['palace']>[0]
+type HoroscopeScope = 'yearly' | 'monthly'
 
 const PALACE_WEIGHTS: Record<keyof FortuneScore['dimensions'], HoroscopePalaceName[]> = {
   career: ['官禄', '命宫', '迁移'],
@@ -257,32 +258,47 @@ export function calculatePeriodScore(
   year: number
 ): FortuneScore {
   const horoscope = chart.horoscope(new Date(`${year}-6-15`))
+  const rawDimensions = calculateRawDimensions(horoscope, 'yearly')
 
-  // Each scope palace name maps to a natal palace index. Ask iztro for the
-  // yearly-scope palace instead of scoring natal palace names directly.
-  const dimensions = {
-    career: calculateDimensionScore(horoscope, PALACE_WEIGHTS.career),
-    wealth: calculateDimensionScore(horoscope, PALACE_WEIGHTS.wealth),
-    relationship: calculateDimensionScore(horoscope, PALACE_WEIGHTS.relationship),
-    health: calculateDimensionScore(horoscope, PALACE_WEIGHTS.health),
+  return {
+    total: Math.max(0, Math.min(100, weightedDimensionTotal(rawDimensions))),
+    trend: 'flat', // 后续根据前后对比计算
+    dimensions: normalizeDimensions(rawDimensions),
   }
+}
 
-  const total = Math.round(
+/**
+ * 计算指定运限下的四个维度原始分数。
+ */
+function calculateRawDimensions(
+  horoscope: Horoscope,
+  scope: HoroscopeScope
+): FortuneScore['dimensions'] {
+  return {
+    career: calculateDimensionScore(horoscope, PALACE_WEIGHTS.career, scope),
+    wealth: calculateDimensionScore(horoscope, PALACE_WEIGHTS.wealth, scope),
+    relationship: calculateDimensionScore(horoscope, PALACE_WEIGHTS.relationship, scope),
+    health: calculateDimensionScore(horoscope, PALACE_WEIGHTS.health, scope),
+  }
+}
+
+function weightedDimensionTotal(dimensions: FortuneScore['dimensions']): number {
+  return Math.round(
     dimensions.career * 0.3 +
     dimensions.wealth * 0.25 +
     dimensions.relationship * 0.25 +
     dimensions.health * 0.2
   )
+}
 
+function normalizeDimensions(
+  dimensions: FortuneScore['dimensions']
+): FortuneScore['dimensions'] {
   return {
-    total: Math.max(0, Math.min(100, total)),
-    trend: 'flat', // 后续根据前后对比计算
-    dimensions: {
-      career: normalize(dimensions.career),
-      wealth: normalize(dimensions.wealth),
-      relationship: normalize(dimensions.relationship),
-      health: normalize(dimensions.health),
-    },
+    career: normalize(dimensions.career),
+    wealth: normalize(dimensions.wealth),
+    relationship: normalize(dimensions.relationship),
+    health: normalize(dimensions.health),
   }
 }
 
@@ -291,13 +307,14 @@ export function calculatePeriodScore(
  */
 function calculateDimensionScore(
   horoscope: Horoscope,
-  palaceNames: HoroscopePalaceName[]
+  palaceNames: HoroscopePalaceName[],
+  scope: HoroscopeScope
 ): number {
   let sum = 0
   let count = 0
 
   for (const palaceName of palaceNames) {
-    const palace = horoscope.palace(palaceName, 'yearly')
+    const palace = horoscope.palace(palaceName, scope)
     if (!palace) continue
 
     const normalizeMutagen = (mutagen: unknown): string[] | undefined => {
@@ -322,18 +339,18 @@ function calculateDimensionScore(
       })),
     })
 
-    // A yearly transformation belongs to the palace containing its transformed
-    // star, not to every dimension as a global bonus.
-    const yearlyMutagenBonus = (['禄', '权', '科', '忌'] as const).reduce(
+    // A scope transformation belongs only to the palace containing its
+    // transformed star, not to every dimension as a global bonus.
+    const scopeMutagenBonus = (['禄', '权', '科', '忌'] as const).reduce(
       (bonus, mutagen) => bonus + (
-        horoscope.hasHoroscopeMutagen(palaceName, 'yearly', mutagen)
+        horoscope.hasHoroscopeMutagen(palaceName, scope, mutagen)
           ? SIHUA_MODIFIER[mutagen]
           : 0
       ),
       0
     )
 
-    sum += score + yearlyMutagenBonus
+    sum += score + scopeMutagenBonus
     count++
   }
 
@@ -660,80 +677,14 @@ function calculateRealMonthlyScores(
   for (let month = 1; month <= 12; month++) {
     const date = new Date(`${year}-${String(month).padStart(2, '0')}-15`)
     const horoscope = chart.horoscope(date)
+    const monthlyDimensions = calculateRawDimensions(horoscope, 'monthly')
 
-    // 基础分：流年分数
-    let baseScore = 50
-
-    // 流月四化加成
-    const monthlyMutagen = horoscope.monthly.mutagen || []
-    for (const star of monthlyMutagen) {
-      const starName = String(star)
-      if (starName.includes('禄')) baseScore += 12
-      else if (starName.includes('权')) baseScore += 10
-      else if (starName.includes('科')) baseScore += 8
-      else if (starName.includes('忌')) baseScore -= 15
-    }
-
-    // 流年四化叠加
-    const yearlyMutagen = horoscope.yearly.mutagen || []
-    for (const star of yearlyMutagen) {
-      const starName = String(star)
-      if (starName.includes('禄')) baseScore += 8
-      else if (starName.includes('权')) baseScore += 6
-      else if (starName.includes('科')) baseScore += 5
-      else if (starName.includes('忌')) baseScore -= 10
-    }
-
-    // 流月命宫位置影响 (不同宫位有不同基础运势)
-    const monthlyPalaceIndex = horoscope.monthly.index
-    const palaceModifier = getPalaceModifier(chart, monthlyPalaceIndex)
-    baseScore += palaceModifier
-
-    // 归一化
-    scores.push(Math.max(15, Math.min(95, baseScore)))
+    scores.push(Math.max(15, Math.min(95, weightedDimensionTotal(monthlyDimensions))))
   }
 
   return scores
 }
 
-/**
- * 获取宫位的运势修正值
- */
-function getPalaceModifier(chart: FunctionalAstrolabe, palaceIndex: number): number {
-  const palace = chart.palaces[palaceIndex]
-  if (!palace) return 0
-
-  let modifier = 0
-
-  // 主星评分
-  for (const star of palace.majorStars) {
-    const name = String(star.name)
-    const baseScore = STAR_BASE_SCORE[name] || 0
-
-    // 亮度系数
-    const brightness = star.brightness ? String(star.brightness) : '平'
-    const coef = BRIGHTNESS_COEF[brightness] || 1.0
-
-    modifier += baseScore * coef * 0.3  // 降低权重避免过大波动
-
-    // 四化
-    if (star.mutagen) {
-      const mutagen = String(star.mutagen)
-      if (mutagen.includes('禄')) modifier += 5
-      else if (mutagen.includes('权')) modifier += 4
-      else if (mutagen.includes('科')) modifier += 3
-      else if (mutagen.includes('忌')) modifier -= 8
-    }
-  }
-
-  // 辅星
-  for (const star of palace.minorStars) {
-    const name = String(star.name)
-    modifier += (STAR_BASE_SCORE[name] || 0) * 0.2
-  }
-
-  return modifier
-}
 
 /**
  * 计算周度波动 (4周)
@@ -785,19 +736,7 @@ function calculateMonthlyDimensions(
   const date = new Date(`${year}-${String(month).padStart(2, '0')}-15`)
   const horoscope = chart.horoscope(date)
 
-  // 基于流月命宫位置计算各维度
-  const monthlyPalaceIndex = horoscope.monthly.index
-
-  // 简化计算：基于宫位轮转
-  const base = 50
-  const palaceBonus = getPalaceModifier(chart, monthlyPalaceIndex)
-
-  return {
-    career: normalize(base + palaceBonus + (Math.random() - 0.5) * 10),
-    wealth: normalize(base + palaceBonus * 0.8 + (Math.random() - 0.5) * 10),
-    relationship: normalize(base + palaceBonus * 0.6 + (Math.random() - 0.5) * 10),
-    health: normalize(base + palaceBonus * 0.7 + (Math.random() - 0.5) * 10),
-  }
+  return normalizeDimensions(calculateRawDimensions(horoscope, 'monthly'))
 }
 
 /**
