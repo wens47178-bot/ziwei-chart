@@ -1,7 +1,7 @@
 import type { PageKey } from '@/App'
 import { useState } from 'react'
 
-type Entry = { label: string; key: string }
+type Entry = { label: string; key: PageKey }
 const GROUPS: { title: string; en: string; items: Entry[] }[] = [
   { title: '紫微命盘', en: 'DESTINY CHART', items: [
     { label: '起紫微命盘', key: 'birth' }, { label: '本命十二宫', key: 'chart' },
