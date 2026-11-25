@@ -128,10 +128,13 @@ async function extractSearchKeywords(
     // 使用非流式请求提取关键词
     if (provider === 'gemini') {
       // Gemini 非流式
-      const url = `${baseUrl || providerConfig.baseUrl}/models/${model || providerConfig.defaultModel}:generateContent?key=${apiKey}`
+      const url = `${baseUrl || providerConfig.baseUrl}/models/${model || providerConfig.defaultModel}:generateContent`
       const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
+        },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: chartContext }] }],
           systemInstruction: { parts: [{ text: KEYWORD_EXTRACTION_PROMPT }] },
@@ -375,7 +378,7 @@ async function* streamGemini(
   // 系统消息作为 systemInstruction
   const systemMessage = messages.find(m => m.role === 'system')
 
-  const url = `${baseUrl || providerConfig.baseUrl}/models/${modelName}:streamGenerateContent?key=${apiKey}`
+  const url = `${baseUrl || providerConfig.baseUrl}/models/${modelName}:streamGenerateContent`
 
   // 构建请求体
   const requestBody: Record<string, unknown> = {
@@ -390,7 +393,10 @@ async function* streamGemini(
 
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': apiKey,
+    },
     body: JSON.stringify(requestBody),
   })
 
