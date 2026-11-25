@@ -53,9 +53,9 @@ function CustomTooltip({ active, payload }: TooltipProps) {
                      data.score >= 20 ? '偏低' : '低位'
 
   return (
-    <div className="bg-night/95 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-white/10 z-50 w-[320px] md:w-[380px]">
+    <div className="bg-white p-5 rounded-xl shadow-xl border border-slate-200 z-50 z-50 w-[320px] md:w-[380px]">
       {/* ─── Header ─── */}
-      <div className="flex justify-between items-start mb-3 border-b border-white/10 pb-3">
+      <div className="flex justify-between items-start mb-3 border-b border-slate-200 pb-3">
         <div>
           <p className="text-xl font-bold text-slate-900" style={{ fontFamily: 'var(--font-serif)' }}>
             {data.year} {data.ganZhi}年
@@ -78,7 +78,7 @@ function CustomTooltip({ active, payload }: TooltipProps) {
       <div className="grid grid-cols-4 gap-2 text-xs mb-4 bg-emerald-50 border border-emerald-100 p-3 rounded-xl">
         <div className="text-center">
           <span className="block text-text-muted mb-1">年初</span>
-          <span className="font-mono text-white font-bold">{data.open}</span>
+          <span className="font-mono text-slate-900 font-bold">{data.open}</span>
         </div>
         <div className="text-center">
           <span className="block text-text-muted mb-1">年末</span>
@@ -107,7 +107,7 @@ function CustomTooltip({ active, payload }: TooltipProps) {
 
       {/* ─── 流年四化 ─── */}
       {data.yearlyMutagens && data.yearlyMutagens.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-white/10">
+        <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-slate-200">
           {data.yearlyMutagens.map((m, i) => (
             <span key={i} className="px-2 py-0.5 rounded text-xs bg-star/20 text-star-light">
               {m}
@@ -371,7 +371,7 @@ export function LifeKLine() {
 
             {/* 图表标题 */}
             <div className="mb-4 flex justify-between items-center px-2">
-              <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-serif)' }}>
+              <h3 className="text-lg font-bold text-slate-900" style={{ fontFamily: 'var(--font-serif)' }}>
                 人生流年大运 K 线图
               </h3>
               <div className="flex gap-3 text-xs font-medium">
@@ -489,7 +489,7 @@ export function LifeKLine() {
               />
 
               {/* 详细信息卡片 */}
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-sm">
+              <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
                 <h3 className="text-sm text-text-muted font-medium mb-4">
                   📌 {selectedPoint.year}年 {selectedPoint.ganZhi} · {selectedPoint.age}岁
                 </h3>
@@ -512,7 +512,7 @@ export function LifeKLine() {
                   </div>
 
                   {selectedPoint.yearlyMutagens && selectedPoint.yearlyMutagens.length > 0 && (
-                    <div className="pt-3 border-t border-white/10">
+                    <div className="pt-3 border-t border-slate-200">
                       <span className="text-text-muted text-sm block mb-2">流年四化</span>
                       <div className="flex flex-wrap gap-1.5">
                         {selectedPoint.yearlyMutagens.map((m, i) => (
@@ -525,7 +525,7 @@ export function LifeKLine() {
                   )}
 
                   {selectedPoint.reason && (
-                    <div className="pt-3 border-t border-white/10">
+                    <div className="pt-3 border-t border-slate-200">
                       <span className="text-text-muted text-sm block mb-2">运势解读</span>
                       <p className="text-text-secondary text-sm leading-relaxed" style={{ fontFamily: 'var(--font-brush)' }}>
                         {selectedPoint.reason}
@@ -550,7 +550,7 @@ export function LifeKLine() {
 
 function EmptyState() {
   return (
-    <div className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
+    <div className="text-center p-8 rounded-2xl bg-white border border-slate-200">
       <KLineIcon className="mx-auto mb-4 h-12 w-12 text-gold/30" />
       <p className="text-text-muted mb-4">
         请先在「命盘解读」中输入您的生辰信息
