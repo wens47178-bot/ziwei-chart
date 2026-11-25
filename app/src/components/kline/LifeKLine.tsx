@@ -46,10 +46,10 @@ function CustomTooltip({ active, payload }: TooltipProps) {
 
   const data = payload[0].payload
   const isUp = data.close >= data.open
-  const scoreLevel = data.score >= 80 ? '大吉' :
-                     data.score >= 60 ? '吉' :
-                     data.score >= 40 ? '平' :
-                     data.score >= 20 ? '凶' : '大凶'
+  const scoreLevel = data.score >= 80 ? '高位' :
+                     data.score >= 60 ? '偏高' :
+                     data.score >= 40 ? '中位' :
+                     data.score >= 20 ? '偏低' : '低位'
 
   return (
     <div className="bg-night/95 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-white/10 z-50 w-[320px] md:w-[380px]">
@@ -333,7 +333,10 @@ export function LifeKLine() {
           人生 K 线
         </h2>
         <p className="text-text-muted text-sm mt-2">
-          {birthInfo?.year}年生 · 100 年运势起伏一目了然
+          {birthInfo?.year}年生 · 100 年趋势参考
+        </p>
+        <p className="text-text-muted text-xs mt-2 max-w-2xl mx-auto">
+          评分由星曜与运限规则的启发式权重生成，仅供传统术数研究与自我观察参考，不代表事件概率、科学预测或确定的人生吉凶。
         </p>
       </div>
 
@@ -372,10 +375,10 @@ export function LifeKLine() {
               </h3>
               <div className="flex gap-3 text-xs font-medium">
                 <span className="flex items-center text-green-400 bg-green-500/10 px-2 py-1 rounded">
-                  <div className="w-2 h-2 bg-green-500 mr-2 rounded-full" /> 吉运
+                  <div className="w-2 h-2 bg-green-500 mr-2 rounded-full" /> 参考分偏高
                 </span>
                 <span className="flex items-center text-rose-400 bg-rose-500/10 px-2 py-1 rounded">
-                  <div className="w-2 h-2 bg-rose-500 mr-2 rounded-full" /> 凶运
+                  <div className="w-2 h-2 bg-rose-500 mr-2 rounded-full" /> 参考分偏低
                 </span>
               </div>
             </div>
@@ -414,7 +417,7 @@ export function LifeKLine() {
                   tickLine={false}
                   ticks={[0, 25, 50, 75, 100]}
                   label={{
-                    value: '运势分',
+                    value: '参考分',
                     angle: -90,
                     position: 'insideLeft',
                     fontSize: 10,
