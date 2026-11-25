@@ -499,7 +499,7 @@ export function generateDecadalKLines(
     // 计算该大限期间内每年的分数
     const yearlyScores: number[] = []
     for (let year = startYear; year <= endYear; year++) {
-      // 获取该年12个月的平均分
+      // 获取该年各公历月中点的平均参考分
       const monthlyScores = calculateRealMonthlyScoresForDecadal(chart, year, palace)
       const avgScore = monthlyScores.reduce((a, b) => a + b, 0) / monthlyScores.length
       yearlyScores.push(avgScore)
@@ -733,7 +733,7 @@ export function generateMonthlyKLines(
 ): KLineData[] {
   const klines: KLineData[] = []
 
-  // 计算12个月的真实分数
+  // 计算12个公历月中点对应的流月盘分数
   const monthlyScores = calculateRealMonthlyScores(chart, year)
 
   for (let month = 1; month <= 12; month++) {
