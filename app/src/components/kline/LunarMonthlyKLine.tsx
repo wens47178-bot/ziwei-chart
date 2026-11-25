@@ -35,7 +35,7 @@ function LunarCandleShape({
   if (!payload) return null
 
   const isUp = payload.close >= payload.open
-  const color = isUp ? '#22c55e' : '#ef4444'
+  const color = isUp ? '#69866d' : '#a56d69'
   const top = Math.min(y, y + height)
   const bodyHeight = Math.max(2, Math.abs(height))
   const center = x + width / 2
@@ -79,11 +79,11 @@ function LunarTooltip({
     <div className="rounded-xl border border-[#e9e5dc] bg-white p-3 text-sm shadow-lg">
       <p className="mb-2 font-semibold text-[#302b23]">{item.period}</p>
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-        <span className="text-[#918a7e]">期初</span><span className="text-right text-slate-900">{item.open}</span>
-        <span className="text-text-muted">期末</span><span className="text-right text-slate-900">{item.close}</span>
-        <span className="text-text-muted">最高</span><span className="text-right text-[#69866d]">{item.high}</span>
-        <span className="text-text-muted">最低</span><span className="text-right text-[#a56d69]">{item.low}</span>
-        <span className="text-text-muted">参考分</span><span className="text-right text-[#9b8053]">{item.score.total}</span>
+        <span className="text-[#918a7e]">期初</span><span className="text-right text-[#37332d]">{item.open}</span>
+        <span className="text-[#918a7e]">期末</span><span className="text-right text-[#37332d]">{item.close}</span>
+        <span className="text-[#918a7e]">最高</span><span className="text-right text-[#69866d]">{item.high}</span>
+        <span className="text-[#918a7e]">最低</span><span className="text-right text-[#a56d69]">{item.low}</span>
+        <span className="text-[#918a7e]">参考分</span><span className="text-right text-[#9b8053]">{item.score.total}</span>
       </div>
     </div>
   )
@@ -129,7 +129,7 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
   return (
     <section className="space-y-4 rounded-2xl border border-[#e9e5dc] bg-white shadow-sm p-4 md:p-6">
       <div>
-        <h3 className="text-lg font-bold text-slate-900" style={{ fontFamily: 'var(--font-serif)' }}>
+        <h3 className="text-lg font-bold text-[#37332d]" style={{ fontFamily: 'var(--font-serif)' }}>
           农历流月 K 线
         </h3>
         <p className="mt-1 text-xs leading-relaxed text-[#898273]">
