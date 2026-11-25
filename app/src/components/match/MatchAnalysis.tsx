@@ -302,7 +302,7 @@ ${guidance2}
         className="
           relative p-6 lg:p-8
           bg-white border border-rose-100 rounded-2xl shadow-sm
-          shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+          shadow-sm
         "
       >
         {/* 顶部发光线 */}
@@ -349,7 +349,7 @@ ${guidance2}
 
         {/* 错误提示 */}
         {error && (
-          <div className="mt-4 p-3 rounded-lg bg-misfortune/10 text-misfortune text-sm border border-misfortune/20">
+          <div className="mt-4 p-3 rounded-lg bg-misfortune/10 text-rose-700 text-sm border border-rose-200">
             {error}
           </div>
         )}
@@ -359,7 +359,6 @@ ${guidance2}
       <div
         className="
           relative p-6 lg:p-8
-          bg-gradient-to-br from-white/[0.04] to-transparent
           bg-white border border-rose-100 shadow-sm rounded-2xl
           shadow-[0_8px_32px_rgba(0,0,0,0.3)]
         "
@@ -375,7 +374,7 @@ ${guidance2}
 
         {/* 未配置提示 */}
         {!currentSettings.apiKey && !result && (
-          <div className="text-text-muted text-sm py-8 text-center">
+          <div className="text-slate-500 text-sm py-8 text-center">
             <div className="text-3xl mb-3 opacity-30">⚭</div>
             请先在设置中配置 AI 模型的 API Key，即可获得双人合盘分析。
           </div>
@@ -391,7 +390,7 @@ ${guidance2}
 
         {/* 加载中 */}
         {loading && !result && (
-          <div className="flex items-center justify-center gap-3 text-text-muted py-12">
+          <div className="flex items-center justify-center gap-3 text-slate-500 py-12">
             <div className="w-5 h-5 border-2 border-star border-t-transparent rounded-full animate-spin" />
             <span>正在分析两人契合度...</span>
           </div>
