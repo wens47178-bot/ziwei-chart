@@ -6,6 +6,7 @@
 import { useRef, useState, useCallback } from 'react'
 import html2canvas from 'html2canvas'
 import { useChartStore, useContentCacheStore } from '@/stores'
+import { detectPatterns } from '@/knowledge'
 import { Button } from '@/components/ui'
 import type { FunctionalAstrolabe } from '@/lib/astro'
 
@@ -66,19 +67,10 @@ function getLifePalaceStars(chart: FunctionalAstrolabe): string {
    ------------------------------------------------------------ */
 
 function getPatternName(chart: FunctionalAstrolabe): string | null {
-  // 简化版格局判断 - 可后续扩展
-  const lifePalace = chart.palaces?.find((p) => p.name === '命宫')
-  const stars = lifePalace?.majorStars?.map((s) => String(s.name)) || []
-
-  if (stars.includes('紫微') && stars.includes('天府')) return '紫府同宫格'
-  if (stars.includes('紫微') && stars.includes('贪狼')) return '紫贪同宫格'
-  if (stars.includes('紫微') && stars.includes('天相')) return '紫相同宫格'
-  if (stars.includes('太阳') && stars.includes('太阴')) return '日月同宫格'
-  if (stars.includes('天机') && stars.includes('太阴')) return '机月同梁格'
-  if (stars.includes('廉贞') && stars.includes('贪狼')) return '廉贪同宫格'
-  if (stars.includes('武曲') && stars.includes('贪狼')) return '武贪同宫格'
-
-  return null
+  // 与命盘格局工作区共用同一套保守规则，避免分享卡片单独误报格局。
+  const hint = detectPatterns(chart)[0]
+  if (!hint) return null
+  return hint.split('：')[0] || null
 }
 
 /* ------------------------------------------------------------
