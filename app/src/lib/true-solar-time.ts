@@ -110,7 +110,7 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
     month: correctedDate.getUTCMonth() + 1,
     day: correctedDate.getUTCDate(),
     hour: correctedDate.getUTCHours(),
-    minute: correctedDate.getMinutes(),
+    minute: correctedDate.getUTCMinutes(),
     timeIndex,
     originalShichen,
     correctedShichen,
