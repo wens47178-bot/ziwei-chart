@@ -137,6 +137,41 @@ interface SettingsState {
   getCurrentSettings: () => ProviderSettings
 }
 
+const SETTINGS_PROVIDERS: ModelProvider[] = ['kimi', 'gemini', 'claude', 'deepseek', 'custom']
+
+/**
+ * Persist preferences, but never persist provider or search API credentials.
+ * Credentials remain in Zustand memory for the current page session only.
+ */
+export function sanitizePersistedSettings(persistedState: unknown): Partial<SettingsState> {
+  const persisted = (
+    persistedState && typeof persistedState === 'object'
+      ? persistedState
+      : {}
+  ) as Partial<SettingsState>
+
+  const providerSettings = Object.fromEntries(
+    SETTINGS_PROVIDERS.map((provider) => [
+      provider,
+      {
+        ...DEFAULT_PROVIDER_SETTINGS,
+        ...(persisted.providerSettings?.[provider] ?? {}),
+        apiKey: '',
+      },
+    ])
+  ) as Record<ModelProvider, ProviderSettings>
+
+  return {
+    provider: SETTINGS_PROVIDERS.includes(persisted.provider as ModelProvider)
+      ? persisted.provider
+      : 'kimi',
+    providerSettings,
+    enableThinking: persisted.enableThinking ?? false,
+    enableWebSearch: persisted.enableWebSearch ?? false,
+    searchApiKey: '',
+  }
+}
+
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set, get) => ({
@@ -175,6 +210,13 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: 'ziwei-settings',
+      version: 1,
+      partialize: sanitizePersistedSettings,
+      migrate: (persistedState) => sanitizePersistedSettings(persistedState),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...sanitizePersistedSettings(persistedState),
+      }),
     }
   )
 )
