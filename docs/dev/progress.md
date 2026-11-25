@@ -225,3 +225,11 @@ or notable verification run.
 - Replaced the annual global four-transformation bonus (which is the same four fixed bonuses every year) with a bounded adjustment derived from the yearly-scope weighted score.
 - Added a regression assertion that the first lifetime K-line's dimensions match the selected year's yearly-scope dimensions.
 - This improves scope attribution; the underlying score weights remain heuristic and are not doctrinally or scientifically validated.
+
+
+## 2026-11-25 Decadal K-line transformation scope
+
+- Found that decadal base scoring omitted decadal-scope transformations, while decadal monthly scoring counted all yearly/monthly transformations as global bonuses.
+- Added natal-index-to-scope-palace resolution and apply decadal, yearly, and monthly transformation modifiers only when the transformed star is in the decadal life palace's corresponding natal position.
+- Added regression coverage for scope-to-natal-palace attribution and decadal transformation contribution.
+- The transformation weights remain heuristic score parameters; this change validates scope mapping, not the doctrinal correctness of the weights.

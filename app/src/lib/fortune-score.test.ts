@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { generateChart } from './astro'
-import { calculateMonthlyDimensions, calculatePeriodScore, generateLifetimeKLines, getDecadalYearRange } from './fortune-score'
+import { calculateDecadalBaseScore, calculateMonthlyDimensions, calculatePeriodScore, calculateScopeMutagenBonus, generateLifetimeKLines, getDecadalYearRange } from './fortune-score'
 import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
 
 describe('K-line scoring', () => {
@@ -60,6 +60,7 @@ describe('K-line scoring', () => {
 
   it('generates repeatable lifetime K-lines for the same chart', () => {
     const chart = {
+      rawDates: { lunarDate: { lunarYear: 2000 } },
       solarDate: '2000-8-16',
       lunarDate: '二〇〇〇年七月十七',
       time: '寅时',
@@ -77,6 +78,7 @@ describe('K-line scoring', () => {
       }],
       horoscope: () => ({
         yearly: { mutagen: [], index: 0 },
+        decadal: { index: 0, palaceNames: ['命宫'] },
         palace: () => ({ majorStars: [], minorStars: [], adjectiveStars: [] }),
         hasHoroscopeMutagen: () => false,
       }),
@@ -86,6 +88,43 @@ describe('K-line scoring', () => {
 
     expect(lifetime).toEqual(generateLifetimeKLines(chart, 2000))
     expect(lifetime[0].dimensions).toEqual(calculatePeriodScore(chart, 2000).dimensions)
+  })
+
+  it('applies scope transformations only to the matching natal palace index', () => {
+    const horoscope = {
+      yearly: { palaceNames: ['命宫', '财帛'] },
+      hasHoroscopeMutagen: (palaceName: string, scope: string, mutagen: string) =>
+        palaceName === '财帛' && scope === 'yearly' && mutagen === '忌',
+    } as unknown as Parameters<typeof calculateScopeMutagenBonus>[0]
+
+    const modifiers = { '禄': 6, '权': 5, '科': 4, '忌': -8 }
+
+    expect(calculateScopeMutagenBonus(horoscope, 'yearly', 1, modifiers)).toBe(-8)
+    expect(calculateScopeMutagenBonus(horoscope, 'yearly', 0, modifiers)).toBe(0)
+  })
+
+  it('includes transformations placed in the decadal life palace in the decadal base', () => {
+    const chart = {
+      rawDates: { lunarDate: { lunarYear: 2000 } },
+      palaces: [{
+        index: 0,
+        name: '命宫',
+        decadal: {
+          range: [1, 10],
+          heavenlyStem: '甲',
+          earthlyBranch: '子',
+        },
+        majorStars: [],
+        minorStars: [],
+      }],
+      horoscope: () => ({
+        decadal: { index: 0, palaceNames: ['命宫'] },
+        hasHoroscopeMutagen: (_palaceName: string, scope: string, mutagen: string) =>
+          scope === 'decadal' && mutagen === '禄',
+      }),
+    } as unknown as FunctionalAstrolabe
+
+    expect(calculateDecadalBaseScore(chart, 1)).toBe(63)
   })
 
 })

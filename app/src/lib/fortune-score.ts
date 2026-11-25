@@ -180,13 +180,37 @@ const SIHUA_MODIFIER: Record<string, number> = {
   '忌': -18,  // 化忌: 阻碍困扰
 }
 
+type HoroscopeMutagen = '禄' | '权' | '科' | '忌'
+type MutagenModifiers = Record<HoroscopeMutagen, number>
+
+const DECADAL_MUTAGEN_MODIFIERS: MutagenModifiers = {
+  '禄': 18,
+  '权': 15,
+  '科': 12,
+  '忌': -22,
+}
+
+const YEARLY_MUTAGEN_MODIFIERS: MutagenModifiers = {
+  '禄': 6,
+  '权': 5,
+  '科': 4,
+  '忌': -8,
+}
+
+const MONTHLY_MUTAGEN_MODIFIERS: MutagenModifiers = {
+  '禄': 10,
+  '权': 8,
+  '科': 6,
+  '忌': -12,
+}
+
 /* ============================================================
    宫位权重 (用于分维度计算)
    ============================================================ */
 
 type Horoscope = ReturnType<FunctionalAstrolabe['horoscope']>
 type HoroscopePalaceName = Parameters<Horoscope['palace']>[0]
-type HoroscopeScope = 'yearly' | 'monthly'
+type HoroscopeScope = 'decadal' | 'yearly' | 'monthly'
 
 const PALACE_WEIGHTS: Record<keyof FortuneScore['dimensions'], HoroscopePalaceName[]> = {
   career: ['官禄', '命宫', '迁移'],
@@ -331,6 +355,29 @@ function normalizeDimensions(
     relationship: normalize(dimensions.relationship),
     health: normalize(dimensions.health),
   }
+}
+
+/**
+ * Apply a scope's transformations only when the transformed star is in the
+ * natal palace represented by the supplied index.
+ */
+export function calculateScopeMutagenBonus(
+  horoscope: Horoscope,
+  scope: HoroscopeScope,
+  natalPalaceIndex: number,
+  modifiers: MutagenModifiers
+): number {
+  const palaceName = horoscope[scope].palaceNames[natalPalaceIndex] as HoroscopePalaceName | undefined
+  if (!palaceName) return 0
+
+  return (['禄', '权', '科', '忌'] as const).reduce(
+    (bonus, mutagen) => bonus + (
+      horoscope.hasHoroscopeMutagen(palaceName, scope, mutagen)
+        ? modifiers[mutagen]
+        : 0
+    ),
+    0
+  )
 }
 
 /**
@@ -525,25 +572,26 @@ function calculateRealMonthlyScoresForDecadal(
 
       let monthScore = palaceBaseScore
 
-      // 流月四化调整
-      const monthlyMutagen = horoscope.monthly.mutagen || []
-      for (const star of monthlyMutagen) {
-        const starName = String(star)
-        if (starName.includes('禄')) monthScore += 10
-        else if (starName.includes('权')) monthScore += 8
-        else if (starName.includes('科')) monthScore += 6
-        else if (starName.includes('忌')) monthScore -= 12
-      }
-
-      // 流年四化调整
-      const yearlyMutagen = horoscope.yearly.mutagen || []
-      for (const star of yearlyMutagen) {
-        const starName = String(star)
-        if (starName.includes('禄')) monthScore += 6
-        else if (starName.includes('权')) monthScore += 5
-        else if (starName.includes('科')) monthScore += 4
-        else if (starName.includes('忌')) monthScore -= 8
-      }
+      // Only count transformations that land in this decadal life palace's
+      // corresponding natal palace index at each scope.
+      monthScore += calculateScopeMutagenBonus(
+        horoscope,
+        'decadal',
+        decadalPalace.index,
+        DECADAL_MUTAGEN_MODIFIERS
+      )
+      monthScore += calculateScopeMutagenBonus(
+        horoscope,
+        'yearly',
+        decadalPalace.index,
+        YEARLY_MUTAGEN_MODIFIERS
+      )
+      monthScore += calculateScopeMutagenBonus(
+        horoscope,
+        'monthly',
+        decadalPalace.index,
+        MONTHLY_MUTAGEN_MODIFIERS
+      )
 
       scores.push(Math.max(15, Math.min(95, monthScore)))
     } catch {
@@ -949,7 +997,7 @@ function findDecadalForAge(
 /**
  * 计算大运宫位的基础分数 (决定10年的运势水位)
  */
-function calculateDecadalBaseScore(
+export function calculateDecadalBaseScore(
   chart: FunctionalAstrolabe,
   age: number
 ): number {
@@ -984,6 +1032,22 @@ function calculateDecadalBaseScore(
     const name = String(star.name)
     const baseScore = STAR_BASE_SCORE[name] || 0
     score += baseScore * 0.8
+  }
+
+  // The decadal life palace is "命宫" within the decadal scope. Use a date in
+  // this decadal's first nominal year and verify it maps back to this natal palace.
+  const [startAge, endAge] = palace.decadal.range
+  if (age >= startAge && age <= endAge) {
+    const decadalYear = chart.rawDates.lunarDate.lunarYear + startAge - 1
+    const horoscope = chart.horoscope(new Date(`${decadalYear}-06-15`))
+    if (horoscope.decadal.index === palace.index) {
+      score += calculateScopeMutagenBonus(
+        horoscope,
+        'decadal',
+        palace.index,
+        DECADAL_MUTAGEN_MODIFIERS
+      )
+    }
   }
 
   return score
