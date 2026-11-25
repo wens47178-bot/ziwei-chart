@@ -21,7 +21,13 @@ From `app/`:
 npm run lint
 npm run test
 npm run build
+npm audit
 ```
+
+GitHub Actions also prints a non-blocking dependency-audit summary after `npm ci`.
+It lists affected packages, severity, vulnerable version ranges, and whether npm
+reports an available fix. Audit findings must be reviewed and remediated separately;
+the audit-report step does not silently upgrade or rewrite the lockfile.
 
 For deployment mirror workflow edits:
 
