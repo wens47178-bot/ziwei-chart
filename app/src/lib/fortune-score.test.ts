@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { generateChart } from './astro'
-import { calculateMonthlyDimensions, calculatePeriodScore } from './fortune-score'
+import { calculateMonthlyDimensions, calculatePeriodScore, generateLifetimeKLines, getDecadalYearRange } from './fortune-score'
+import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
 
 describe('K-line scoring', () => {
   it('uses the selected year palace layout instead of reusing natal dimensions', () => {
@@ -50,6 +51,37 @@ describe('K-line scoring', () => {
 
     expect(calculateMonthlyDimensions(chart, 2023, 1)).toEqual(
       calculateMonthlyDimensions(chart, 2023, 1)
+    )
+  })
+
+  it('maps decadal virtual-age ranges to the correct lunar birth-year sequence', () => {
+    expect(getDecadalYearRange(2000, 6, 15)).toEqual([2005, 2014])
+  })
+
+  it('generates repeatable lifetime K-lines for the same chart', () => {
+    const chart = {
+      solarDate: '2000-8-16',
+      lunarDate: '二〇〇〇年七月十七',
+      time: '寅时',
+      gender: '女',
+      fiveElementsClass: '金四局',
+      palaces: [{
+        name: '命宫',
+        decadal: {
+          range: [1, 100],
+          heavenlyStem: '甲',
+          earthlyBranch: '子',
+        },
+        majorStars: [],
+        minorStars: [],
+      }],
+      horoscope: () => ({
+        yearly: { mutagen: [], index: 0 },
+      }),
+    } as unknown as FunctionalAstrolabe
+
+    expect(generateLifetimeKLines(chart, 2000)).toEqual(
+      generateLifetimeKLines(chart, 2000)
     )
   })
 
