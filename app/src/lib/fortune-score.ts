@@ -499,7 +499,7 @@ export function generateDecadalKLines(
     // 计算该大限期间内每年的分数
     const yearlyScores: number[] = []
     for (let year = startYear; year <= endYear; year++) {
-      // 获取该年12个月的平均分
+      // 获取该年各公历月中点的平均参考分
       const monthlyScores = calculateRealMonthlyScoresForDecadal(chart, year, palace)
       const avgScore = monthlyScores.reduce((a, b) => a + b, 0) / monthlyScores.length
       yearlyScores.push(avgScore)
@@ -567,7 +567,7 @@ export function generateDecadalKLines(
 }
 
 /**
- * 计算大限期间某年的月度分数 (简化版，基于大限宫位)
+ * 计算大限期间各公历月中点的参考分数 (简化版，基于大限宫位)
  */
 function calculateRealMonthlyScoresForDecadal(
   chart: FunctionalAstrolabe,
@@ -669,7 +669,7 @@ function calculateDecadalDimensions(palace: { name?: unknown; majorStars: Array<
 
 /**
  * 生成流年 K 线数据 (当前年 + 未来3年)
- * 每年的 OHLC 基于12个月的真实流月盘数据
+ * 每年的 OHLC 基于12个公历月中点对应的流月盘取样
  */
 export function generateYearlyKLines(
   chart: FunctionalAstrolabe,
@@ -679,7 +679,7 @@ export function generateYearlyKLines(
   const klines: KLineData[] = []
 
   for (let year = currentYear; year <= currentYear + 3; year++) {
-    // 计算12个月的真实分数
+    // 计算12个公历月中点对应的流月盘分数
     const monthlyScores = calculateRealMonthlyScores(chart, year)
     const yearScore = calculatePeriodScore(chart, year)
 
@@ -691,12 +691,12 @@ export function generateYearlyKLines(
     if (Math.max(...monthlyScores) - Math.min(...monthlyScores) > 15) {
       events.push({
         type: 'positive',
-        title: `${maxMonth}月运势高峰`,
+        title: `公历${maxMonth}月运势高峰`,
         stars: [],
       })
       events.push({
         type: 'negative',
-        title: `${minMonth}月运势低谷`,
+        title: `公历${minMonth}月运势低谷`,
         stars: [],
       })
     }
@@ -724,8 +724,8 @@ export function generateYearlyKLines(
 }
 
 /**
- * 生成月度 K 线数据 (指定年份12个月)
- * 使用真实流月盘数据
+ * 生成月度 K 线数据 (指定年份12个公历月)
+ * 每月以公历15日取样对应的流月盘，不等同于完整农历流月列表
  */
 export function generateMonthlyKLines(
   chart: FunctionalAstrolabe,
@@ -733,7 +733,7 @@ export function generateMonthlyKLines(
 ): KLineData[] {
   const klines: KLineData[] = []
 
-  // 计算12个月的真实分数
+  // 计算12个公历月中点对应的流月盘分数
   const monthlyScores = calculateRealMonthlyScores(chart, year)
 
   for (let month = 1; month <= 12; month++) {
@@ -746,7 +746,7 @@ export function generateMonthlyKLines(
     const events = generateMonthlyEvents(chart, year, month)
 
     klines.push({
-      period: `${month}月`,
+      period: `公历${month}月`,
       type: 'monthly',
       open: weeklyScores[0],
       high: Math.max(...weeklyScores),
@@ -772,8 +772,8 @@ export function generateMonthlyKLines(
 }
 
 /**
- * 计算某年12个月的真实分数
- * 基于流月盘的四化和星曜
+ * 计算某年12个公历月中点的参考分数
+ * 基于对应日期的流月盘四化和星曜
  */
 function calculateRealMonthlyScores(
   chart: FunctionalAstrolabe,
@@ -794,7 +794,7 @@ function calculateRealMonthlyScores(
 
 
 /**
- * 计算周度波动 (4周)
+ * 计算公历月内四个周度取样点的波动
  */
 function calculateWeeklyVariation(
   chart: FunctionalAstrolabe,
@@ -847,7 +847,7 @@ export function calculateMonthlyDimensions(
 }
 
 /**
- * 生成月度事件
+ * 生成公历月中点对应流月盘的事件
  */
 function generateMonthlyEvents(
   chart: FunctionalAstrolabe,
