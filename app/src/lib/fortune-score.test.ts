@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { generateChart } from './astro'
-import { calculateDecadalBaseScore, calculateMonthlyDimensions, calculatePeriodScore, calculateScopeMutagenBonus, generateLifetimeKLines, getDecadalYearRange } from './fortune-score'
+import { createLocalCalendarDate, calculateDecadalBaseScore, calculateMonthlyDimensions, calculatePeriodScore, calculateScopeMutagenBonus, generateLifetimeKLines, getDecadalYearRange } from './fortune-score'
 import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
 
 describe('K-line scoring', () => {
+  it('constructs horoscope dates from the intended local calendar day', () => {
+    const date = createLocalCalendarDate(2024, 3, 10)
+
+    expect(date.getFullYear()).toBe(2024)
+    expect(date.getMonth()).toBe(2)
+    expect(date.getDate()).toBe(10)
+    expect(date.getHours()).toBe(12)
+  })
   it('uses the selected year palace layout instead of reusing natal dimensions', () => {
     const chart = generateChart({
       year: 2000,
