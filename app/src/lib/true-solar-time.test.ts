@@ -1,3 +1,5 @@
+declare const process: { env: Record<string, string | undefined> }
+
 import { describe, expect, it } from 'vitest'
 import birthplaceData from './birthplace-data.json'
 import {
