@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { generateChart } from './astro'
-import { createLocalCalendarDate, calculateDecadalBaseScore, calculateMonthlyDimensions, calculatePeriodScore, calculateScopeMutagenBonus, generateLifetimeKLines, generateMonthlyKLines, getDecadalYearRange } from './fortune-score'
+import { createLocalCalendarDate, calculateDecadalBaseScore, calculateMonthlyDimensions, calculatePeriodScore, calculateScopeMutagenBonus, generateLifetimeKLines, generateLunarMonthlyKLines, generateMonthlyKLines, getDecadalYearRange } from './fortune-score'
 import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
 
 describe('K-line scoring', () => {
@@ -62,6 +62,34 @@ describe('K-line scoring', () => {
     )
   })
 
+
+
+  it('generates a true lunar-month series with leap-month halves', () => {
+    const chart = generateChart({
+      year: 2000,
+      month: 8,
+      day: 16,
+      hour: 4,
+      gender: 'female',
+      trueSolarEnabled: false,
+    })
+
+    const leapYear = generateLunarMonthlyKLines(chart, 2023, true)
+
+    expect(leapYear).toHaveLength(14)
+    expect(leapYear.some((period) => period.period.includes('闰2月上半月'))).toBe(true)
+    expect(leapYear.some((period) => period.period.includes('闰2月下半月'))).toBe(true)
+    expect(leapYear.every((period) =>
+      Number.isFinite(period.open) &&
+      Number.isFinite(period.high) &&
+      Number.isFinite(period.low) &&
+      Number.isFinite(period.close) &&
+      period.low <= period.open &&
+      period.low <= period.close &&
+      period.high >= period.open &&
+      period.high >= period.close
+    )).toBe(true)
+  }, 10000)
 
   it('labels monthly K-line samples as Gregorian months', () => {
     const chart = generateChart({

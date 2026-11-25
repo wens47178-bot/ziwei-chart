@@ -14,6 +14,7 @@
    ============================================================ */
 
 import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
+import { lunar2solar } from 'lunar-lite'
 import { createLocalCalendarDate } from './horoscope'
 export { createLocalCalendarDate } from './horoscope'
 import { extractKnowledge } from '../knowledge'
@@ -756,6 +757,71 @@ export function generateMonthlyKLines(
     const prev = klines[i - 1].close
     const curr = klines[i].close
     klines[i].score.trend = curr > prev ? 'up' : curr < prev ? 'down' : 'flat'
+  }
+
+  return klines
+}
+
+/**
+ * 生成按真实农历月份排列的流月 K 线。
+ *
+ * 与公历月中点序列分开提供，避免将两种时间口径混为一谈。
+ * 闰月是否拆分由 iztro monthlyList(year, fixLeap) 决定。
+ */
+export function generateLunarMonthlyKLines(
+  chart: FunctionalAstrolabe,
+  year: number,
+  fixLeap = true
+): KLineData[] {
+  const branches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥']
+  const natalTime = String(chart.time || '').replace('时', '')
+  const timeIndex = natalTime.includes('子') ? 0 : Math.max(0, branches.indexOf(natalTime))
+  const periods = chart.monthlyList(year, fixLeap)
+
+  const klines: KLineData[] = periods.map((period) => {
+    const [startDay, endDay] = period.dayRange
+    const sampleDays = [...new Set([
+      startDay,
+      Math.round(startDay + (endDay - startDay) / 3),
+      Math.round(startDay + (endDay - startDay) * 2 / 3),
+      endDay,
+    ])]
+    const samples = sampleDays.map((day) => {
+      const solarDate = lunar2solar(
+        `${year}-${period.month}-${day}`,
+        period.isLeapMonth
+      ).toString()
+      const horoscope = chart.horoscope(solarDate, timeIndex)
+      const dimensions = normalizeDimensions(calculateRawDimensions(horoscope, 'monthly'))
+      const score = Math.max(15, Math.min(95, weightedDimensionTotal(dimensions)))
+      return { score, dimensions }
+    })
+    const scores = samples.map((sample) => sample.score)
+    const middle = samples[Math.floor(samples.length / 2)]
+    const monthLabel = period.isLeapMonth
+      ? `闰${period.month}月${period.part === 'first' ? '上半月' : period.part === 'second' ? '下半月' : ''}`
+      : `农历${period.month}月`
+
+    return {
+      period: `${monthLabel}（初${startDay}至${endDay}）`,
+      type: 'monthly' as const,
+      open: scores[0],
+      high: Math.max(...scores),
+      low: Math.min(...scores),
+      close: scores[scores.length - 1],
+      score: {
+        total: Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length),
+        trend: 'flat' as const,
+        dimensions: middle.dimensions,
+      },
+      events: [],
+    }
+  })
+
+  for (let index = 1; index < klines.length; index++) {
+    const previous = klines[index - 1].close
+    const current = klines[index].close
+    klines[index].score.trend = current > previous ? 'up' : current < previous ? 'down' : 'flat'
   }
 
   return klines
