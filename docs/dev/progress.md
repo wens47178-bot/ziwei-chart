@@ -179,3 +179,6 @@ or notable verification run.
 - Asserted both `fixLeap: true` and `fixLeap: false` chart outcomes against the upstream iztro `bySolar()` tests, including soul/body palace branches, soul star, five-elements class, and Zi Wei palace.
 - This verifies the current solar-date integration and that the `fixLeap` option is actually forwarded through `generateChart()`.
 - The current BirthForm intentionally accepts solar dates only; a lunar-date input flow (including an explicit leap-month selector) is not implemented and must not be implied by the engine's `byLunar()` capability.
+
+
+- Fixture refinement: upstream's test suite resets iztro to its default algorithm before each test, whereas this application explicitly configures the Zhongzhou algorithm. Therefore the upstream default-algorithm soul-star labels are not valid expected values for this app. Keep shared calendar/palace-placement expectations and assert that enabling/disabling leap correction changes the algorithm-specific soul result, rather than copying incompatible labels.
