@@ -12,8 +12,9 @@ import { ShareCard } from '@/components/share'
 import { AdvancedAnalysis, type AdvancedMode } from '@/components/AdvancedAnalysis'
 import { LunarMonthlyKLine } from '@/components/kline/LunarMonthlyKLine'
 import { useChartStore } from '@/stores'
+import { HomeLanding } from '@/components/HomeLanding'
 
-type PageKey = 'birth' | 'chart' | 'palaces' | 'sihua' | 'decadal' | 'stars' | 'patterns' | 'trines' | 'fortune' | 'lunar' | 'kline' | 'match' | 'ai' | 'share'
+export type PageKey = 'birth' | 'chart' | 'palaces' | 'sihua' | 'decadal' | 'stars' | 'patterns' | 'trines' | 'fortune' | 'lunar' | 'kline' | 'match' | 'ai' | 'share'
 type PageMeta = { key: PageKey; label: string; en: string; title: string; subtitle: string; note: string; icon: string }
 
 const PAGES: PageMeta[] = [
@@ -35,7 +36,7 @@ const PAGES: PageMeta[] = [
 
 export default function App() {
   const { chart, birthInfo } = useChartStore()
-  const [activePage, setActivePage] = useState<PageKey>('birth')
+  const [activePage, setActivePage] = useState<PageKey | 'home'>('home')
   const [showSettings, setShowSettings] = useState(false)
   const page = PAGES.find((item) => item.key === activePage) ?? PAGES[0]
 
@@ -52,10 +53,17 @@ export default function App() {
     return null
   }
 
+  if (activePage === 'home') return (
+    <>
+      <HomeLanding onEnter={(key) => setActivePage(key)} onSettings={() => setShowSettings(true)} />
+      {showSettings && <div className="settings-overlay" onClick={(event) => event.target === event.currentTarget && setShowSettings(false)}><div><SettingsPanel onClose={() => setShowSettings(false)} /></div></div>}
+      <Analytics />
+    </>
+  )
   return (
     <div className="min-h-screen bg-[#fff] text-[#211f1b]">
       <header className="reference-header">
-        <button className="brand-lockup" onClick={() => setActivePage('birth')} aria-label="天衍首页">
+        <button className="brand-lockup" onClick={() => setActivePage('home')} aria-label="天衍首页">
           <span className="brand-word">天衍</span><span className="brand-mark">✳</span>
           <span className="brand-caption">ZIWEI DESTINY STUDIO</span>
         </button>
@@ -114,7 +122,7 @@ export default function App() {
         <section className="workspace-panel" aria-label={page.label}>
           <div className="workspace-topline">
             <div><span className="workspace-kicker">YOUR PERSONAL STAR MAP</span><span className="workspace-current">{page.label}</span></div>
-            <button className="workspace-settings" onClick={() => setShowSettings(true)}>偏好设置 <span>↗</span></button>
+            <div className="workspace-actions"><button className="workspace-settings" onClick={() => setActivePage("home")}>← 返回首页</button><button className="workspace-settings" onClick={() => setShowSettings(true)}>偏好设置 <span>↗</span></button></div>
           </div>
           <div className={activePage === 'birth' ? 'workspace-content birth-workspace' : 'workspace-content'}>
             {renderWorkspace()}
