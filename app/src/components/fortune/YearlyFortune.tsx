@@ -11,6 +11,7 @@ import { streamChat, type ChatMessage, type LLMConfig } from '@/lib/llm'
 import { extractKnowledge, buildPromptContext } from '@/knowledge'
 import { buildGuidancePromptContext } from '@/knowledge-db'
 import { Button, Select } from '@/components/ui'
+import { findPalaceForHoroscopeName } from '@/lib/horoscope'
 
 /* ------------------------------------------------------------
    年份选项
@@ -119,7 +120,7 @@ interface HoroscopeData {
 }
 
 function buildYearlyContext(
-  chart: { palaces: Array<{ name: unknown; majorStars: Array<{ name: unknown; brightness?: unknown; mutagen?: unknown }>; minorStars: Array<{ name: unknown; mutagen?: unknown }> }> },
+  chart: { palaces: Array<{ index: number; name: unknown; majorStars: Array<{ name: unknown; brightness?: unknown; mutagen?: unknown }>; minorStars: Array<{ name: unknown; mutagen?: unknown }> }> },
   horoscope: { yearly: HoroscopeData; decadal: HoroscopeData },
   year: number
 ): string {
@@ -149,7 +150,7 @@ function buildYearlyContext(
   const importantPalaces = ['命宫', '财帛宫', '官禄宫', '夫妻宫', '疾厄宫', '迁移宫']
 
   for (const palaceName of importantPalaces) {
-    const palace = chart.palaces.find(p => String(p.name) === palaceName)
+    const palace = findPalaceForHoroscopeName(chart.palaces, yearly.palaceNames, palaceName)
     if (!palace) continue
 
     const majorStarsStr = palace.majorStars.map(s => {
