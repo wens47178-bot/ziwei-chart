@@ -155,3 +155,12 @@ or notable verification run.
 - Added an integration regression asserting that a late Zi birth (23:00) and the following day's early Zi birth (00:00) produce the same normalized chart under the configured `dayDivide: 'forward'` rule.
 - Added assertions that the UI's twelve shichen option values align with the intended hour mapping, including the Zi, Chou, and Hai boundaries.
 - This change adds tests only; no chart calculation behavior was changed.
+
+
+## 2026-11-25 Birth form true-solar toggle correction
+
+- Fixed a form wiring bug: birth-time resolution previously hardcoded `enabled: true`, so disabling the true-solar-time checkbox did not actually disable correction.
+- The resolver now receives the checkbox's current value.
+- Clear stale birthplace matches when the user edits the birthplace or toggles true-solar correction, and handle lookup failures without leaving an old match displayed.
+- Read corrected minutes with the UTC getter to keep all returned wall-clock fields consistent with the timezone-independent arithmetic.
+- Changes are isolated in a PR and require full CI before merge.
