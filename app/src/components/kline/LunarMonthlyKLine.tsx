@@ -76,11 +76,11 @@ function LunarTooltip({
 
   const item = payload[0].payload
   return (
-    <div className="rounded-xl border border-white/10 bg-night/95 p-3 text-sm shadow-xl">
+    <div className="rounded-xl border border-slate-200 bg-white p-3 text-sm shadow-xl">
       <p className="mb-2 font-semibold text-slate-900">{item.period}</p>
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-        <span className="text-slate-500">期初</span><span className="text-right text-white">{item.open}</span>
-        <span className="text-text-muted">期末</span><span className="text-right text-white">{item.close}</span>
+        <span className="text-slate-500">期初</span><span className="text-right text-slate-900">{item.open}</span>
+        <span className="text-text-muted">期末</span><span className="text-right text-slate-900">{item.close}</span>
         <span className="text-text-muted">最高</span><span className="text-right text-emerald-700">{item.high}</span>
         <span className="text-text-muted">最低</span><span className="text-right text-rose-700">{item.low}</span>
         <span className="text-text-muted">参考分</span><span className="text-right text-amber-700">{item.score.total}</span>
@@ -129,7 +129,7 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
   return (
     <section className="space-y-4 rounded-2xl border border-emerald-100 bg-white shadow-sm p-4 md:p-6">
       <div>
-        <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-serif)' }}>
+        <h3 className="text-lg font-bold text-slate-900" style={{ fontFamily: 'var(--font-serif)' }}>
           农历流月 K 线
         </h3>
         <p className="mt-1 text-xs leading-relaxed text-text-muted">
@@ -150,7 +150,7 @@ export function LunarMonthlyKLine({ chart }: LunarMonthlyKLineProps) {
               setData([])
               setGeneratedYear(null)
             }}
-            className="w-28 rounded-lg border border-white/10 bg-night px-3 py-2 text-sm text-white outline-none focus:border-star/60"
+            className="w-28 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-star/60"
           />
         </label>
         <label className="flex items-center gap-2 pb-2 text-xs text-text-secondary">
