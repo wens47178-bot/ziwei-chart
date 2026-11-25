@@ -37,7 +37,7 @@ export const PROVIDER_CONFIGS: Record<ModelProvider, { baseUrl: string; defaultM
   },
   gemini: {
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
-    defaultModel: 'gemini-3.1-pro-preview',
+    defaultModel: 'gemini-2.5-flash-lite',
   },
   claude: {
     baseUrl: 'https://api.anthropic.com/v1',
@@ -378,10 +378,10 @@ async function* streamGemini(
   const { apiKey, model, baseUrl, enableThinking, enableWebSearch } = config
   const providerConfig = PROVIDER_CONFIGS.gemini
 
-  // 思考模式切换到最新 Gemini 3.1 Pro Preview
+  // Free-tier friendly default; thinking mode can be overridden in advanced settings.
   let modelName = model || providerConfig.defaultModel
   if (enableThinking && !model) {
-    modelName = 'gemini-3.1-pro-preview'
+    modelName = 'gemini-2.5-flash-lite'
   }
 
   // 转换消息格式
