@@ -61,28 +61,28 @@ function CustomTooltip({ active, payload }: TooltipProps) {
             {data.year} {data.ganZhi}年
             <span className="text-base text-slate-500 ml-2">({data.age}岁)</span>
           </p>
-          <p className="text-sm text-violet-700 font-medium mt-1">
+          <p className="text-sm text-[#8a7653] font-medium mt-1">
             大运：{data.daYun} ({data.daYunRange})
           </p>
         </div>
         <div className={`text-sm font-bold px-3 py-1.5 rounded-lg ${
-          data.score >= 60 ? 'bg-green-500/20 text-green-400' :
-          data.score >= 40 ? 'bg-amber-500/20 text-amber-400' :
-          'bg-rose-500/20 text-rose-400'
+          data.score >= 60 ? 'bg-green-500/20 text-[#69866d]' :
+          data.score >= 40 ? 'bg-amber-500/20 text-[#9b8053]' :
+          'bg-rose-500/20 text-[#a56d69]'
         }`}>
           {scoreLevel} {data.score}分
         </div>
       </div>
 
       {/* ─── OHLC Grid ─── */}
-      <div className="grid grid-cols-4 gap-2 text-xs mb-4 bg-emerald-50 border border-emerald-100 p-3 rounded-xl">
+      <div className="grid grid-cols-4 gap-2 text-xs mb-4 bg-[#f7f8f4] border border-[#e9e5dc] p-3 rounded-xl">
         <div className="text-center">
           <span className="block text-text-muted mb-1">年初</span>
           <span className="font-mono text-slate-900 font-bold">{data.open}</span>
         </div>
         <div className="text-center">
           <span className="block text-text-muted mb-1">年末</span>
-          <span className={`font-mono font-bold ${isUp ? 'text-green-400' : 'text-rose-400'}`}>{data.close}</span>
+          <span className={`font-mono font-bold ${isUp ? 'text-[#69866d]' : 'text-[#a56d69]'}`}>{data.close}</span>
         </div>
         <div className="text-center">
           <span className="block text-text-muted mb-1">年内高</span>
@@ -90,7 +90,7 @@ function CustomTooltip({ active, payload }: TooltipProps) {
         </div>
         <div className="text-center">
           <span className="block text-text-muted mb-1">年内低</span>
-          <span className="font-mono text-rose-400 font-bold">{data.low}</span>
+          <span className="font-mono text-[#a56d69] font-bold">{data.low}</span>
         </div>
       </div>
 
@@ -109,7 +109,7 @@ function CustomTooltip({ active, payload }: TooltipProps) {
       {data.yearlyMutagens && data.yearlyMutagens.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-slate-200">
           {data.yearlyMutagens.map((m, i) => (
-            <span key={i} className="px-2 py-0.5 rounded text-xs bg-star/20 text-star-light">
+            <span key={i} className="px-2 py-0.5 rounded text-xs bg-[#f5f0e5] text-[#92784e]">
               {m}
             </span>
           ))}
@@ -375,10 +375,10 @@ export function LifeKLine() {
                 人生流年大运 K 线图
               </h3>
               <div className="flex gap-3 text-xs font-medium">
-                <span className="flex items-center text-green-400 bg-green-500/10 px-2 py-1 rounded">
+                <span className="flex items-center text-[#69866d] bg-green-500/10 px-2 py-1 rounded">
                   <div className="w-2 h-2 bg-green-500 mr-2 rounded-full" /> 参考分偏高
                 </span>
-                <span className="flex items-center text-rose-400 bg-rose-500/10 px-2 py-1 rounded">
+                <span className="flex items-center text-[#a56d69] bg-rose-500/10 px-2 py-1 rounded">
                   <div className="w-2 h-2 bg-rose-500 mr-2 rounded-full" /> 参考分偏低
                 </span>
               </div>
@@ -497,15 +497,15 @@ export function LifeKLine() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-text-muted">所属大运</span>
-                    <span className="text-star-light font-medium">{selectedPoint.daYun} ({selectedPoint.daYunRange})</span>
+                    <span className="text-[#92784e] font-medium">{selectedPoint.daYun} ({selectedPoint.daYunRange})</span>
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-text-muted">综合评分</span>
                     <span className={`font-bold ${
                       selectedPoint.score >= 70 ? 'text-gold' :
-                      selectedPoint.score >= 50 ? 'text-green-400' :
-                      selectedPoint.score >= 30 ? 'text-amber-400' : 'text-rose-400'
+                      selectedPoint.score >= 50 ? 'text-[#69866d]' :
+                      selectedPoint.score >= 30 ? 'text-[#9b8053]' : 'text-[#a56d69]'
                     }`}>
                       {selectedPoint.score} 分
                     </span>
@@ -516,7 +516,7 @@ export function LifeKLine() {
                       <span className="text-text-muted text-sm block mb-2">流年四化</span>
                       <div className="flex flex-wrap gap-1.5">
                         {selectedPoint.yearlyMutagens.map((m, i) => (
-                          <span key={i} className="px-2 py-0.5 rounded text-xs bg-star/20 text-star-light">
+                          <span key={i} className="px-2 py-0.5 rounded text-xs bg-[#f5f0e5] text-[#92784e]">
                             {m}
                           </span>
                         ))}
