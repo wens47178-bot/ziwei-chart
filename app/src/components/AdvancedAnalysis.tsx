@@ -31,14 +31,13 @@ export function AdvancedAnalysis({ mode }: { mode: AdvancedMode }) {
   const [selectedStar, setSelectedStar] = useState('')
   const [targetYear, setTargetYear] = useState(new Date().getFullYear())
 
-  const palaces = chart?.palaces ?? []
+  const palaces = useMemo(() => chart?.palaces ?? [], [chart])
   const selected = palaces.find((palace) => palace.name === selectedPalace) ?? palaces[0]
   const horoscope = useMemo(() => {
     if (!chart) return null
     try { return chart.horoscope(createLocalCalendarDate(targetYear, 6, 15)) } catch { return null }
   }, [chart, targetYear])
 
-  const activeStar = observedStars.includes(selectedStar) ? selectedStar : (observedStars[0] ?? '')
   const patternHints = useMemo(() => chart ? extractKnowledge(chart, birthInfo?.year).格局提示 : [], [chart, birthInfo?.year])
   const trinePalaces = useMemo(() => {
     if (!selected) return []
@@ -59,6 +58,7 @@ export function AdvancedAnalysis({ mode }: { mode: AdvancedMode }) {
     }
     return [...names].sort((a, b) => a.localeCompare(b, 'zh-CN'))
   }, [palaces])
+  const activeStar = observedStars.includes(selectedStar) ? selectedStar : (observedStars[0] ?? '')
 
   if (!chart) return <div className="rounded-2xl border border-dashed border-[#ded8cc] p-10 text-center text-sm text-[#8c8579]">请先建立命盘，再查看这项分析。</div>
 
