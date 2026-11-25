@@ -16,6 +16,22 @@ describe('iztro chart engine integration', () => {
     expect(chart.fiveElementsClass).toBeTruthy()
   })
 
+  it('matches the upstream iztro solar-to-lunar and ganzhi reference fixture', () => {
+    const chart = generateChart({
+      year: 2000,
+      month: 8,
+      day: 16,
+      hour: 4,
+      gender: 'female',
+      trueSolarEnabled: false,
+    })
+
+    // Reference values are taken from iztro's own bySolar() integration test.
+    expect(chart.solarDate).toBe('2000-8-16')
+    expect(chart.lunarDate).toBe('二〇〇〇年七月十七')
+    expect(chart.chineseDate).toBe('庚辰 甲申 丙午 庚寅')
+  })
+
   it('treats late zi hour as the following civil day under the configured day boundary', () => {
     const lateZi = generateChart({
       year: 1990,
