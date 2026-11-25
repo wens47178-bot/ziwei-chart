@@ -6,6 +6,7 @@
 import { getStarInfo, type StarInfo } from './stars/majorStars'
 import { getSihuaInfo, type SihuaInfo } from './sihua'
 import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
+import { createLocalCalendarDate } from '@/lib/horoscope'
 
 /* ------------------------------------------------------------
    知识上下文类型
@@ -200,7 +201,7 @@ export function extractKnowledge(chart: FunctionalAstrolabe, birthYear?: number)
 
     for (let year = startYear; year <= endYear; year++) {
       try {
-        const horoscope = chart.horoscope(new Date(`${year}-6-15`))
+        const horoscope = chart.horoscope(createLocalCalendarDate(year, 6, 15))
         const yearly = horoscope.yearly
 
         context.流年.push({
