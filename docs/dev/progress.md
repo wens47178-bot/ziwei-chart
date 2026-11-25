@@ -104,3 +104,10 @@ or notable verification run.
 - CI passed on 2026-11-25 after the versioned Zustand persist generic fix: dependency installation, ESLint, all 34 Vitest tests, and TypeScript/Vite production build.
 - PR #3 remains open for merge at the time of this update.
 - The same `npm ci` run reported 20 dependency audit findings (1 low, 7 moderate, 12 high). These are dependency advisories, not test failures; a separate lockfile/advisory review is now a priority.
+
+
+## 2026-11-25 Dependency audit follow-up
+
+- The latest CI dependency installation reported 20 vulnerabilities: 1 low, 7 moderate, and 12 high.
+- Added a non-blocking CI audit-summary step on branch `ci/report-npm-audit-details` so the exact affected packages, vulnerable ranges, advisory titles, and fix availability are visible in workflow logs.
+- This reporting-only change does not alter package versions or the lockfile. Dependency remediation will be handled in a separate reviewed change after examining the advisory output.
