@@ -635,3 +635,16 @@ body { background: #fff; color: var(--ref-ink); }
 .academic-note p { margin:7px 0 0; color:#898276; font-size:11px; line-height:1.9; }
 @media(max-width:850px) { .academic-book-grid { grid-template-columns:1fr; }.academic-paths { grid-template-columns:1fr; }.academic-path+.academic-path { border-left:0; border-top:1px solid #eeeae3; } }
 @media(max-width:520px) { .academic-center { padding-top:0; }.academic-hero h2 { font-size:25px; }.academic-book { grid-template-columns:88px minmax(0,1fr); gap:12px; padding:10px; }.academic-book-cover { min-height:126px; }.academic-book-cover:before { width:90px;height:90px; }.academic-book-cover:after { width:70px;height:70px; }.academic-book-info p { -webkit-line-clamp:4; } }
+
+/* Interactive feature artwork gallery */
+.home-nav-items button.selected { color:#9c7b45; background:linear-gradient(90deg,rgba(196,164,108,.13),rgba(196,164,108,0)); }
+.home-nav-items button.selected span { font-weight:600; }
+.home-nav-items button.selected b { opacity:1; color:#b38f56; }
+.home-art-card { cursor:pointer; }
+.home-art-card .home-celestial-art { width:100%; height:100%; display:block; transition:filter .35s ease,transform .65s cubic-bezier(.2,.7,.2,1); }
+.home-art-card:hover .home-celestial-art { transform:scale(1.025); filter:saturate(1.08); }
+.home-art-copy { pointer-events:none; }
+.home-art-copy strong { transition:opacity .2s ease; }
+.home-featured .featured-ai { cursor:pointer; }
+.home-featured .featured-ai i { display:inline-flex; align-items:center; gap:10px; }
+@media(prefers-reduced-motion:reduce) { .home-art-card .home-celestial-art { transition:none; } }
