@@ -182,3 +182,11 @@ or notable verification run.
 
 
 - Fixture refinement: upstream's test suite resets iztro to its default algorithm before each test, whereas this application explicitly configures the Zhongzhou algorithm. Therefore the upstream default-algorithm soul-star labels are not valid expected values for this app. Keep shared calendar/palace-placement expectations and assert that enabling/disabling leap correction changes the algorithm-specific soul result, rather than copying incompatible labels.
+
+
+## 2026-11-25 Yearly fortune palace mapping correction
+
+- Found that yearly fortune context labeled the natal chart's natal-name palace as a yearly palace, which can attach the wrong natal stars to the selected yearly palace theme.
+- Added an index-based resolver using iztro's `yearly.palaceNames` mapping and applied it when building yearly AI context.
+- Added unit coverage for correct scope-name-to-natal-index mapping and missing palace handling.
+- This corrects the palace/star context supplied to the AI; it does not change the underlying iztro chart calculation.
