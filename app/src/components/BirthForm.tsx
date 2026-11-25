@@ -18,7 +18,7 @@ const GENDER_OPTIONS = [
   { value: 'female', label: '女', icon: '♀' },
 ]
 
-export function BirthForm() {
+export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
   const { setBirthInfo, setChart } = useChartStore()
 
   const [year, setYear] = useState(1990)
@@ -108,6 +108,7 @@ export function BirthForm() {
 
       setBirthInfo(birthInfo)
       setChart(chart)
+      onSuccess?.()
     } catch (error) {
       console.error('排盘失败:', error)
       setSubmitError(
@@ -124,27 +125,15 @@ export function BirthForm() {
     <form
       onSubmit={handleSubmit}
       className="
-        relative w-full max-w-5xl p-6 sm:p-8
-        bg-white border border-slate-200 rounded-3xl
-        shadow-[0_18px_60px_rgba(15,23,42,0.08)]
+        relative w-full max-w-none p-0 sm:p-1
+        bg-transparent border-0 rounded-none shadow-none
       "
     >
-      {/* 顶部发光线 */}
-      <div
-        className="
-          absolute top-0 left-1/2 -translate-x-1/2
-          w-1/2 h-px
-          bg-gradient-to-r from-transparent via-star/40 to-transparent
-        "
-      />
-
       {/* 标题区域 */}
       <div className="text-left mb-8">
         <h2
           className="
-            text-2xl font-semibold mb-2
-            bg-gradient-to-r from-text via-text-secondary to-text
-            bg-clip-text text-transparent
+            text-2xl font-semibold mb-2 text-[#25231f]
           "
           style={{ fontFamily: 'var(--font-serif)' }}
         >
@@ -159,12 +148,11 @@ export function BirthForm() {
         {/* 出生日期区块 */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-text-secondary font-medium">出生日期</span>
+            <span className="text-sm text-[#716b5e] font-medium">出生日期</span>
             <span
               className="
-                text-xs px-2.5 py-1 rounded-full
-                bg-gradient-to-r from-gold/20 to-gold/10
-                text-gold border border-gold/20
+                text-xs px-3 py-1 rounded-full
+                bg-[#f5f3ef] text-[#766b56] border border-[#e4dfd5]
               "
             >
               阳历
@@ -209,8 +197,8 @@ export function BirthForm() {
                   flex items-center justify-center gap-2
                   cursor-pointer transition-all duration-200
                   ${gender === opt.value
-                    ? 'bg-gradient-to-r from-star to-star-dark text-white shadow-[0_4px_20px_rgba(124,58,237,0.3)]'
-                    : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-violet-50 hover:border-violet-200'
+                    ? 'bg-[#28251f] text-white shadow-sm'
+                    : 'bg-[#faf9f7] border border-[#dedbd5] text-[#625d54] hover:bg-[#f3f0e9] hover:border-[#c9b991]'
                   }
                 `}
               >
@@ -262,7 +250,7 @@ export function BirthForm() {
         <label
           className="
             flex items-center justify-between gap-4 rounded-xl
-            bg-slate-50 border border-slate-200
+            bg-[#f8f7f4] border border-[#e5e1d9]
             px-4 py-3 cursor-pointer
           "
         >
@@ -333,12 +321,6 @@ export function BirthForm() {
         请输入阳历（公历）日期，系统会自动转为农历排盘
       </p>
 
-      {/* 角落装饰 */}
-      <div className="absolute -bottom-2 -right-2 w-16 h-16 opacity-20">
-        <div className="absolute inset-0 rounded-full border border-star/30" />
-        <div className="absolute inset-2 rounded-full border border-gold/20" />
-        <div className="absolute inset-4 rounded-full border border-star/10" />
-      </div>
     </form>
   )
 }
