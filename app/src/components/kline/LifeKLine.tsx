@@ -25,6 +25,7 @@ import {
 import { useChartStore, useSettingsStore, useContentCacheStore } from '@/stores'
 import { KLineIcon } from '@/components/icons/KLineIcon'
 import { ScoreRadar } from './ScoreRadar'
+import { LunarMonthlyKLine } from './LunarMonthlyKLine'
 import {
   generateLifetimeKLines,
   generateKLinesWithLLM,
@@ -537,6 +538,8 @@ export function LifeKLine() {
           )}
         </>
       )}
+
+      <LunarMonthlyKLine chart={chart} />
     </div>
   )
 }
