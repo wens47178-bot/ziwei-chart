@@ -88,6 +88,7 @@ export async function resolveBirthTimeAsync(input: ResolveBirthTimeInput): Promi
 }
 
 export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): ResolvedBirthTime {
+  validateBirthDateTime(input)
   const originalTimeIndex = hourToTimeIndex(input.hour)
   const originalShichen = shichenNameForTimeIndex(originalTimeIndex)
   const location = findBirthplaceInData(input.birthplace, input.birthplaces ?? [])
