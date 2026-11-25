@@ -35,7 +35,7 @@ const MATCH_PROMPT = `# Role
 
 # Analysis Logic
 1.  **星情对看**：分析两人命宫主星的性质是否匹配（如：强弱搭配、动静结合）。
-2.  **四化互飞**：推演A的命宫四化飞入B的宫位，判断A对B是生助（化禄）还是刑克（化忌），反之亦然。
+2.  **四化互飞（证据边界）**：当前提供的是双方各自的本命盘上下文，并没有预先计算的跨盘四化飞入映射。不得直接断言“A的化禄/化忌飞入B的某宫”或反向结论，也不得把本命四化分布误称为跨盘互飞。若现有字段不足以逐步、明确地推导某项跨盘关系，必须说明“当前数据不足以确认”，不得补造宫位、星曜或吉凶结论。
 3.  **宫位参合**：观察双方夫妻宫的意象是否与对方吻合。
 
 # Output Format
@@ -250,6 +250,7 @@ export function MatchAnalysis() {
 ## 第一人
 - 出生：${person1.year}年${person1.month}月${person1.day}日
 - 性别：${person1.gender === 'male' ? '男' : '女'}
+- 出生时辰口径：表单选择的传统时辰；本合盘表单未收集出生地，未执行真太阳时校正
 - 五行局：${chart1.fiveElementsClass}
 
 ${context1}
@@ -259,6 +260,7 @@ ${guidance1}
 ## 第二人
 - 出生：${person2.year}年${person2.month}月${person2.day}日
 - 性别：${person2.gender === 'male' ? '男' : '女'}
+- 出生时辰口径：表单选择的传统时辰；本合盘表单未收集出生地，未执行真太阳时校正
 - 五行局：${chart2.fiveElementsClass}
 
 ${context2}
