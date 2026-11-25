@@ -129,3 +129,15 @@ or notable verification run.
 - Added an integration smoke test that verifies the upgraded iztro engine still generates a 12-palace chart.
 - The override is provisional until fresh dependency audit, lint, all tests, and production build pass.
 - Upstream evidence: https://github.com/SylarLong/iztro/pull/322 and https://github.com/SylarLong/iztro/releases/tag/v2.6.5.
+
+
+## 2026-11-25 Dependency remediation merged
+
+- PR #5 merged to the user's fork `main` as `f153f5f7b21ebdfee6e9112c0fdfc90806064dce`.
+- Updated the compatible dependency lockfile, including `iztro@2.6.5`, `i18next@26.7.2`, `echarts@6.1.0`, `vite@7.3.8`, and `vitest@4.1.12`.
+- Added a scoped npm override for iztro's i18next dependency, aligned with upstream iztro PR #322.
+- Final npm audit reported 0 vulnerabilities.
+- GitHub Actions passed ESLint, all 35 Vitest tests across 7 files, and the TypeScript/Vite production build.
+- Fixed two React effect lint findings by moving birthplace matching state changes into user event handlers and initializing AI interpretation state from the cache.
+- Removed the temporary dependency-preview workflow after its one-time lockfile update was complete.
+- Deployment mirror synchronization remains source-repository guarded; merging into this fork does not deploy the Vercel site.
