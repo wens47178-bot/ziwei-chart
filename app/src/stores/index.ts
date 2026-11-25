@@ -161,10 +161,12 @@ export function sanitizePersistedSettings(persistedState: unknown): Partial<Sett
     ])
   ) as Record<ModelProvider, ProviderSettings>
 
+  const provider = persisted.provider && SETTINGS_PROVIDERS.includes(persisted.provider)
+    ? persisted.provider
+    : 'kimi'
+
   return {
-    provider: SETTINGS_PROVIDERS.includes(persisted.provider as ModelProvider)
-      ? persisted.provider
-      : 'kimi',
+    provider,
     providerSettings,
     enableThinking: persisted.enableThinking ?? false,
     enableWebSearch: persisted.enableWebSearch ?? false,
