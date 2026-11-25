@@ -175,7 +175,7 @@ function PersonInput({ label, value, onChange }: PersonInputProps) {
                 flex-1 py-2 px-3 rounded-lg text-center text-sm cursor-pointer transition-all
                 ${value.gender === opt.value
                   ? 'bg-star text-slate-900'
-                  : 'bg-white/5 border border-white/10 hover:bg-white/10'
+                  : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-rose-50'
                 }
               `}
             >
@@ -360,7 +360,7 @@ ${guidance2}
         className="
           relative p-6 lg:p-8
           bg-gradient-to-br from-white/[0.04] to-transparent
-          backdrop-blur-xl border border-white/[0.08] rounded-2xl
+          bg-white border border-rose-100 shadow-sm rounded-2xl
           shadow-[0_8px_32px_rgba(0,0,0,0.3)]
         "
       >
