@@ -317,7 +317,7 @@ function calculateDimensionScore(
         name: String(star.name),
         mutagen: normalizeMutagen(star.mutagen),
       })),
-      adjectiveStars: palace.adjectiveStars.map(star => ({
+      adjectiveStars: palace.adjectiveStars?.map(star => ({
         name: String(star.name),
       })),
     })
