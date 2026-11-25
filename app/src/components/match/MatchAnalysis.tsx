@@ -68,13 +68,13 @@ const MATCH_PROMPT = `# Role
 
 const MarkdownComponents = {
   h1: ({ children }: { children?: React.ReactNode }) => (
-    <h1 className="text-2xl font-bold text-gold mt-6 mb-3 first:mt-0">{children}</h1>
+    <h1 className="text-2xl font-bold text-amber-700 mt-6 mb-3 first:mt-0">{children}</h1>
   ),
   h2: ({ children }: { children?: React.ReactNode }) => (
     <h2 className="text-xl font-semibold text-gold/90 mt-5 mb-2">{children}</h2>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
-    <h3 className="text-lg font-medium text-star-light mt-4 mb-2">{children}</h3>
+    <h3 className="text-lg font-medium text-violet-700 mt-4 mb-2">{children}</h3>
   ),
   p: ({ children }: { children?: React.ReactNode }) => (
     <p className="mb-3 leading-relaxed">{children}</p>
@@ -94,7 +94,7 @@ const MarkdownComponents = {
     </li>
   ),
   blockquote: ({ children }: { children?: React.ReactNode }) => (
-    <blockquote className="border-l-2 border-gold/40 pl-4 my-3 italic text-text-secondary">
+    <blockquote className="border-l-2 border-gold/40 pl-4 my-3 italic text-slate-700">
       {children}
     </blockquote>
   ),
@@ -102,7 +102,7 @@ const MarkdownComponents = {
     <hr className="my-6 border-0 h-px bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
   ),
   em: ({ children }: { children?: React.ReactNode }) => (
-    <em className="text-text-muted not-italic">{children}</em>
+    <em className="text-slate-500 not-italic">{children}</em>
   ),
 }
 
@@ -130,8 +130,7 @@ function PersonInput({ label, value, onChange }: PersonInputProps) {
     <div
       className="
         relative p-5
-        bg-gradient-to-br from-white/[0.04] to-transparent
-        backdrop-blur-xl border border-white/[0.08] rounded-xl
+        bg-white border border-rose-100 rounded-xl shadow-sm
         shadow-[0_4px_20px_rgba(0,0,0,0.2)]
       "
     >
@@ -175,8 +174,8 @@ function PersonInput({ label, value, onChange }: PersonInputProps) {
               className={`
                 flex-1 py-2 px-3 rounded-lg text-center text-sm cursor-pointer transition-all
                 ${value.gender === opt.value
-                  ? 'bg-star text-white'
-                  : 'bg-white/5 border border-white/10 hover:bg-white/10'
+                  ? 'bg-star text-slate-900'
+                  : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-rose-50'
                 }
               `}
             >
@@ -302,9 +301,8 @@ ${guidance2}
       <div
         className="
           relative p-6 lg:p-8
-          bg-gradient-to-br from-white/[0.04] to-transparent
-          backdrop-blur-xl border border-white/[0.08] rounded-2xl
-          shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+          bg-white border border-rose-100 rounded-2xl shadow-sm
+          shadow-sm
         "
       >
         {/* 顶部发光线 */}
@@ -351,7 +349,7 @@ ${guidance2}
 
         {/* 错误提示 */}
         {error && (
-          <div className="mt-4 p-3 rounded-lg bg-misfortune/10 text-misfortune text-sm border border-misfortune/20">
+          <div className="mt-4 p-3 rounded-lg bg-misfortune/10 text-rose-700 text-sm border border-rose-200">
             {error}
           </div>
         )}
@@ -361,8 +359,7 @@ ${guidance2}
       <div
         className="
           relative p-6 lg:p-8
-          bg-gradient-to-br from-white/[0.04] to-transparent
-          backdrop-blur-xl border border-white/[0.08] rounded-2xl
+          bg-white border border-rose-100 shadow-sm rounded-2xl
           shadow-[0_8px_32px_rgba(0,0,0,0.3)]
         "
       >
@@ -377,7 +374,7 @@ ${guidance2}
 
         {/* 未配置提示 */}
         {!currentSettings.apiKey && !result && (
-          <div className="text-text-muted text-sm py-8 text-center">
+          <div className="text-slate-500 text-sm py-8 text-center">
             <div className="text-3xl mb-3 opacity-30">⚭</div>
             请先在设置中配置 AI 模型的 API Key，即可获得双人合盘分析。
           </div>
@@ -393,7 +390,7 @@ ${guidance2}
 
         {/* 加载中 */}
         {loading && !result && (
-          <div className="flex items-center justify-center gap-3 text-text-muted py-12">
+          <div className="flex items-center justify-center gap-3 text-slate-500 py-12">
             <div className="w-5 h-5 border-2 border-star border-t-transparent rounded-full animate-spin" />
             <span>正在分析两人契合度...</span>
           </div>
@@ -403,7 +400,7 @@ ${guidance2}
         {result && (
           <div
             className="
-              prose prose-invert max-w-none
+              prose max-w-none prose-slate
               text-text-secondary text-lg lg:text-xl leading-loose
             "
             style={{ fontFamily: 'var(--font-brush)' }}

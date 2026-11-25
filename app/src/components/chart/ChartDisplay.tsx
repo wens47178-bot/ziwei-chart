@@ -62,10 +62,10 @@ const BRIGHTNESS_MAP: Record<string, string> = {
 const BRIGHTNESS_STYLE: Record<string, string> = {
   '庙': 'text-fortune',
   '旺': 'text-gold',
-  '得': 'text-star-light',
+  '得': 'text-violet-700',
   '利': 'text-star-light',
-  '平': 'text-text-muted',
-  '不': 'text-misfortune/70',
+  '平': 'text-slate-500',
+  '不': 'text-rose-700/70',
   '陷': 'text-misfortune',
 }
 
@@ -120,7 +120,7 @@ function StarTag({ star, showBrightness = true }: StarTagProps) {
       className={`
         inline-flex items-center gap-0.5 text-[11px] px-1 py-0.5 rounded
         transition-all duration-200
-        ${hasMutagen ? mutagenStyle + ' font-medium' : 'bg-white/5 text-text-secondary hover:bg-white/10'}
+        ${hasMutagen ? mutagenStyle + ' font-medium' : 'bg-slate-100 text-slate-700 hover:bg-violet-50'}
       `}
     >
       {name}
@@ -152,12 +152,11 @@ function PalaceCard({
       onClick={onClick}
       className={`
         group relative p-2 lg:p-3 h-full min-h-[130px] lg:min-h-[170px] flex flex-col
-        bg-white/[0.03] backdrop-blur-sm
-        border border-white/[0.06] rounded-xl
+        bg-white border border-slate-200 rounded-xl shadow-sm
         transition-all duration-300 cursor-pointer
-        hover:bg-white/[0.06] hover:border-white/[0.12]
-        ${isLife ? 'ring-1 ring-gold/50 bg-gold/[0.03]' : ''}
-        ${isBody ? 'ring-1 ring-star/50 bg-star/[0.03]' : ''}
+        hover:bg-violet-50/60 hover:border-violet-200
+        ${isLife ? 'ring-1 ring-amber-300 bg-amber-50/70' : ''}
+        ${isBody ? 'ring-1 ring-violet-300 bg-violet-50/70' : ''}
         ${isSelected ? 'ring-2 ring-star' : ''}
       `}
     >
@@ -166,13 +165,13 @@ function PalaceCard({
         <span className="text-text-muted font-mono">{stem}{branch}</span>
         <div className="flex items-center gap-1">
           {decadalRange && (
-            <span className="text-star-light/60 font-mono">{decadalRange}</span>
+            <span className="text-violet-600 font-mono">{decadalRange}</span>
           )}
           <span className={`
             px-1 py-0.5 rounded font-medium
-            ${isLife ? 'bg-gold/20 text-gold' : ''}
-            ${isBody ? 'bg-star/20 text-star-light' : ''}
-            ${!isLife && !isBody ? 'text-text-secondary' : ''}
+            ${isLife ? 'bg-amber-100 text-amber-800' : ''}
+            ${isBody ? 'bg-violet-100 text-violet-800' : ''}
+            ${!isLife && !isBody ? 'text-slate-700' : ''}
           `}>
             {name}
           </span>
@@ -197,7 +196,7 @@ function PalaceCard({
       {adjectiveStars.length > 0 && (
         <div className="flex flex-wrap gap-0.5 mb-1 flex-1">
           {adjectiveStars.map((name, i) => (
-            <span key={i} className="text-[9px] px-1 py-0.5 rounded bg-white/[0.03] text-text-muted/70">
+            <span key={i} className="text-[9px] px-1 py-0.5 rounded bg-slate-100 text-slate-500">
               {name}
             </span>
           ))}
@@ -205,7 +204,7 @@ function PalaceCard({
       )}
 
       {/* 底部: 十二神 */}
-      <div className="flex justify-between text-[9px] text-text-muted/60 mt-auto pt-1 border-t border-white/[0.04]">
+      <div className="flex justify-between text-[9px] text-text-muted/60 mt-auto pt-1 border-t border-slate-200">
         <span>{changsheng12}</span>
         <span>{boshi12}</span>
       </div>
@@ -237,7 +236,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
       relative h-full min-h-[280px] lg:min-h-[360px] p-3 lg:p-4
       flex flex-col items-center justify-center
       bg-gradient-to-br from-white/[0.04] to-white/[0.02]
-      backdrop-blur-md border border-white/[0.08] rounded-xl
+      bg-white border border-slate-200 shadow-sm rounded-xl
     ">
       {/* 背景装饰 */}
       <div className="absolute inset-0 opacity-[0.02]">
@@ -282,7 +281,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
       </div>
 
       {/* 五行局 + 命主身主 */}
-      <div className="mt-3 pt-3 border-t border-white/[0.06] w-full">
+      <div className="mt-3 pt-3 border-t border-slate-200 w-full">
         <div className="flex justify-center gap-2 mb-2">
           <span className="
             px-2 py-0.5 rounded-full text-xs
@@ -387,8 +386,8 @@ export function ChartDisplay() {
     <div className="
       relative p-3 lg:p-6
       bg-gradient-to-br from-white/[0.04] to-transparent
-      backdrop-blur-xl border border-white/[0.08] rounded-2xl
-      shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+      bg-white border border-slate-200 shadow-sm rounded-2xl
+      shadow-sm
       max-w-6xl mx-auto
     ">
       {/* 顶部发光线 */}
@@ -415,7 +414,7 @@ export function ChartDisplay() {
       </div>
 
       {/* 图例 */}
-      <div className="flex flex-wrap items-center justify-center gap-4 mt-3 pt-3 border-t border-white/[0.06] text-[10px]">
+      <div className="flex flex-wrap items-center justify-center gap-4 mt-3 pt-3 border-t border-slate-200 text-[10px]">
         <div className="flex items-center gap-1">
           <span className="w-2 h-2 rounded-full bg-gold" />
           <span className="text-text-muted">命宫</span>

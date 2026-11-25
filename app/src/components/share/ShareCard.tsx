@@ -113,7 +113,7 @@ export function ShareCard() {
       await document.fonts.ready
 
       const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: '#0a0a12',
+        backgroundColor: '#fffdf8',
         scale: 2,
         useCORS: true,
         logging: true,  // 开启日志
@@ -139,7 +139,7 @@ export function ShareCard() {
 
   if (!chart || !birthInfo) {
     return (
-      <div className="text-center py-12 text-text-muted">
+      <div className="text-center py-12 text-slate-500">
         <div className="text-4xl mb-3 opacity-30">✦</div>
         <p>请先生成命盘，再创建分享卡片</p>
       </div>
@@ -161,7 +161,7 @@ export function ShareCard() {
         style={{
           width: '360px',
           height: '560px',
-          background: '#0c0c18',
+          background: '#fffdf8',
           borderRadius: '16px',
           position: 'relative',
           overflow: 'hidden',
@@ -177,7 +177,7 @@ export function ShareCard() {
             right: '8px',
             bottom: '8px',
             borderRadius: '12px',
-            border: '1px solid rgba(255, 215, 0, 0.15)',
+            border: '1px solid rgba(182, 138, 58, 0.35)',
             pointerEvents: 'none',
           }}
         />
@@ -189,14 +189,14 @@ export function ShareCard() {
             right: '12px',
             bottom: '12px',
             borderRadius: '8px',
-            border: '1px solid rgba(255, 215, 0, 0.08)',
+            border: '1px solid rgba(182, 138, 58, 0.18)',
             pointerEvents: 'none',
           }}
         />
 
         {/* 四角装饰 */}
-        <div style={{ position: 'absolute', top: '16px', left: '16px', color: 'rgba(212, 175, 55, 0.3)', fontSize: '18px' }}>✦</div>
-        <div style={{ position: 'absolute', top: '16px', right: '16px', color: 'rgba(212, 175, 55, 0.3)', fontSize: '18px' }}>✦</div>
+        <div style={{ position: 'absolute', top: '16px', left: '16px', color: 'rgba(152, 112, 46, 0.45)', fontSize: '18px' }}>✦</div>
+        <div style={{ position: 'absolute', top: '16px', right: '16px', color: 'rgba(152, 112, 46, 0.35)', fontSize: '18px' }}>✦</div>
         <div style={{ position: 'absolute', bottom: '16px', left: '16px', color: 'rgba(212, 175, 55, 0.3)', fontSize: '18px' }}>✦</div>
         <div style={{ position: 'absolute', bottom: '16px', right: '16px', color: 'rgba(212, 175, 55, 0.3)', fontSize: '18px' }}>✦</div>
 
@@ -214,7 +214,7 @@ export function ShareCard() {
           {/* 顶部星辰装饰线 */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
             <div style={{ width: '48px', height: '1px', background: 'rgba(212, 175, 55, 0.3)' }} />
-            <span style={{ color: 'rgba(212, 175, 55, 0.5)', fontSize: '12px', letterSpacing: '0.1em' }}>☆ · ☆ · ☆</span>
+            <span style={{ color: 'rgba(152, 112, 46, 0.65)', fontSize: '12px', letterSpacing: '0.1em' }}>☆ · ☆ · ☆</span>
             <div style={{ width: '48px', height: '1px', background: 'rgba(212, 175, 55, 0.3)' }} />
           </div>
 
@@ -224,7 +224,7 @@ export function ShareCard() {
               style={{
                 fontSize: '20px',
                 letterSpacing: '0.2em',
-                color: '#FCD34D',
+                color: '#98702e',
                 fontFamily: FONT_SERIF,
                 margin: 0,
               }}
@@ -239,7 +239,7 @@ export function ShareCard() {
               style={{
                 fontSize: '18px',
                 lineHeight: '2',
-                color: '#FFFBEB',
+                color: '#334155',
                 whiteSpace: 'pre-line',
                 fontFamily: FONT_BRUSH,
                 textAlign: 'center',
@@ -253,7 +253,7 @@ export function ShareCard() {
           {/* 分隔线 */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '16px' }}>
             <div style={{ width: '64px', height: '1px', background: 'rgba(212, 175, 55, 0.3)' }} />
-            <span style={{ color: 'rgba(212, 175, 55, 0.4)', fontSize: '12px' }}>❖</span>
+            <span style={{ color: 'rgba(152, 112, 46, 0.45)', fontSize: '12px' }}>❖</span>
             <div style={{ width: '64px', height: '1px', background: 'rgba(212, 175, 55, 0.3)' }} />
           </div>
 
@@ -263,7 +263,7 @@ export function ShareCard() {
               style={{
                 fontSize: '14px',
                 letterSpacing: '0.05em',
-                color: 'rgba(252, 211, 77, 0.8)',
+                color: 'rgba(152, 112, 46, 0.9)',
                 fontFamily: FONT_SERIF,
                 margin: '0 0 8px 0',
               }}
@@ -271,7 +271,7 @@ export function ShareCard() {
               命宫主星：{stars}
             </p>
             {pattern && (
-              <p style={{ fontSize: '12px', color: 'rgba(212, 175, 55, 0.6)', margin: '0 0 4px 0' }}>
+              <p style={{ fontSize: '12px', color: 'rgba(152, 112, 46, 0.7)', margin: '0 0 4px 0' }}>
                 格局：{pattern}
               </p>
             )}
@@ -299,15 +299,15 @@ export function ShareCard() {
             >
               命
             </div>
-            <p style={{ color: 'rgba(252, 211, 77, 0.6)', fontSize: '14px', letterSpacing: '0.1em', margin: 0 }}>
+            <p style={{ color: 'rgba(152, 112, 46, 0.75)', fontSize: '14px', letterSpacing: '0.1em', margin: 0 }}>
               {ganZhi}年 · {gender}
             </p>
           </div>
 
           {/* 底部水印 */}
-          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid rgba(212, 175, 55, 0.1)', textAlign: 'center' }}>
+          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid rgba(152, 112, 46, 0.18)', textAlign: 'center' }}>
             <p style={{ color: 'rgba(212, 175, 55, 0.3)', fontSize: '12px', letterSpacing: '0.2em', margin: 0 }}>
-              ─── 紫微知道 ───
+              ─── 天衍 · 命理探索 ───
             </p>
           </div>
         </div>
@@ -321,7 +321,7 @@ export function ShareCard() {
               value={customQuote}
               onChange={(e) => setCustomQuote(e.target.value)}
               placeholder="输入自定义金句，每句话换行..."
-              className="w-full h-24 px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-text placeholder:text-text-muted focus:outline-none focus:border-gold/30 resize-none"
+              className="w-full h-24 px-4 py-3 rounded-lg bg-white border border-slate-200 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-amber-400 resize-none"
               style={{ fontFamily: FONT_BRUSH }}
             />
             <div className="flex gap-2">
@@ -336,7 +336,7 @@ export function ShareCard() {
         ) : (
           <button
             onClick={() => setIsEditing(true)}
-            className="w-full py-2 text-sm text-text-muted hover:text-text-secondary transition-colors"
+            className="w-full py-2 text-sm text-text-muted hover:text-slate-800 transition-colors"
           >
             ✎ 自定义金句
           </button>
