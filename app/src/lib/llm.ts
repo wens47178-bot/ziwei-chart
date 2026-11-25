@@ -348,6 +348,23 @@ async function* streamOpenAICompatible(
       }
     }
   }
+
+  // Some providers close the stream immediately after the final data line,
+  // without a newline. Flush the decoder and parse that remaining event.
+  buffer += decoder.decode()
+  const finalLine = buffer.trim()
+  if (finalLine.startsWith('data: ')) {
+    const data = finalLine.slice(6)
+    if (data !== '[DONE]') {
+      try {
+        const json = JSON.parse(data)
+        const content = json.choices?.[0]?.delta?.content
+        if (content) yield content
+      } catch {
+        // Ignore incomplete or non-JSON trailing data.
+      }
+    }
+  }
 }
 
 /* ------------------------------------------------------------
@@ -551,6 +568,20 @@ async function* streamClaude(
           // 忽略
         }
       }
+    }
+  }
+
+  // Flush a final Claude event even if the provider omits its trailing newline.
+  buffer += decoder.decode()
+  const finalLine = buffer.trim()
+  if (finalLine.startsWith('data: ')) {
+    try {
+      const json = JSON.parse(finalLine.slice(6))
+      if (json.type === 'content_block_delta' && json.delta?.type === 'text_delta') {
+        yield json.delta.text || ''
+      }
+    } catch {
+      // Ignore incomplete trailing data.
     }
   }
 }
