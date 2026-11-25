@@ -148,3 +148,10 @@ or notable verification run.
 - Started branch `fix/true-solar-time-timezone-determinism`.
 - Replaced local-time `Date` construction and getters in true-solar correction with UTC calendar arithmetic. Birth input is a civil wall-clock time; using the browser/runtime timezone could otherwise make the same birth details produce different results across regions or DST transitions.
 - Added regression coverage for a DST-transition date and leap-day input. Changes remain isolated until CI validates the behavior.
+
+
+## 2026-11-25 Zi-hour day-boundary regression coverage
+
+- Added an integration regression asserting that a late Zi birth (23:00) and the following day's early Zi birth (00:00) produce the same normalized chart under the configured `dayDivide: 'forward'` rule.
+- Added assertions that the UI's twelve shichen option values align with the intended hour mapping, including the Zi, Chou, and Hai boundaries.
+- This change adds tests only; no chart calculation behavior was changed.
