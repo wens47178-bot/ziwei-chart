@@ -778,7 +778,7 @@ export function generateLunarMonthlyKLines(
   const timeIndex = natalTime.includes('子') ? 0 : Math.max(0, branches.indexOf(natalTime))
   const periods = chart.monthlyList(year, fixLeap)
 
-  const klines = periods.map((period) => {
+  const klines: KLineData[] = periods.map((period) => {
     const [startDay, endDay] = period.dayRange
     const sampleDays = [...new Set([
       startDay,
