@@ -164,3 +164,10 @@ or notable verification run.
 - Clear stale birthplace matches when the user edits the birthplace or toggles true-solar correction, and handle lookup failures without leaving an old match displayed.
 - Read corrected minutes with the UTC getter to keep all returned wall-clock fields consistent with the timezone-independent arithmetic.
 - Changes are isolated in a PR and require full CI before merge.
+
+
+## 2026-11-25 Independent calendar reference fixture
+
+- Added an application-level regression fixture for 2000-08-16 (female, 寅时), asserting the solar date, converted lunar date, and four-pillar Ganzhi string.
+- Expected values are copied from the upstream iztro `bySolar()` integration test, so this checks the application's integration against a concrete engine reference rather than only checking that a 12-palace chart exists.
+- This fixture does not claim to independently validate every Zi Wei school convention or leap-month interpretation; those require separate domain references and boundary fixtures.
