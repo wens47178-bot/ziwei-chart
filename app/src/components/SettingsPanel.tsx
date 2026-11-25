@@ -374,7 +374,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
 
         {/* 隐私提示 */}
         <p className="text-xs text-text-muted text-center">
-          API Key 仅保存在你的浏览器本地，不会上传到任何服务器。
+          API Key 仅在当前页面内存中保留，不写入浏览器本地存储；刷新页面后需要重新输入。请求会直接发送给所选服务商。
         </p>
       </div>
     </div>

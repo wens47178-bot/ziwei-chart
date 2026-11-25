@@ -68,9 +68,9 @@ known and is not by itself a failure.
   local coordinate dataset.
 - The deployment mirror sync depends on the GitHub secret `ZWKNOWS_SYNC_TOKEN`
   retaining both `repo` and `workflow` permissions.
-- `npm ci` currently reports 11 dependency audit findings (1 low, 2 moderate,
-  8 high); remediation needs a separately scoped dependency review because this
-  documentation/license change does not alter the lockfile.
+- A July 2026 dependency audit reported 11 findings (1 low, 2 moderate, 8 high).
+  This count is historical and must be rechecked against the current lockfile before
+  remediation decisions.
 
 ## Next Useful Work
 
@@ -87,18 +87,20 @@ known and is not by itself a failure.
 or notable verification run.
 
 
-## 2026-11-25 Security and CI Proposal
+## 2026-11-25 Completed engineering work
 
-- Added a proposed hardening change on branch `security/gemini-api-key-header-ci`: Gemini API keys are sent via the `x-goog-api-key` header instead of URL query parameters in both keyword extraction and streaming requests.
-- Added a focused Vitest regression test for Gemini streaming authentication.
-- Added a pull-request CI workflow to run `npm ci`, lint, tests, and the production build on Node.js 22.
-- This proposal is not merged. Fresh CI results are required before treating the change as verified or deployed.
+- PR #1 merged to the user's fork `main` as `b4fac3ff6ca40d9df22eb55fed1419c779d5189b`: Gemini API keys now use the `x-goog-api-key` header in both keyword extraction and streaming requests; added a regression test and CI workflow.
+- PR #1 CI passed: `npm ci`, ESLint, Vitest, and TypeScript/Vite production build.
+- PR #2 merged to the user's fork `main` as `92f0550b991138bea739809ed9ffeddbbb3ac04d`: Gemini streaming now requests the documented `alt=sse` format and parses SSE event boundaries, multi-part text, split chunks, CRLF separators, escaped quotes, and the final buffered event.
+- PR #2 CI passed: dependency installation, lint, tests, and production build.
+- The fork's deployment-sync workflow correctly skipped because its repository guard only permits the canonical `ziweiknows/ziwei-chart` source repository. No deployment-mirror push was performed.
+- Official Gemini streaming protocol reference: https://ai.google.dev/gemini-api/docs/get-started/rest.
 
+## 2026-11-25 In-progress security improvement
 
-## 2026-11-25 Gemini streaming protocol fix
-
-- Updated Gemini \`streamGenerateContent\` to request the documented Server-Sent Events format with \`alt=sse\`.
-- Replaced the fragile brace/regex parser with event-boundary parsing, JSON payload decoding, multi-part text extraction, and final-buffer flushing.
-- Added regression coverage for API-key header authentication, SSE chunk boundaries, CRLF separators, escaped quotes, multiple text parts, and a final event without a trailing blank line.
-- Official protocol reference: Google Gemini REST streaming requires \`alt=sse\` and emits \`data:\` events containing \`candidates[0].content.parts[].text\`.
-- Changes are on a review branch and require CI before merge.
+- Reviewing Zustand settings persistence because provider and Tavily API keys were included in the `ziwei-settings` localStorage payload.
+- A proposed change on branch `security/keep-api-keys-out-of-local-storage` removes API credentials from persisted browser storage while retaining non-secret preferences.
+- Credentials will remain in app memory for the current page session and need to be entered again after a reload.
+- CI passed on 2026-11-25 after the versioned Zustand persist generic fix: dependency installation, ESLint, all 34 Vitest tests, and TypeScript/Vite production build.
+- PR #3 remains open for merge at the time of this update.
+- The same `npm ci` run reported 20 dependency audit findings (1 low, 7 moderate, 12 high). These are dependency advisories, not test failures; a separate lockfile/advisory review is now a priority.
