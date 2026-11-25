@@ -24,7 +24,12 @@ export const useChartStore = create<ChartState>()((set) => ({
   birthInfo: null,
   chart: null,
   setBirthInfo: (info) => set({ birthInfo: info }),
-  setChart: (chart) => set({ chart }),
+  setChart: (chart) => {
+    // AI interpretations, annual readings, and K-lines belong to one chart only.
+    // Never carry cached output over when a new chart is generated.
+    useContentCacheStore.getState().clearAll()
+    set({ chart })
+  },
   clear: () => {
     set({ birthInfo: null, chart: null })
     // 同时清除内容缓存
