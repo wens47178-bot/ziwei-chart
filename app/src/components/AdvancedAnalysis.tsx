@@ -28,6 +28,7 @@ function Pill({ children }: { children: React.ReactNode }) {
 export function AdvancedAnalysis({ mode }: { mode: AdvancedMode }) {
   const { chart, birthInfo } = useChartStore()
   const [selectedPalace, setSelectedPalace] = useState('命宫')
+  const [selectedStar, setSelectedStar] = useState('')
   const [targetYear, setTargetYear] = useState(new Date().getFullYear())
 
   const palaces = chart?.palaces ?? []
@@ -37,6 +38,7 @@ export function AdvancedAnalysis({ mode }: { mode: AdvancedMode }) {
     try { return chart.horoscope(createLocalCalendarDate(targetYear, 6, 15)) } catch { return null }
   }, [chart, targetYear])
 
+  const activeStar = observedStars.includes(selectedStar) ? selectedStar : (observedStars[0] ?? '')
   const patternHints = useMemo(() => chart ? extractKnowledge(chart, birthInfo?.year).格局提示 : [], [chart, birthInfo?.year])
   const trinePalaces = useMemo(() => {
     if (!selected) return []
@@ -120,11 +122,11 @@ export function AdvancedAnalysis({ mode }: { mode: AdvancedMode }) {
       </>}
 
       {mode === 'stars' && <>
-        <div className="flex flex-wrap gap-2">{observedStars.map((name) => <button key={name} onClick={() => setSelectedPalace(name)} className={`rounded-full border px-3 py-2 text-xs ${selectedPalace === name ? 'border-[#bda77e] bg-[#f8f5ee] text-[#5f4d2f]' : 'border-[#e8e5df] text-[#777166]'}`}>{name}</button>)}</div>
+        <div className="flex flex-wrap gap-2">{observedStars.map((name) => <button key={name} onClick={() => setSelectedStar(name)} className={`rounded-full border px-3 py-2 text-xs ${activeStar === name ? 'border-[#bda77e] bg-[#f8f5ee] text-[#5f4d2f]' : 'border-[#e8e5df] text-[#777166]'}`}>{name}</button>)}</div>
         {(() => {
-          const info = getStarInfo(selectedPalace)
-          const placements = palaces.flatMap((palace) => [...(palace.majorStars ?? []), ...(palace.minorStars ?? []), ...(palace.adjectiveStars ?? [])].filter((star) => String(star.name) === selectedPalace).map(() => palace.name))
-          return <div className="mt-5 rounded-2xl bg-[#faf9f6] p-5"><p className="text-xs tracking-widest text-[#a58a5d]">STAR PROFILE</p><h3 className="mt-2 text-2xl font-semibold text-[#302b23]">{selectedPalace}</h3>{info ? <><p className="mt-2 text-sm text-[#847a68]">{info.group} · {info.wuxing} · {info.yinyang}</p><p className="mt-4 text-sm leading-7 text-[#5f594e]">{info.description}</p><div className="mt-4 flex flex-wrap gap-2">{info.traits.map((trait) => <Pill key={trait}>{trait}</Pill>)}</div></> : <p className="mt-3 text-sm leading-7 text-[#827a6d]">知识库暂未收录这颗星曜的详细释义；此处只显示命盘中实际出现的位置，不补造星性说明。</p>}<div className="mt-5 border-t border-[#e7e2d8] pt-4"><p className="text-xs text-[#9a907f]">本命盘落宫</p><div className="mt-2 flex flex-wrap gap-2">{placements.map((name, i) => <Pill key={i}>{name}</Pill>)}{placements.length === 0 && <span className="text-sm text-[#8c8579]">当前命盘未发现此星曜</span>}</div></div></div>
+          const info = getStarInfo(activeStar)
+          const placements = palaces.flatMap((palace) => [...(palace.majorStars ?? []), ...(palace.minorStars ?? []), ...(palace.adjectiveStars ?? [])].filter((star) => String(star.name) === activeStar).map(() => palace.name))
+          return <div className="mt-5 rounded-2xl bg-[#faf9f6] p-5"><p className="text-xs tracking-widest text-[#a58a5d]">STAR PROFILE</p><h3 className="mt-2 text-2xl font-semibold text-[#302b23]">{activeStar}</h3>{info ? <><p className="mt-2 text-sm text-[#847a68]">{info.group} · {info.wuxing} · {info.yinyang}</p><p className="mt-4 text-sm leading-7 text-[#5f594e]">{info.description}</p><div className="mt-4 flex flex-wrap gap-2">{info.traits.map((trait) => <Pill key={trait}>{trait}</Pill>)}</div></> : <p className="mt-3 text-sm leading-7 text-[#827a6d]">知识库暂未收录这颗星曜的详细释义；此处只显示命盘中实际出现的位置，不补造星性说明。</p>}<div className="mt-5 border-t border-[#e7e2d8] pt-4"><p className="text-xs text-[#9a907f]">本命盘落宫</p><div className="mt-2 flex flex-wrap gap-2">{placements.map((name, i) => <Pill key={i}>{name}</Pill>)}{placements.length === 0 && <span className="text-sm text-[#8c8579]">当前命盘未发现此星曜</span>}</div></div></div>
         })()}
       </>}
     </div>
