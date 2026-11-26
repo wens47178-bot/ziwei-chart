@@ -171,7 +171,7 @@ export function shichenNameForTimeIndex(timeIndex: number): string {
 }
 
 function normalizePlace(input?: string): string {
-  return (input ?? '').trim().toLocaleLowerCase().replace(/[\s\p{P}\p{S}]+/gu, '')
+  return (input ?? '').trim().toLowerCase().replace(/[\s\p{P}\p{S}]+/gu, '')
 }
 
 function scoreBirthplaceMatch(input: string, place: Birthplace): number {
