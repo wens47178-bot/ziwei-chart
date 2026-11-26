@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts'
 import { useChartStore } from '@/stores'
 import { createLocalCalendarDate } from '@/lib/horoscope'
-import { extractKnowledge, getStarInfo } from '@/knowledge'
+import { extractKnowledge, getStarInfo, getAllStars } from '@/knowledge'
 
 export type AdvancedMode = 'palaces' | 'sihua' | 'decadal' | 'stars' | 'patterns' | 'trines'
 
@@ -59,7 +59,8 @@ export function AdvancedAnalysis({ mode }: { mode: AdvancedMode }) {
     }
     return [...names].sort((a, b) => a.localeCompare(b, 'zh-CN'))
   }, [palaces])
-  const activeStar = observedStars.includes(selectedStar) ? selectedStar : (observedStars[0] ?? '')
+  const atlasStars = Array.from(new Set([...observedStars, ...getAllStars().map(star => star.name)]))
+  const activeStar = atlasStars.includes(selectedStar) ? selectedStar : (atlasStars[0] ?? '')
 
   if (!chart) return <div className="rounded-2xl border border-dashed border-[#ded8cc] p-10 text-center text-sm text-[#8c8579]">请先建立命盘，再查看这项分析。</div>
 
@@ -129,11 +130,11 @@ export function AdvancedAnalysis({ mode }: { mode: AdvancedMode }) {
       </>}
 
       {mode === 'stars' && <>
-        <div className="flex flex-wrap gap-2">{observedStars.map((name) => <button key={name} onClick={() => setSelectedStar(name)} className={`rounded-full border px-3 py-2 text-xs ${activeStar === name ? 'border-[#bda77e] bg-[#f8f5ee] text-[#5f4d2f]' : 'border-[#e8e5df] text-[#777166]'}`}>{name}</button>)}</div>
+        <div className="flex flex-wrap gap-2">{atlasStars.map((name) => <button key={name} onClick={() => setSelectedStar(name)} className={`rounded-full border px-3 py-2 text-xs ${activeStar === name ? 'border-[#bda77e] bg-[#f8f5ee] text-[#5f4d2f]' : 'border-[#e8e5df] text-[#777166]'}`}>{name}</button>)}</div>
         {(() => {
           const info = getStarInfo(activeStar)
           const placements = palaces.flatMap((palace) => [...(palace.majorStars ?? []), ...(palace.minorStars ?? []), ...(palace.adjectiveStars ?? [])].filter((star) => String(star.name) === activeStar).map(() => palace.name))
-          return <div className="mt-5 rounded-2xl bg-[#faf9f6] p-5"><p className="text-xs tracking-widest text-[#a58a5d]">STAR PROFILE</p><h3 className="mt-2 text-2xl font-semibold text-[#302b23]">{activeStar}</h3>{info ? <><p className="mt-2 text-sm text-[#847a68]">{info.group} · {info.wuxing} · {info.yinyang}</p><p className="mt-4 text-sm leading-7 text-[#5f594e]">{info.description}</p><div className="mt-4 flex flex-wrap gap-2">{info.traits.map((trait) => <Pill key={trait}>{trait}</Pill>)}</div></> : <p className="mt-3 text-sm leading-7 text-[#827a6d]">知识库暂未收录这颗星曜的详细释义；此处只显示命盘中实际出现的位置，不补造星性说明。</p>}<div className="mt-5 border-t border-[#e7e2d8] pt-4"><p className="text-xs text-[#9a907f]">本命盘落宫</p><div className="mt-2 flex flex-wrap gap-2">{placements.map((name, i) => <Pill key={i}>{name}</Pill>)}{placements.length === 0 && <span className="text-sm text-[#8c8579]">当前命盘未发现此星曜</span>}</div></div></div>
+          return <div className="mt-5 rounded-2xl bg-[#faf9f6] p-5"><p className="text-xs tracking-widest text-[#a58a5d]">STAR PROFILE</p><h3 className="mt-2 text-2xl font-semibold text-[#302b23]">{activeStar}</h3>{info ? <><p className="mt-2 text-sm text-[#847a68]">{[info.group, info.wuxing === '流派有异' ? '' : info.wuxing, info.yinyang === '不统一标注' ? '' : info.yinyang].filter(Boolean).join(' · ')}</p><p className="mt-4 text-sm leading-7 text-[#5f594e]">{info.description}</p><div className="mt-4 flex flex-wrap gap-2">{info.traits.map((trait) => <Pill key={trait}>{trait}</Pill>)}</div></> : <p className="mt-3 text-sm leading-7 text-[#827a6d]">知识库暂未收录这颗星曜的详细释义；此处只显示命盘中实际出现的位置，不补造星性说明。</p>}<div className="mt-5 border-t border-[#e7e2d8] pt-4"><p className="text-xs text-[#9a907f]">本命盘落宫</p><div className="mt-2 flex flex-wrap gap-2">{placements.map((name, i) => <div key={i} className="w-full rounded-lg border border-[#e7e2d8] p-3"><Pill>{name}</Pill>{info && <p className="mt-2 text-sm leading-7 text-[#5f594e]">{info.palaceEffects[String(name)] ?? `传统合参：${activeStar}的${info.keywords.join('、')}主题，可结合此宫所代表的${({"命宫":"个人性格、自我定位与行为方式","兄弟宫":"手足、同辈关系与相互支持","夫妻宫":"亲密关系、沟通与相处模式","子女宫":"子女互动、培育与创造表达","财帛宫":"收入、支出与资源管理","疾厄宫":"生活习惯、休息与身心照料（非医学判断）","迁移宫":"外部环境、出行与适应方式","交友宫":"朋友、团队与合作关系","仆役宫":"朋友、团队与合作关系","官禄宫":"职业方向、职责与工作方式","田宅宫":"居住环境、家庭资源与资产管理","福德宫":"精神生活、兴趣与内在感受","父母宫":"长辈互动、家庭教育与支持"} as Record<string,string>)[String(name)] ?? '相关生活领域'}观察。需结合主星、四化及三方四正，不作单星定论。`}</p>}</div>)}{placements.length === 0 && <span className="text-sm text-[#8c8579]">当前命盘未发现此星曜</span>}</div></div></div>
         })()}
       </>}
     </div>
