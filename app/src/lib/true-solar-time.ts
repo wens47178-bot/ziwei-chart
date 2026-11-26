@@ -172,6 +172,8 @@ interface RemoteCitySearchResult {
   name?: string
   countryCode?: string
   countryName?: string
+  stateName?: string | null
+  stateCode?: string | null
   geonameId?: number | null
 }
 
@@ -214,8 +216,9 @@ async function findRemoteBirthplace(input?: string): Promise<Birthplace | null> 
         ? nameMatches.filter((place) => countryMatchesQuery(place, countryQuery))
         : nameMatches
       const candidates = countryMatches.length > 0 ? countryMatches : countryQuery ? [] : nameMatches
-      const distinctCountries = new Set(candidates.map((place) => place.countryCode ?? place.countryName))
-      if (distinctCountries.size !== 1 || candidates.length === 0) return null
+      // Even within one country, names such as Springfield may identify many places.
+      // Never select an arbitrary result; a state/country qualifier must narrow it to one city.
+      if (candidates.length !== 1) return null
 
       const selected = candidates[0]
       const detailUrl = new URL(`${REMOTE_CITY_API}/cities/${selected.geonameId}`)
@@ -260,9 +263,14 @@ function countryMatchesQuery(place: RemoteCitySearchResult, query: string): bool
     england: ['gb', 'unitedkingdom'],
     uae: ['ae', 'unitedarabemirates'],
   }
-  const accepted = [normalized, ...(aliases[normalized] ?? [])]
-  return accepted.includes(normalizePlace(place.countryCode))
-    || accepted.includes(normalizePlace(place.countryName))
+  const countryTokens = [
+    normalizePlace(place.countryCode),
+    normalizePlace(place.countryName),
+    ...(aliases[normalizePlace(place.countryCode)] ?? []),
+  ].filter(Boolean)
+  const regionTokens = [normalizePlace(place.stateCode), normalizePlace(place.stateName)].filter(Boolean)
+  return countryTokens.some((token) => normalized.includes(token))
+    || regionTokens.some((token) => normalized.includes(token))
 }
 
 async function loadBirthplaceData(): Promise<Birthplace[]> {
