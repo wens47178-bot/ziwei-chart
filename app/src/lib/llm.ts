@@ -649,50 +649,77 @@ export async function chat(
 const HOSTED_AI_ENDPOINT = 'https://tianyan-ai-api.onrender.com/api/interpret'
 
 export async function* streamHostedAI(messages: ChatMessage[]): AsyncGenerator<string> {
-  const response = await fetch(HOSTED_AI_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages }),
-  })
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 170_000)
+  let receivedText = false
 
-  if (!response.ok) {
-    let message = `平台 AI 服务请求失败（${response.status}）`
-    try {
-      const data = await response.json()
-      if (typeof data.error === 'string') message = data.error
-    } catch { /* keep fallback message */ }
-    throw new Error(message)
-  }
+  try {
+    const response = await fetch(HOSTED_AI_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages }),
+      signal: controller.signal,
+    })
 
-  const reader = response.body?.getReader()
-  if (!reader) throw new Error('平台 AI 服务没有返回内容')
-  const decoder = new TextDecoder()
-  let buffer = ''
-
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-    buffer += decoder.decode(value, { stream: true })
-    const events = buffer.split(/\r?\n\r?\n/)
-    buffer = events.pop() || ''
-    for (const event of events) {
-      const data = event.split(/\r?\n/).find((line) => line.startsWith('data:'))?.slice(5).trim()
-      if (!data || data === '[DONE]') continue
+    if (!response.ok) {
+      let message = `平台 AI 服务请求失败（${response.status}）`
       try {
-        const payload = JSON.parse(data) as { text?: string }
-        if (payload.text) yield payload.text
-      } catch { /* ignore malformed event */ }
+        const data = await response.json()
+        if (typeof data.error === 'string') message = data.error
+      } catch { /* keep fallback message */ }
+      throw new Error(message)
     }
-  }
 
-  buffer += decoder.decode()
-  if (buffer.trim()) {
-    const data = buffer.split(/\r?\n/).find((line) => line.startsWith('data:'))?.slice(5).trim()
-    if (data && data !== '[DONE]') {
-      try {
-        const payload = JSON.parse(data) as { text?: string }
-        if (payload.text) yield payload.text
-      } catch { /* ignore incomplete final event */ }
+    const reader = response.body?.getReader()
+    if (!reader) throw new Error('平台 AI 服务没有返回内容')
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    const consumeEvent = (event: string): string | null => {
+      const data = event.split(/\\r?\\n/)
+        .filter((line) => line.startsWith('data:'))
+        .map((line) => line.slice(5).trim())
+        .filter(Boolean)
+        .join('\\n')
+      if (!data || data === '[DONE]') return null
+      const payload = JSON.parse(data) as { text?: string; error?: string }
+      if (payload.error) throw new Error(payload.error)
+      return typeof payload.text === 'string' && payload.text.length > 0 ? payload.text : null
     }
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      const events = buffer.split(/\\r?\\n\\r?\\n/)
+      buffer = events.pop() || ''
+      for (const event of events) {
+        const text = consumeEvent(event)
+        if (text) {
+          receivedText = true
+          yield text
+        }
+      }
+    }
+
+    buffer += decoder.decode()
+    if (buffer.trim()) {
+      const text = consumeEvent(buffer)
+      if (text) {
+        receivedText = true
+        yield text
+      }
+    }
+
+    if (!receivedText) {
+      throw new Error('AI 服务已结束连接，但没有返回报告文字。请稍后重试；若持续发生，需要检查模型额度和服务端日志。')
+    }
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error('AI 解读等待超过 170 秒，已自动停止。请稍后重试；若反复发生，需要检查模型响应速度或服务端日志。')
+    }
+    throw error
+  } finally {
+    clearTimeout(timeout)
   }
 }
