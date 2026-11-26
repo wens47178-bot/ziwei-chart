@@ -266,7 +266,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
               <p>原始时间：{solarDate} {formatTime(birthInfo.hour, birthInfo.minute ?? 0)}</p>
               <p>时区实际偏移：{formatUtcOffset(resolvedTime.utcOffsetMinutes ?? 480)}</p>
               {resolvedTime.dstAdjustmentMinutes !== 0 && (
-                <p>相对本年标准偏移：{formatSignedMinutes(resolvedTime.dstAdjustmentMinutes)} 分钟（已计入当地时区修正）</p>
+                <p>相对本年最小 UTC 偏移：{formatSignedMinutes(resolvedTime.dstAdjustmentMinutes)} 分钟（仅作时差说明；校正使用上方实际偏移）</p>
               )}
               {resolvedTime.ambiguousLocalTime && (
                 <p className="text-amber-700">该时刻在夏令时回拨时段出现两次，系统按第一次出现的时间计算</p>
