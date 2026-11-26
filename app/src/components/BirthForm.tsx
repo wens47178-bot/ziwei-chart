@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { Button, Input, Select } from '@/components/ui'
 import { generateChart, type BirthInfo, type Gender } from '@/lib/astro'
 import { clampDayToMonth, getDayOptions, getMonthOptions, getYearOptions } from '@/lib/birth-date'
-import { findBirthplaceAsync, resolveBirthTimeAsync, type Birthplace } from '@/lib/true-solar-time'
+import { searchBirthplacesAsync, resolveBirthTimeAsync, type Birthplace } from '@/lib/true-solar-time'
 import { useChartStore } from '@/stores'
 
 const YEAR_OPTIONS = getYearOptions()
@@ -31,6 +31,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
   const [birthplace, setBirthplace] = useState('')
   const [trueSolarEnabled, setTrueSolarEnabled] = useState(true)
   const [matchedBirthplace, setMatchedBirthplace] = useState<Birthplace | null>(null)
+  const [birthplaceSuggestions, setBirthplaceSuggestions] = useState<Birthplace[]>([])
   const [matchingBirthplace, setMatchingBirthplace] = useState(false)
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState('')
@@ -40,38 +41,43 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
   useEffect(() => {
     let active = true
     const trimmedBirthplace = birthplace.trim()
+    if (!trueSolarEnabled || trimmedBirthplace.length < 2 || matchedBirthplace) {
+      setBirthplaceSuggestions([])
+      setMatchingBirthplace(false)
+      return
+    }
 
-    if (!trueSolarEnabled || trimmedBirthplace.length < 2) return
-
-    // Wait until the user pauses typing before calling the worldwide gazetteer.
+    // Search both domestic and overseas cities as the user types.
     const timer = window.setTimeout(() => {
-      findBirthplaceAsync(trimmedBirthplace)
-        .then((place) => {
-          if (active) setMatchedBirthplace(place)
+      searchBirthplacesAsync(trimmedBirthplace)
+        .then((places) => {
+          if (active) setBirthplaceSuggestions(places)
         })
         .catch(() => {
-          if (active) setMatchedBirthplace(null)
+          if (active) setBirthplaceSuggestions([])
         })
         .finally(() => {
           if (active) setMatchingBirthplace(false)
         })
-    }, 350)
+    }, 300)
 
     return () => {
       active = false
       window.clearTimeout(timer)
     }
-  }, [birthplace, trueSolarEnabled])
+  }, [birthplace, trueSolarEnabled, matchedBirthplace])
 
   const handleBirthplaceChange = (value: string) => {
     setBirthplace(value)
     setMatchedBirthplace(null)
+    setBirthplaceSuggestions([])
     setMatchingBirthplace(trueSolarEnabled && value.trim().length >= 2)
   }
 
   const handleTrueSolarToggle = (enabled: boolean) => {
     setTrueSolarEnabled(enabled)
     setMatchedBirthplace(null)
+    setBirthplaceSuggestions([])
     setMatchingBirthplace(enabled && birthplace.trim().length >= 2)
   }
 
@@ -251,23 +257,65 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
         </div>
 
         {/* 出生地（可选） */}
-        <Input
-          label="出生地（可选）"
-          placeholder="如：金边、Phnom Penh、Tokyo、New York, USA、伦敦、悉尼"
-          hint={
-            trueSolarEnabled
-              ? matchingBirthplace
-                ? '正在匹配出生地'
+        <div className="relative space-y-2">
+          <Input
+            label="出生地（可选）"
+            placeholder="输入城市即可搜索全球地点，如：深圳、Phnom Penh、Tokyo、New York"
+            hint={
+              !trueSolarEnabled
+                ? '已关闭真太阳时校正'
                 : matchedBirthplace
-                ? `已匹配 ${matchedBirthplace.name}${matchedBirthplace.province ? ` · ${matchedBirthplace.province}` : ''}${matchedBirthplace.country ? `（${matchedBirthplace.country}）` : ''}${matchedBirthplace.timeZone ? ` · ${matchedBirthplace.timeZone}` : ''}，系统会按当地时区校正真太阳时`
-                : birthplace.trim().length >= 2
-                  ? '暂未确认唯一出生地。请补充州、省或国家名称；未确认前不会进行真太阳时校正'
-                  : '支持全球城市与城镇检索；可输入中文、当地名称或英文城市名，建议使用“城市, 州/省, 国家”格式'
-              : '已关闭真太阳时校正'
-          }
-          value={birthplace}
-          onChange={(e) => handleBirthplaceChange(e.target.value)}
-        />
+                  ? `已选择：${matchedBirthplace.name}${matchedBirthplace.province ? ` · ${matchedBirthplace.province}` : ''}${matchedBirthplace.country ? ` · ${matchedBirthplace.country}` : ''}${matchedBirthplace.timeZone ? ` · ${matchedBirthplace.timeZone}` : ''}`
+                  : matchingBirthplace
+                    ? '正在搜索全球城市…'
+                    : birthplace.trim().length >= 2
+                      ? '请选择下方匹配的城市；同名城市会显示所属国家和州／省'
+                      : '支持国内及海外城市，可输入中文、英文或当地名称'
+            }
+            value={birthplace}
+            onChange={(e) => handleBirthplaceChange(e.target.value)}
+          />
+          {birthplaceSuggestions.length > 0 && !matchedBirthplace && (
+            <div className="absolute z-30 top-full left-0 right-0 mt-2 max-h-72 overflow-y-auto rounded-xl border border-[#dedbd5] bg-white shadow-xl">
+              <div className="px-4 py-2 text-xs text-[#8b8376] border-b border-[#eeeae3]">
+                全球匹配结果 · 选择出生城市
+              </div>
+              {birthplaceSuggestions.map((place, index) => (
+                <button
+                  key={`${place.name}-${place.province}-${place.country}-${index}`}
+                  type="button"
+                  onClick={() => {
+                    const fullName = [place.name, place.province, place.country].filter(Boolean).join(', ')
+                    setBirthplace(fullName)
+                    setMatchedBirthplace(place)
+                    setBirthplaceSuggestions([])
+                    setMatchingBirthplace(false)
+                  }}
+                  className="w-full px-4 py-3 text-left hover:bg-[#f8f6f1] border-b border-[#f0ede7] last:border-b-0 transition-colors"
+                >
+                  <span className="block text-sm font-medium text-[#302d27]">{place.name}</span>
+                  <span className="block mt-1 text-xs text-[#898276]">
+                    {[place.province, place.country].filter(Boolean).join(' · ')}
+                    {place.timeZone ? ` · ${place.timeZone}` : ''}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+          {matchedBirthplace && (
+            <button
+              type="button"
+              onClick={() => {
+                setMatchedBirthplace(null)
+                setBirthplace('')
+                setBirthplaceSuggestions([])
+              }}
+              className="text-xs text-[#8b7653] hover:text-[#5f4b2d]"
+            >
+              更改出生地
+            </button>
+          )}
+        </div>
 
         <label
           className="
