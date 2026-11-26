@@ -219,7 +219,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
         {!birthInfo.trueSolarEnabled && (
           <p><span className="text-text-muted">时间校正</span> <span className="text-text-muted">已关闭，按原始出生时间排盘</span></p>
         )}
-        <p><span className="text-text-muted">命宫</span> {lifeBranch || "—"}　<span className="text-text-muted">身宫</span> {bodyBranch || "—"}</p>
+        <p><span className="text-text-muted">命宫</span> {lifeBranch || "—"} <span className="text-text-muted">身宫</span> {bodyBranch || "—"}</p>
         {nayin && (
           <p><span className="text-text-muted">纳音</span> <span className="text-gold">{nayin}</span></p>
         )}
