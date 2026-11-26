@@ -88,7 +88,9 @@ export interface KnowledgeContext {
    从命盘提取知识上下文
    ------------------------------------------------------------ */
 
-export function extractKnowledge(chart: FunctionalAstrolabe): KnowledgeContext {
+export function extractKnowledge(chart: FunctionalAstrolabe, birthYear?: number): KnowledgeContext {
+  // Retained for backwards compatibility; natal extraction deliberately does not synthesize annual forecasts.
+  void birthYear
   const context: KnowledgeContext = {
     命宫主星: [],
     身宫主星: [],
