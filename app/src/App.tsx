@@ -45,11 +45,12 @@ export default function App() {
   const { chart, birthInfo } = useChartStore()
   const [activePage, setActivePage] = useState<PageKey | 'home'>('home')
   const [showSettings, setShowSettings] = useState(false)
+  const [expandedChart, setExpandedChart] = useState(false)
   const page = PAGES.find((item) => item.key === activePage) ?? PAGES[0]
 
   const renderWorkspace = (): ReactNode => {
     if (activePage === 'birth') return <BirthForm onSuccess={() => setActivePage('chart')} />
-    if (activePage === 'chart') return chart ? <div className="grid grid-cols-1 xl:grid-cols-[minmax(420px,0.92fr)_minmax(520px,1.18fr)] items-start gap-5 2xl:gap-7"><div className="xl:sticky xl:top-4 min-w-0"><ChartDisplay /></div><div className="min-w-0"><AIInterpretation /></div></div> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'chart') return chart ? <div className="min-w-0"><div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200 pb-2"><span className="text-sm font-semibold text-neutral-800">本命十二宫</span><button type="button" aria-pressed={expandedChart} onClick={() => setExpandedChart(v => !v)} className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-xs text-neutral-700 hover:bg-neutral-100">{expandedChart ? '退出放大' : '放大命盘 ↗'}</button></div><div className={expandedChart ? 'grid grid-cols-1 gap-5' : 'grid grid-cols-1 2xl:grid-cols-[minmax(580px,1fr)_minmax(400px,1fr)] items-start gap-5'}><div className={expandedChart ? 'mx-auto w-full max-w-[900px]' : 'min-w-0'}><ChartDisplay /></div><div className="min-w-0"><AIInterpretation /></div></div></div> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'palaces' || activePage === 'sihua' || activePage === 'decadal' || activePage === 'stars' || activePage === 'patterns' || activePage === 'trines') return chart ? <AdvancedAnalysis mode={activePage as AdvancedMode} /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'fortune') return chart ? <YearlyFortune /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'lunar') return chart ? <LunarMonthlyKLine chart={chart} /> : <PageEmpty onClick={() => setActivePage('birth')} />
