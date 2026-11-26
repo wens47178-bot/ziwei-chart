@@ -249,16 +249,16 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
         {/* 出生地（可选） */}
         <Input
           label="出生地（可选）"
-          placeholder="如：中国大陆城市：北京、成都、乌鲁木齐"
+          placeholder="如：金边、Phnom Penh、Tokyo、New York, USA、伦敦、悉尼"
           hint={
             trueSolarEnabled
               ? matchingBirthplace
                 ? '正在匹配出生地'
                 : matchedBirthplace
-                ? `已匹配 ${matchedBirthplace.name}，系统会自动校正真太阳时`
+                ? `已匹配 ${matchedBirthplace.name}${matchedBirthplace.country ? `（${matchedBirthplace.country}）` : ''}，系统会按当地时区校正真太阳时`
                 : birthplace.trim()
                   ? '暂未匹配该出生地，将按原时辰排盘'
-                  : '出生地库目前覆盖中国大陆地区；未匹配时不会执行真太阳时校正'
+                  : '已覆盖中国大陆及 150 余个海外主要城市；建议输入城市名，必要时加上国家。未匹配时不会执行校正'
               : '已关闭真太阳时校正'
           }
           value={birthplace}
