@@ -54,7 +54,7 @@ export default function App() {
   const hasChartWorkspace = !!chart && chartPages.includes(activePage as PageKey)
   const renderWorkspace = (): ReactNode => {
     if (activePage === 'birth') return <BirthForm onSuccess={() => setActivePage(pendingPage)} />
-    if (activePage === 'chart') return chart ? <><AIInterpretation view={analysisView} />{analysisView === 'report' && <div className="mt-6 divide-y rounded-xl border border-neutral-200">{([['palaces','命盘依据'],['patterns','命盘推演'],['trines','三方四正联动'],['sihua','四化路径分析'],['decadal','大限运程'],['stars','星曜详情']] as const).map(([mode,label]) => <details key={mode} className="p-4"><summary className="cursor-pointer font-semibold">{label}</summary><AdvancedAnalysis mode={mode} /></details>)}</div>}</> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'chart') return chart ? <><AIInterpretation view={analysisView} />{analysisView === 'report' && <div className="mt-6 divide-y rounded-xl border border-neutral-200">{([['palaces','命盘依据'],['patterns','命盘推演'],['trines','三方四正联动'],['sihua','四化路径分析'],['decadal','大限运程'],['stars','星曜详情']] as const).map(([mode,label]) => <details key={mode} className="p-4"><summary className="cursor-pointer font-semibold">{label}</summary><AdvancedAnalysis mode={mode} /></details>)}</div>}</> : <PageEmpty onClick={() => { setPendingPage(activePage as PageKey); setActivePage('birth') }} />
     if (activePage === 'palaces' || activePage === 'sihua' || activePage === 'decadal' || activePage === 'stars' || activePage === 'patterns' || activePage === 'trines') return chart ? <AdvancedAnalysis mode={activePage as AdvancedMode} /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'fortune') return chart ? <YearlyFortune /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'lunar') return chart ? <LunarMonthlyKLine chart={chart} /> : <PageEmpty onClick={() => setActivePage('birth')} />
@@ -91,17 +91,17 @@ export default function App() {
         </div>
       </header>
 
-      {activePage === 'birth' ? <main className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-center gap-12 px-6 py-8 lg:grid-cols-[1fr_1fr] lg:gap-20 lg:px-20">
-        <section className="min-w-0 lg:pl-8">
+      {activePage === 'birth' ? <main className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-center gap-12 px-6 py-8 lg:grid-cols-[1fr_1fr] lg:gap-20 lg:px-20 lg:items-start">
+        <section className="min-w-0 lg:sticky lg:top-24 lg:pl-8 lg:pt-56">
           <button type="button" onClick={() => setActivePage('home')} className="mb-10 text-sm text-neutral-500">‹ 返回首页</button>
           <p className="text-sm tracking-[.25em] text-[#92794d]">01 / DESTINY ENGINE</p>
           <h1 className="mt-5 text-5xl font-bold tracking-tight lg:text-7xl">起紫微命盘</h1>
           <p className="mt-5 text-neutral-500">输入出生年月日時</p>
           <div className="my-8 h-px w-24 bg-neutral-300" />
           <div className="flex justify-between text-sm text-neutral-500"><span>最近命盘 {chart && birthInfo ? 1 : 0}</span><span>本机保存</span></div>
-          {chart && birthInfo ? <button type="button" onClick={() => setActivePage(pendingPage)} className="mt-4 flex w-full items-center justify-between border-b border-neutral-200 py-4 text-left"><span>{birthInfo.dateType === 'lunar' ? '农历' : '公历'}{birthInfo.year}年{birthInfo.month}月{birthInfo.day}日<br/><small className="text-neutral-500">{birthInfo.birthplace || '未填写出生地'} · {birthInfo.gender === 'male' ? '男' : '女'}</small></span><span>›</span></button> : <p className="mt-4 text-sm text-neutral-400">暂无命盘</p>}
+          {chart && birthInfo ? <button type="button" onClick={() => setActivePage(pendingPage)} className="mt-4 flex w-full items-center justify-between border-b border-neutral-200 py-4 text-left"><span>{birthInfo.name && <strong className="mr-2">{birthInfo.name}</strong>}{birthInfo.dateType === 'lunar' ? '农历' : '公历'}{birthInfo.year}年{birthInfo.month}月{birthInfo.day}日<br/><small className="text-neutral-500">{birthInfo.birthplace || '未填写出生地'} · {birthInfo.gender === 'male' ? '男' : '女'}</small></span><span>›</span></button> : <p className="mt-4 text-sm text-neutral-400">暂无命盘</p>}
         </section>
-        <section className="min-w-0 rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8"><Suspense fallback={<div>正在载入…</div>}>{renderWorkspace()}</Suspense></section>
+        <section className="min-w-0 rounded-3xl border border-neutral-200 bg-white p-6 shadow-[0_12px_48px_rgba(0,0,0,0.08)] sm:p-8"><Suspense fallback={<div>正在载入…</div>}>{renderWorkspace()}</Suspense></section>
       </main> : <main className="reference-layout" style={{ gridTemplateColumns: "minmax(0, 1fr)", maxWidth: "none", width: "100%", padding: 0, gap: 0 }}>
         <section className="editorial-panel" style={{ display: "none" }}>
           <div className="editorial-inner">
