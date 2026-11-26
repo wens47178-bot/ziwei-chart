@@ -93,6 +93,30 @@ describe('findBirthplace', () => {
 })
 
 describe('resolveBirthTime', () => {
+  it('distinguishes early and late zi hours at the 23:00 day boundary', () => {
+    const earlyZi = resolveBirthTime({
+      year: 2024,
+      month: 1,
+      day: 2,
+      hour: 0,
+      enabled: false,
+    })
+    const lateZi = resolveBirthTime({
+      year: 2024,
+      month: 1,
+      day: 1,
+      hour: 23,
+      enabled: false,
+    })
+
+    expect(earlyZi.timeIndex).toBe(0)
+    expect(lateZi.timeIndex).toBe(12)
+    expect(earlyZi.originalShichen).toBe(ZI_SHICHEN)
+    expect(lateZi.originalShichen).toBe(ZI_SHICHEN)
+    expect(earlyZi.day).toBe(2)
+    expect(lateZi.day).toBe(1)
+  })
+
   it('keeps the original time when true solar correction is disabled', async () => {
     const result = await resolveBirthTimeAsync({
       year: 1990,

@@ -75,17 +75,22 @@ export function hourToShichen(hour: number): string {
 }
 
 export function getShichenOptions() {
-  return SHICHEN_NAMES.map((name, index) => {
-    const startHour = index === 0 ? 23 : (index * 2 - 1)
-    const endHour = index === 11 ? 22 : index === 0 ? 0 : (index * 2)
-    const label = index === 0
-      ? `${name}时 (23:00-00:59)`
-      : `${name}时 (${String(startHour).padStart(2, '0')}:00-${String(endHour).padStart(2, '0')}:59)`
+  // 子时跨越民用日期边界。拆分早子时与晚子时，才能正确应用 23:00 子初换日规则。
+  const ziOptions = [
+    { value: 23, label: '子时（晚子时 23:00-23:59）' },
+    { value: 0, label: '子时（早子时 00:00-00:59）' },
+  ]
+  const otherOptions = SHICHEN_NAMES.slice(1).map((name, offset) => {
+    const index = offset + 1
+    const startHour = index * 2 - 1
+    const endHour = index * 2
     return {
-      value: index === 0 ? 23 : index * 2,
-      label,
+      value: index * 2,
+      label: `${name}时 (${String(startHour).padStart(2, '0')}:00-${String(endHour).padStart(2, '0')}:59)`,
     }
   })
+
+  return [...ziOptions, ...otherOptions]
 }
 
 /* ------------------------------------------------------------

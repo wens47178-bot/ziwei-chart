@@ -135,10 +135,14 @@ describe('iztro chart engine integration', () => {
     expect(signature(lateZi)).toEqual(signature(followingEarlyZi))
   })
 
-  it('keeps the twelve shichen options aligned with their intended hour ranges', () => {
-    expect(getShichenOptions().map((option) => option.value)).toEqual([
-      23, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22,
+  it('splits early and late zi hours so the 23:00 day boundary is explicit', () => {
+    const options = getShichenOptions()
+
+    expect(options.map((option) => option.value)).toEqual([
+      23, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22,
     ])
+    expect(options[0].label).toContain('晚子时 23:00-23:59')
+    expect(options[1].label).toContain('早子时 00:00-00:59')
     expect(hourToShichen(23)).toBe('子时')
     expect(hourToShichen(0)).toBe('子时')
     expect(hourToShichen(1)).toBe('丑时')
