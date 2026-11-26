@@ -22,16 +22,14 @@ import {
   Label,
   LabelList,
 } from 'recharts'
-import { useChartStore, useSettingsStore, useContentCacheStore } from '@/stores'
+import { useChartStore, useContentCacheStore } from '@/stores'
 import { KLineIcon } from '@/components/icons/KLineIcon'
 import { ScoreRadar } from './ScoreRadar'
 import { LunarMonthlyKLine } from './LunarMonthlyKLine'
 import {
   generateLifetimeKLines,
-  generateKLinesWithLLM,
   type LifetimeKLinePoint,
 } from '@/lib/fortune-score'
-import { type LLMConfig } from '@/lib/llm'
 
 /* ============================================================
    自定义 Tooltip (深色玻璃态)
@@ -211,7 +209,6 @@ function PeakLabel(props: PeakLabelProps) {
 
 export function LifeKLine() {
   const { chart, birthInfo } = useChartStore()
-  const { provider, getCurrentSettings, enableThinking, enableWebSearch, searchApiKey } = useSettingsStore()
   const { klineCache, setKlineCache } = useContentCacheStore()
 
   const [isGenerating, setIsGenerating] = useState(false)
@@ -219,18 +216,6 @@ export function LifeKLine() {
   const [selectedPoint, setSelectedPoint] = useState<LifetimeKLinePoint | null>(null)
 
   // LLM 配置
-  const llmConfig: LLMConfig = useMemo(() => {
-    const settings = getCurrentSettings()
-    return {
-      provider,
-      apiKey: settings.apiKey,
-      baseUrl: settings.customBaseUrl || undefined,
-      model: settings.customModel || undefined,
-      enableThinking,
-      enableWebSearch,
-      searchApiKey,
-    }
-  }, [provider, getCurrentSettings, enableThinking, enableWebSearch, searchApiKey])
 
   /* ------------------------------------------------------------
      生成 K 线数据 (由 AI 决定涨跌)
@@ -243,22 +228,8 @@ export function LifeKLine() {
     setProgress('初始化...')
 
     try {
-      let lifetime: LifetimeKLinePoint[]
-
-      if (llmConfig.apiKey) {
-        // 使用 LLM 生成 (AI 决定涨跌)
-        lifetime = await generateKLinesWithLLM(
-          chart,
-          birthInfo.year,
-          llmConfig,
-          setProgress
-        )
-      } else {
-        // 无 API Key 时使用算法生成
-        setProgress('正在计算运势...')
-        lifetime = generateLifetimeKLines(chart, birthInfo.year)
-      }
-
+      setProgress('正在计算运势...')
+      const lifetime = generateLifetimeKLines(chart, birthInfo.year)
       setKlineCache({ lifetime, isGenerating: false })
       setProgress('')
     } catch (error) {
@@ -271,7 +242,7 @@ export function LifeKLine() {
     }
 
     setIsGenerating(false)
-  }, [chart, birthInfo, llmConfig, setKlineCache])
+  }, [chart, birthInfo, setKlineCache])
 
   /* ------------------------------------------------------------
      数据转换
@@ -354,13 +325,11 @@ export function LifeKLine() {
             ) : (
               <span className="inline-flex items-center gap-2">
                 <KLineIcon className="h-4 w-4" />
-                AI 生成人生 K 线
+                生成传统规则趋势图
               </span>
             )}
           </button>
-          {!llmConfig.apiKey && (
-            <p className="text-text-muted text-xs">提示：配置 API Key 可使用 AI 分析命盘生成</p>
-          )}
+          
         </div>
       ) : (
         <>
