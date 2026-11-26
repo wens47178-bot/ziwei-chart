@@ -6,6 +6,8 @@ const sampleKnowledge: KnowledgeContext = {
   命宫主星: [],
   身宫主星: [],
   身宫位置: '命宫',
+  三方四正: [],
+  宫干飞化: [],
   十二宫: [
     {
       name: '命宫',
