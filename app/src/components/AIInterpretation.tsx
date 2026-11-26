@@ -89,7 +89,9 @@ const MarkdownComponents = {
     <h1 className="text-2xl font-bold text-amber-700 mt-6 mb-3 first:mt-0">{children}</h1>
   ),
   h2: ({ children }: { children?: React.ReactNode }) => (
-    <h2 className="text-xl font-semibold text-amber-800 mt-5 mb-2">{children}</h2>
+    <h2 className={String(children).includes('命主优点')
+      ? 'text-xl font-semibold text-[#5f5037] mt-5 mb-3 rounded-xl border border-[#e9dfcc] bg-[#faf7f0] px-4 py-3'
+      : 'text-xl font-semibold text-amber-800 mt-5 mb-2'}>{children}</h2>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
     <h3 className="text-lg font-medium text-[#8a7653] mt-4 mb-2">{children}</h3>
