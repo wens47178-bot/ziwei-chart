@@ -33,6 +33,7 @@ export interface BirthInfo {
   month: number
   day: number
   hour: number
+  minute?: number
   gender: Gender
   birthplace?: string
   trueSolarEnabled?: boolean
