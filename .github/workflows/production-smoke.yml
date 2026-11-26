@@ -25,7 +25,7 @@ jobs:
             const page = await browser.newPage({viewport:{width:1440,height:900}});
             const errors = [];
             page.on('pageerror', e => errors.push(e.message));
-            const response = await page.goto('https://tianyan-ziwei-main.onrender.com/', {waitUntil:'domcontentloaded',timeout:90000});
+            const response = await page.goto('https://tianyan.onrender.com/', {waitUntil:'domcontentloaded',timeout:90000});
             if (!response?.ok()) throw Error('Production HTTP '+response?.status());
             await page.getByRole('button',{name:'进入起紫微命盘',exact:true}).waitFor({timeout:30000});
             await page.screenshot({path:'homepage.png'});
@@ -85,7 +85,7 @@ jobs:
               await page.screenshot({path:'xiaoliuren.png',fullPage:true});
             });
             await check('ai', async () => {
-              await page.goto('https://tianyan-ziwei-main.onrender.com/');
+              await page.goto('https://tianyan.onrender.com/');
               await page.getByRole('button',{name:'进入起紫微命盘',exact:true}).click();
               await page.getByRole('button',{name:'开始排盘',exact:true}).click();
               await page.getByRole('button',{name:'AI 对话',exact:true}).click();
