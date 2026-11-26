@@ -263,15 +263,18 @@ function countryMatchesQuery(place: RemoteCitySearchResult, query: string): bool
     england: ['gb', 'unitedkingdom'],
     uae: ['ae', 'unitedarabemirates'],
   }
-  const queryTokens = [normalized, ...(aliases[normalized] ?? [])]
+  const queryTokens = query.split(/\\s+/u).flatMap((part) => {
+    const token = normalizePlace(part)
+    return [token, ...(aliases[token] ?? [])]
+  }).filter(Boolean)
   const countryTokens = [
     normalizePlace(place.countryCode),
     normalizePlace(place.countryName),
     ...(aliases[normalizePlace(place.countryCode)] ?? []),
   ].filter(Boolean)
   const regionTokens = [normalizePlace(place.stateCode), normalizePlace(place.stateName)].filter(Boolean)
-  return countryTokens.some((token) => queryTokens.some((queryToken) => queryToken.includes(token)))
-    || regionTokens.some((token) => normalized.includes(token))
+  return countryTokens.some((token) => queryTokens.includes(token))
+    || regionTokens.some((token) => queryTokens.includes(token))
 }
 
 async function loadBirthplaceData(): Promise<Birthplace[]> {
