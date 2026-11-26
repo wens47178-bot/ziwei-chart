@@ -209,7 +209,6 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
               <p className="text-text-muted">说明：时区规则来自 IANA 时区数据库；1970 年以前部分地区的历史民用时间记录可能不完整，早年出生时间需结合当地历史资料核对</p>
             </div>
           </details>
-      <div className="mb-2 flex items-center justify-between gap-2 text-xs text-neutral-600"><span>{selected ? `${selected.name} · 三方四正` : "点击任一宫位查看三方四正"}</span>{selected && <button type="button" onClick={() => setSelectedPalace(null)} className="text-blue-700">取消选择</button>}</div>
         )}
         {showUnmatched && (
           <p>
@@ -401,6 +400,7 @@ export function ChartDisplay({ activeLayer }: { activeLayer?: 'origin' | 'decada
       <div className="mb-2 flex items-center justify-end gap-2"><span role="status" className="text-xs text-red-700">{exportError}</span><button type="button" disabled={exporting} onClick={exportChart} className="rounded border border-neutral-300 px-3 py-1 text-xs disabled:opacity-50">{exporting ? "正在导出…" : "保存命盘图片"}</button></div>
       <label className="mb-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={showFlying} onChange={e => setShowFlying(e.target.checked)} />宫干飞化箭头（选择来源宫）</label>
       </details>
+      <div className="mb-2 flex items-center justify-between gap-2 text-xs text-neutral-600"><span>{selected ? `${selected.name} · 三方四正` : "点击任一宫位查看三方四正"}</span>{selected && <button type="button" onClick={() => setSelectedPalace(null)} className="text-blue-700">取消选择</button>}</div>
       <div className="grid grid-cols-4 text-center text-[10px] text-neutral-500"><span>南偏东</span><span>正南方</span><span>南偏西</span><span>西偏南</span></div>
       <div className="overflow-x-auto">
       {/* 4x4 网格 */}
