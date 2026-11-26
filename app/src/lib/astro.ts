@@ -84,6 +84,21 @@ export function generateChart(info: BirthInfo): FunctionalAstrolabe {
   return astro.bySolar(`${resolvedTime.year}-${resolvedTime.month}-${resolvedTime.day}`, resolvedTime.timeIndex, genderName, fixLeap)
 }
 
+export function getLunarMonthLength(year: number, month: number, isLeapMonth = false): number {
+  const reference = astro.bySolar(`${year}-1-1`, 0, '男', true)
+  const period = reference.monthlyList(year, true).find((item) => item.month === month && Boolean(item.isLeapMonth) === isLeapMonth)
+  if (!period) {
+    if (isLeapMonth) throw new RangeError(`该年份没有闰${month}月`)
+    throw new RangeError('无法取得该年份的农历月份资料')
+  }
+  return period.dayRange[1]
+}
+
+export function hasLunarLeapMonth(year: number, month: number): boolean {
+  const reference = astro.bySolar(`${year}-1-1`, 0, '男', true)
+  return reference.monthlyList(year, true).some((item) => item.month === month && item.isLeapMonth)
+}
+
 export function getTimeIndex(hour: number, minute = 0): number {
   // 00:00–00:59 is early Zi (0); 23:00–23:59 is late Zi (12).
   if (hour === 0) return 0
