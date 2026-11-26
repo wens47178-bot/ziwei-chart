@@ -132,7 +132,7 @@ describe('findBirthplace', () => {
           countryName: 'Iceland',
           latitude: '65.6835',
           longitude: '-18.0878',
-          timezone: 'Atlantic/Akureyri',
+          timezone: 'Atlantic/Reykjavik',
         }),
       })
     vi.stubGlobal('fetch', fetchMock)
@@ -140,7 +140,7 @@ describe('findBirthplace', () => {
     const place = await findBirthplaceAsync('Akureyri, Iceland')
 
     expect(place?.name).toBe('Akureyri')
-    expect(place?.timeZone).toBe('Atlantic/Akureyri')
+    expect(place?.timeZone).toBe('Atlantic/Reykjavik')
     expect(place?.latitude).toBeCloseTo(65.6835)
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
