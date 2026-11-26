@@ -6,8 +6,8 @@
 import { useState, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useChartStore, useSettingsStore, useContentCacheStore } from '@/stores'
-import { streamChat, type ChatMessage, type LLMConfig } from '@/lib/llm'
+import { useChartStore, useContentCacheStore } from '@/stores'
+import { streamHostedAI, type ChatMessage } from '@/lib/llm'
 import { extractKnowledge, buildPromptContext } from '@/knowledge'
 import { buildGuidancePromptContext } from '@/knowledge-db'
 import { Button, Select } from '@/components/ui'
@@ -75,7 +75,7 @@ const MarkdownComponents = {
     <h2 className="text-xl font-semibold text-gold/90 mt-5 mb-2">{children}</h2>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
-    <h3 className="text-lg font-medium text-[#8a7653] mt-4 mb-2">{children}</h3>
+    <h3 className="text-lg font-medium text-neutral-900 mt-4 mb-2">{children}</h3>
   ),
   p: ({ children }: { children?: React.ReactNode }) => (
     <p className="mb-3 leading-relaxed">{children}</p>
@@ -196,9 +196,7 @@ function buildYearlyContext(
 
 export function YearlyFortune() {
   const { chart, birthInfo } = useChartStore()
-  const { provider, providerSettings, enableThinking, enableWebSearch, searchApiKey } = useSettingsStore()
   const { yearlyFortune, setYearlyFortune } = useContentCacheStore()
-  const currentSettings = providerSettings[provider]
 
   const [year, setYear] = useState(currentYear)
   const [streamingResult, setStreamingResult] = useState<{
@@ -219,10 +217,6 @@ export function YearlyFortune() {
 
   const handleAnalyze = useCallback(async () => {
     if (!chart || !birthInfo) return
-    if (!currentSettings.apiKey) {
-      setError('请先在设置中配置 API Key')
-      return
-    }
 
     setLoading(true)
     setError(null)
@@ -265,18 +259,9 @@ ${guidanceContext}
         { role: 'user', content: userMessage },
       ]
 
-      const config: LLMConfig = {
-        provider,
-        apiKey: currentSettings.apiKey,
-        baseUrl: currentSettings.customBaseUrl || undefined,
-        model: currentSettings.customModel || undefined,
-        enableThinking,
-        enableWebSearch,
-        searchApiKey: searchApiKey || undefined,
-      }
 
       let fullText = ''
-      for await (const token of streamChat(config, messages)) {
+      for await (const token of streamHostedAI(messages)) {
         fullText += token
         setStreamingResult({ chart, year, content: fullText })
       }
@@ -288,7 +273,7 @@ ${guidanceContext}
     } finally {
       setLoading(false)
     }
-  }, [chart, birthInfo, year, provider, currentSettings, enableThinking, enableWebSearch, searchApiKey, setYearlyFortune])
+  }, [chart, birthInfo, year, setYearlyFortune])
 
   if (!chart) return null
 
@@ -297,7 +282,7 @@ ${guidanceContext}
       {/* 顶部：年份选择控制面板 */}
       <div
         className="
-          relative p-6 lg:p-8
+          relative p-3 lg:p-4
           bg-white border border-[#e9e5dc] rounded-2xl shadow-sm
           shadow-sm
         "
@@ -331,7 +316,7 @@ ${guidanceContext}
 
             <Button
               onClick={handleAnalyze}
-              disabled={loading || !currentSettings.apiKey}
+              disabled={loading}
               size="sm"
               variant="gold"
             >
@@ -340,7 +325,7 @@ ${guidanceContext}
                   <span className="w-3 h-3 border-2 border-night border-t-transparent rounded-full animate-spin" />
                   分析中
                 </span>
-              ) : currentSettings.apiKey ? '查看运势' : '请先配置 API'}
+              ) : '查看运势'}
             </Button>
           </div>
         </div>
@@ -372,15 +357,10 @@ ${guidanceContext}
         />
 
         {/* 未配置提示 */}
-        {!currentSettings.apiKey && !fortune && (
-          <div className="text-slate-500 text-sm py-8 text-center">
-            <div className="text-3xl mb-3 opacity-30">◎</div>
-            请先在设置中配置 AI 模型的 API Key，即可获得年度运势分析。
-          </div>
-        )}
+        
 
         {/* 未分析提示 */}
-        {currentSettings.apiKey && !fortune && !loading && (
+        {!fortune && !loading && (
           <div className="text-text-muted text-sm py-8 text-center">
             <div className="text-3xl mb-3 opacity-30">◎</div>
             选择年份并点击「查看运势」开始分析
