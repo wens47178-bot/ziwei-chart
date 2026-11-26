@@ -19,6 +19,7 @@ export interface ResolveBirthTimeInput {
   month: number
   day: number
   hour: number
+  minute?: number
   birthplace?: string
   enabled: boolean
 }
@@ -44,7 +45,6 @@ export interface ResolvedBirthTime {
 
 const BEIJING_STANDARD_LONGITUDE = 120
 const MINUTES_PER_LONGITUDE_DEGREE = 4
-const REPRESENTATIVE_MINUTE = 0
 
 const SHICHEN_NAMES = [
   '子时',
@@ -96,7 +96,7 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
 
   // Birth input is a wall-clock time, not a timestamp in the browser's timezone.
   // Use UTC calendar arithmetic so DST and the viewer's timezone cannot shift the chart.
-  const baseDate = createUtcCalendarDate(input.year, input.month, input.day, input.hour)
+  const baseDate = createUtcCalendarDate(input.year, input.month, input.day, input.hour, input.minute ?? 0)
   const correctionMinutes = shouldApply
     ? getTrueSolarCorrectionMinutes(input.year, input.month, input.day, location.longitude)
     : 0
@@ -220,6 +220,10 @@ function validateBirthDateTime(input: ResolveBirthTimeInput): void {
   if (!Number.isInteger(input.hour) || input.hour < 0 || input.hour > 23) {
     throw new RangeError('Birth hour must be an integer between 0 and 23.')
   }
+  const minute = input.minute ?? 0
+  if (!Number.isInteger(minute) || minute < 0 || minute > 59) {
+    throw new RangeError('Birth minute must be an integer between 0 and 59.')
+  }
 
   const lastDay = createUtcCalendarDate(input.year, input.month + 1, 0).getUTCDate()
   if (input.day > lastDay) {
@@ -227,10 +231,10 @@ function validateBirthDateTime(input: ResolveBirthTimeInput): void {
   }
 }
 
-function createUtcCalendarDate(year: number, month: number, day: number, hour = 0): Date {
+function createUtcCalendarDate(year: number, month: number, day: number, hour = 0, minute = 0): Date {
   const date = new Date(0)
   date.setUTCFullYear(year, month - 1, day)
-  date.setUTCHours(hour, REPRESENTATIVE_MINUTE, 0, 0)
+  date.setUTCHours(hour, minute, 0, 0)
   return date
 }
 
