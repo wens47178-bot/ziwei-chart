@@ -200,6 +200,28 @@ export function AIInterpretation() {
   // 是否正在输出动画
   const [animating, setAnimating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [question, setQuestion] = useState('')
+  const [dialog, setDialog] = useState<ChatMessage[]>([])
+  const [asking, setAsking] = useState(false)
+  const [answer, setAnswer] = useState('')
+  const ask = async () => {
+    if (!chart || asking || !question.trim()) return
+    const next: ChatMessage[] = [...dialog, { role: 'user', content: question.trim() }]
+    setQuestion('')
+    setAsking(true)
+    setAnswer('')
+    let reply = ''
+    try {
+      const context = buildPromptContext(extractKnowledge(chart))
+      for await (const token of streamHostedAI([{ role: 'system', content: '依据以下本命盘回答追问。区分传统解释与事实，不编造运限，不作医疗或投资预测。\n' + context }, ...next.slice(-12)])) {
+        reply += token
+        setAnswer(reply)
+      }
+      setDialog([...next, { role: 'assistant', content: reply }])
+      setAnswer('')
+    } catch { setError('追问失败，请重试'); setQuestion(next[next.length - 1].content) }
+    finally { setAsking(false) }
+  }
   const [activeTab, setActiveTab] = useState<string>('命格总评')
 
   /* ------------------------------------------------------------
@@ -434,6 +456,12 @@ ${guidanceContext}
           </div>
         )}
 
+        <section className="mt-6 border-t border-neutral-200 pt-4">
+          <h3 className="mb-3 font-semibold">AI 命盘追问</h3>
+          {dialog.map((message, i) => <div key={i} className="mb-2 rounded-lg bg-neutral-50 p-3 text-sm"><strong>{message.role === 'user' ? '你' : '天衍 AI'}</strong><ReactMarkdown>{message.content}</ReactMarkdown></div>)}
+          {answer && <div className="mb-2 rounded-lg bg-neutral-50 p-3 text-sm"><ReactMarkdown>{answer}</ReactMarkdown></div>}
+          <form className="flex gap-2" onSubmit={e => { e.preventDefault(); void ask() }}><input aria-label="命盘追问" value={question} onChange={e => setQuestion(e.target.value)} maxLength={1000} placeholder="输入想进一步了解的问题" className="min-w-0 flex-1 rounded border border-neutral-300 px-3 py-2 text-sm" /><button type="submit" disabled={asking || !question.trim() || loading} className="rounded bg-neutral-900 px-3 text-sm text-white disabled:opacity-50">{asking ? '回答中' : '发送'}</button></form>
+        </section>
         {loading && !displayText && (
           <div className="flex items-center justify-center gap-3 text-text-muted py-12">
             <div className="w-5 h-5 border-2 border-star border-t-transparent rounded-full animate-spin" />
