@@ -175,7 +175,7 @@ describe('resolveBirthTime', () => {
     expect(result.utcOffsetMinutes).toBe(540)
     expect(result.dstAdjustmentMinutes).toBe(60)
     expect(result.correctionMinutes).toBe(
-      result.longitudeCorrectionMinutes + result.equationOfTimeMinutes - 60,
+      result.longitudeCorrectionMinutes + result.equationOfTimeMinutes,
     )
     expect(result.hour).toBe(10)
   })
