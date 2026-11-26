@@ -293,14 +293,14 @@ ${guidanceContext}
 
   /* 排盘后自动生成报告；已有缓存则直接展示，避免重复消耗模型额度。 */
   useEffect(() => {
-    if (chart && currentSettings.apiKey && !aiInterpretation && !loadingRef.current) {
+    if (chart && currentSettings.apiKey && (!aiInterpretation || !aiInterpretation.includes('## 命格总评')) && !loadingRef.current) {
       void handleInterpret()
     }
   }, [chart, currentSettings.apiKey, aiInterpretation, handleInterpret])
 
   if (!chart) return null
 
-  const activeContent = getReportSection(displayText, activeTab)
+  const isStructuredReport = displayText.includes('## 命格总评')\n  const activeContent = getReportSection(displayText, activeTab)
 
   return (
     <div className="relative bg-white border border-[#e9e5dc] rounded-2xl shadow-sm overflow-hidden">
@@ -338,7 +338,11 @@ ${guidanceContext}
 
         {displayText && (
           <div className="min-h-[420px]">
-            {activeContent ? (
+            {!isStructuredReport ? (
+              <div className="prose max-w-none prose-slate text-text-secondary text-[15px] lg:text-base leading-8">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={MarkdownComponents}>{displayText}</ReactMarkdown>
+              </div>
+            ) : activeContent ? (
               <>
                 <div className="mb-4">
                   <h3 className={`text-2xl lg:text-3xl font-semibold leading-tight ${activeTab === '命主优点' ? 'text-[#80633d]' : 'text-[#202020]'}`} style={{ fontFamily: 'var(--font-serif)' }}>
