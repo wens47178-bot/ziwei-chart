@@ -263,7 +263,7 @@ export function AIInterpretation() {
 
     try {
       // 提取知识上下文
-      const knowledge = extractKnowledge(chart, birthInfo.year)
+      const knowledge = extractKnowledge(chart)
       const contextStr = buildPromptContext(knowledge)
       const guidanceContext = buildGuidancePromptContext({
         knowledge,
