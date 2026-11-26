@@ -6,7 +6,6 @@
 import { getStarInfo, type StarInfo } from './stars/majorStars'
 import { getSihuaInfo, type SihuaInfo } from './sihua'
 import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
-import { createLocalCalendarDate } from '@/lib/horoscope'
 
 /* ------------------------------------------------------------
    知识上下文类型
@@ -43,6 +42,20 @@ interface PalaceData {
   decadalRange?: string    // 大限年龄范围
 }
 
+interface PalaceRelationData {
+  palace: string
+  trinePalaces: Array<{ name: string; majorStars: string[] }>
+  oppositePalace: { name: string; majorStars: string[] } | null
+}
+
+interface FlyingTransformationData {
+  sourcePalace: string
+  sourceStem: string
+  star: string
+  transformation: '化禄' | '化权' | '化科' | '化忌'
+  targetPalace: string | null
+}
+
 export interface KnowledgeContext {
   // 基础信息
   命宫主星: StarInfo[]
@@ -51,6 +64,8 @@ export interface KnowledgeContext {
 
   // 完整十二宫信息
   十二宫: PalaceData[]
+  三方四正: PalaceRelationData[]
+  宫干飞化: FlyingTransformationData[]
 
   // 大限信息（十二个大限）
   大限: DecadalData[]
@@ -74,11 +89,15 @@ export interface KnowledgeContext {
    ------------------------------------------------------------ */
 
 export function extractKnowledge(chart: FunctionalAstrolabe, birthYear?: number): KnowledgeContext {
+  // Retained for backwards compatibility; natal extraction deliberately does not synthesize annual forecasts.
+  void birthYear
   const context: KnowledgeContext = {
     命宫主星: [],
     身宫主星: [],
     身宫位置: '',
     十二宫: [],
+    三方四正: [],
+    宫干飞化: [],
     大限: [],
     流年: [],
     四化分布: [],
@@ -186,6 +205,53 @@ export function extractKnowledge(chart: FunctionalAstrolabe, birthYear?: number)
     }
   }
 
+  // 为十二宫逐一建立三方四正：本宫、两个三合宫，以及对宫。
+  // iztro 宫位 index 每隔 4 位为三合，隔 6 位为对宫。
+  for (const palace of palaces) {
+    const trineIndexes = [0, 4, 8].map((offset) => (palace.index + offset) % 12)
+    const oppositeIndex = (palace.index + 6) % 12
+    context.三方四正.push({
+      palace: String(palace.name),
+      trinePalaces: trineIndexes.map((index) => {
+        const related = palaces.find((item) => item.index === index)
+        return {
+          name: String(related?.name ?? '未取得宫位'),
+          majorStars: (related?.majorStars ?? []).map((star) => String(star.name)),
+        }
+      }),
+      oppositePalace: (() => {
+        const opposite = palaces.find((item) => item.index === oppositeIndex)
+        return opposite ? {
+          name: String(opposite.name),
+          majorStars: (opposite.majorStars ?? []).map((star) => String(star.name)),
+        } : null
+      })(),
+    })
+  }
+
+  // 按各宫宫干推演宫干四化，并将化星落点映射回实际宫位。
+  // 这是本项目当前 STEM_SIHUA 表所采用的宫干飞化口径，不代表所有流派一致。
+  for (const palace of palaces) {
+    const stem = String(palace.heavenlyStem || '')
+    const transformations = STEM_SIHUA[stem] ?? []
+    for (const item of transformations) {
+      const match = item.match(/^(.+?)(化禄|化权|化科|化忌)$/)
+      if (!match) continue
+      const [, starName, transformation] = match
+      const target = palaces.find((targetPalace) =>
+        [...(targetPalace.majorStars ?? []), ...(targetPalace.minorStars ?? [])]
+          .some((star) => String(star.name) === starName)
+      )
+      context.宫干飞化.push({
+        sourcePalace: String(palace.name),
+        sourceStem: stem,
+        star: starName,
+        transformation: transformation as FlyingTransformationData['transformation'],
+        targetPalace: target ? String(target.name) : null,
+      })
+    }
+  }
+
   // 按年龄排序大限
   context.大限.sort((a, b) => {
     const aStart = parseInt(a.ageRange.split('-')[0])
@@ -193,29 +259,8 @@ export function extractKnowledge(chart: FunctionalAstrolabe, birthYear?: number)
     return aStart - bStart
   })
 
-  // 提取流年信息（基于出生年计算近15年）
-  if (birthYear) {
-    const currentYear = new Date().getFullYear()
-    const startYear = currentYear - 10
-    const endYear = currentYear + 5
-
-    for (let year = startYear; year <= endYear; year++) {
-      try {
-        const horoscope = chart.horoscope(createLocalCalendarDate(year, 6, 15))
-        const yearly = horoscope.yearly
-
-        context.流年.push({
-          year,
-          stem: String(yearly.heavenlyStem || ''),
-          branch: String(yearly.earthlyBranch || ''),
-          mutagens: (yearly.mutagen || []).map(m => String(m)),
-          palaceName: String(yearly.palaceNames?.[0] || ''),
-        })
-      } catch {
-        // 忽略计算错误
-      }
-    }
-  }
+  // 本命解读不自动生成“近年/未来流年”预测。
+  // 只有用户明确选择具体流年并提供对应流年盘时，才在独立运限流程中加入数据。
 
   // 生成格局提示
   context.格局提示 = detectPatterns(chart)
@@ -362,6 +407,32 @@ export function buildPromptContext(context: KnowledgeContext): string {
     lines.push(`- 主星：${majorStarsStr}`)
     if (minorStarsStr) lines.push(`- 辅星：${minorStarsStr}`)
     if (adjectiveStr) lines.push(`- 杂曜：${adjectiveStr}`)
+    lines.push('')
+  }
+
+  // 各宫三方四正
+  if (context.三方四正.length > 0) {
+    lines.push('## 十二宫三方四正关系')
+    lines.push('（每组列出本宫与两个三合宫，并单独列出对宫；不可将三合宫误写成对宫。）')
+    for (const relation of context.三方四正) {
+      const trines = relation.trinePalaces.map((palace) =>
+        `${palace.name}：${palace.majorStars.join('、') || '无主星'}`
+      ).join('；')
+      const opposite = relation.oppositePalace
+        ? `${relation.oppositePalace.name}：${relation.oppositePalace.majorStars.join('、') || '无主星'}`
+        : '未取得对宫资料'
+      lines.push(`- ${relation.palace}三方：${trines}；对宫：${opposite}`)
+    }
+    lines.push('')
+  }
+
+  // 宫干飞化落点
+  if (context.宫干飞化.length > 0) {
+    lines.push('## 十二宫宫干飞化落点')
+    lines.push('（按当前项目宫干四化表推演；落点未找到时明确标记，不可自行补宫位。）')
+    for (const item of context.宫干飞化) {
+      lines.push(`- ${item.sourcePalace}（${item.sourceStem}干）${item.star}${item.transformation}飞入${item.targetPalace ?? '本盘未定位到该星落宫'}`)
+    }
     lines.push('')
   }
 

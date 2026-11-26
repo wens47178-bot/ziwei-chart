@@ -30,6 +30,9 @@ const SYSTEM_PROMPT = `# Role
 5. **缺失数据处理**：若某项分析需要的大限/流年/流月资料未提供，应明确说明本次资料不足，不要用本命盘星曜代替。没有证据时直接说“盘面不足以判断”，不要补写套话。
 6. **可读性**：先用普通人听得懂的话概括，再解释术语；每段尽量采用“盘面依据 → 传统含义 → 现实中可能的表现 → 可执行建议”结构。避免堆砌星曜名称或重复空泛形容词。
 7. **平衡与谨慎**：优势与挑战并列，避免恐吓、宿命论和夸大准确度。健康只作传统文化角度的非医疗提醒，不推断疾病或器官病变。
+8. **三方四正**：优先使用上下文中逐宫列出的“三方四正关系”。三合宫是本宫加两个三合宫，对宫必须单独辨认；不得把对宫误当三合宫，也不得只看命宫孤立断事。讨论某宫时，须结合该宫、三合宫、对宫的实际星曜，并说明哪一宫提供了什么依据。
+9. **宫干飞化**：只可引用上下文“十二宫宫干飞化落点”中明确列出的来源宫、宫干、化星及实际落宫。必须说清“由哪一宫飞出、哪颗星化何曜、落入哪一宫”。若落点未定位，说明资料不足。当前飞化表是本项目采用的宫干四化口径，不得包装成所有紫微流派通用结论；不要自行推演资料未提供的自化、回飞或复杂飞宫规则。
+10. **运限边界**：本次若为本命盘报告，只解读本命结构与已提供的大限起止资料；不得自动生成近年或未来流年预测。只有用户明确选择某一运限并提供对应运限盘，才可解读该运限。
 
 # Output Format
 请严格使用以下一级标题（标题文字必须完全一致，方便界面按主题切换），每个主题独立成节：
@@ -260,7 +263,7 @@ export function AIInterpretation() {
 
     try {
       // 提取知识上下文
-      const knowledge = extractKnowledge(chart, birthInfo.year)
+      const knowledge = extractKnowledge(chart)
       const contextStr = buildPromptContext(knowledge)
       const guidanceContext = buildGuidancePromptContext({
         knowledge,
@@ -285,6 +288,14 @@ export function AIInterpretation() {
 - 出生地：${birthInfo.birthplace || '未提供'}
 - 真太阳时：${birthInfo.trueSolarEnabled ? (resolved?.applied ? `已应用，校正后时间 ${String(resolved.hour).padStart(2, '0')}:${String(resolved.minute).padStart(2, '0')}，修正 ${resolved.correctionMinutes} 分钟，时区 ${resolved.timeZone || '未识别'}` : '已开启但未取得可确认的地点校正资料') : '未启用'}
 - 五行局：${chart.fiveElementsClass}
+
+## 排盘口径
+- 年分界：正月初一
+- 运限分界：正月初一
+- 子时换日：子初 23:00
+- 小限分界：自然年
+- 安星法：中州派
+- 说明：以上为本平台当前采用的排盘配置；不同流派设置可能产生不同盘式，不将本口径宣称为唯一标准。
 
 ## 命盘资料
 ${contextStr}
