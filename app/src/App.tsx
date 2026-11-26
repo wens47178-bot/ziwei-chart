@@ -1,6 +1,7 @@
 /* 天衍：参考图驱动的独立功能工作台 */
 import { lazy, Suspense, useState, type ReactNode } from 'react'
 import { Analytics } from '@vercel/analytics/react'
+import '@/perf-lazy-load.css'
 import { SettingsPanel } from '@/components/SettingsPanel'
 import { useChartStore } from '@/stores'
 import { HomeLanding } from '@/components/HomeLanding'
