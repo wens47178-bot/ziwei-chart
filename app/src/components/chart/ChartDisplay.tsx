@@ -277,6 +277,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
               <p>校正后时间：{formatResolvedDateTime(resolvedTime.year, resolvedTime.month, resolvedTime.day, resolvedTime.hour, resolvedTime.minute)}</p>
               <p>时辰变化：{resolvedTime.originalShichen} → {resolvedTime.correctedShichen}</p>
               {resolvedTime.crossedDate && <p className="text-amber-700">校正跨越了民用日期边界，排盘采用校正后的日期</p>}
+              <p className="text-text-muted">说明：时区规则来自 IANA 时区数据库；1970 年以前部分地区的历史民用时间记录可能不完整，早年出生时间需结合当地历史资料核对</p>
             </div>
           </details>
         )}
