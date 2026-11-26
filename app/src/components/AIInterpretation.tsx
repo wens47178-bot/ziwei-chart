@@ -236,7 +236,8 @@ export function AIInterpretation() {
 
       // 区分用户输入历法与排盘引擎采用的公历日期
       const inputCalendar = birthInfo.dateType === 'lunar' ? '农历' : '阳历'
-      const inputDate = `${birthInfo.year}年${birthInfo.month}月${birthInfo.day}日${birthInfo.dateType === 'lunar' && birthInfo.isLeapMonth ? '（闰月）' : ''}`
+      const leapLabel = birthInfo.dateType === 'lunar' && birthInfo.isLeapMonth ? '（闰月）' : ''
+      const inputDate = `${birthInfo.year}年${birthInfo.month}月${birthInfo.day}日${leapLabel}`
       const solarDate = chart.solarDate || '引擎未返回'
       const resolved = birthInfo.resolvedBirthTime
       const userMessage = `请严格依据以下真实命盘资料撰写完整报告。请先单独列出命主优点，再分析需要留意的地方。不得编造星曜、宫位、四化、格局或运限数据。
