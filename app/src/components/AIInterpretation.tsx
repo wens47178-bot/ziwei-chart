@@ -301,7 +301,8 @@ ${guidanceContext}
 
   if (!chart) return null
 
-  const isStructuredReport = displayText.includes('## 命格总评')\n  const activeContent = getReportSection(displayText, activeTab)
+  const isStructuredReport = displayText.includes('## 命格总评')
+  const activeContent = getReportSection(displayText, activeTab)
 
   return (
     <div className="relative bg-white border border-[#e9e5dc] rounded-2xl shadow-sm overflow-hidden">
