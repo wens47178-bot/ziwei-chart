@@ -30,7 +30,8 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end() }
 
-  const pathname = new URL(req.url || '/', 'http://localhost').pathname.replace(/\\/$/, '') || '/'
+  const rawPathname = new URL(req.url || '/', 'http://localhost').pathname
+  const pathname = rawPathname.length > 1 && rawPathname.endsWith('/') ? rawPathname.slice(0, -1) : rawPathname
   if (req.method === 'GET' && pathname === '/health') {
     return sendJson(res, 200, { ok: true, configured: Boolean(GEMINI_API_KEY) })
   }
