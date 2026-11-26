@@ -100,6 +100,110 @@ const videos: Record<string,{id:string;title:string}[]> = {
       "id": "BV1eZ421v7bT",
       "title": "云野卦馆 · 小六壬入门"
     }
+  ],
+  "紫微斗数全书": [
+    {
+      "id": "BV1WDrdYrEBQ",
+      "title": "张露心 · 全书诸星问答论"
+    },
+    {
+      "id": "BV1YSL3zkEtp",
+      "title": "张露心 · 全书安星法"
+    }
+  ],
+  "紫微斗数全集": [
+    {
+      "id": "BV1YSL3zkEtp",
+      "title": "相关参考：传统安星法（非全集逐章讲解）"
+    }
+  ],
+  "中州派紫微斗数初级讲义": [
+    {
+      "id": "BV1UjvVeAEui",
+      "title": "王亭之中州派初级讲义"
+    },
+    {
+      "id": "BV1hv1LBCEz9",
+      "title": "旧尘啦 · 中州派深造讲义参考"
+    }
+  ],
+  "紫微斗数讲义：星曜性质": [
+    {
+      "id": "BV14ER5YbEtZ",
+      "title": "相关参考：yi昭烈星曜基础"
+    },
+    {
+      "id": "BV1Hfur6jE8a",
+      "title": "赤松玄社 · 五大桃花星"
+    }
+  ],
+  "穷通宝鉴": [
+    {
+      "id": "BV12E4mzfEpv",
+      "title": "寒谷也回春 · 穷通宝鉴系列第一讲"
+    }
+  ],
+  "周易": [
+    {
+      "id": "BV1euorB2ECp",
+      "title": "周易与六爻基础课程"
+    }
+  ],
+  "卜筮正宗": [
+    {
+      "id": "BV1r6EwzBEDv",
+      "title": "天辅大易 · 卜筮正宗导论"
+    },
+    {
+      "id": "BV1RnHizcEhd",
+      "title": "天辅大易 · 卜筮正宗029"
+    }
+  ],
+  "易隐": [
+    {
+      "id": "BV1euorB2ECp",
+      "title": "相关参考：六爻基础（非易隐逐章讲解）"
+    }
+  ],
+  "梅花易数": [
+    {
+      "id": "BV1na4y1Q7ze",
+      "title": "云野卦馆 · 梅花入门"
+    },
+    {
+      "id": "BV1jvnJzXE6a",
+      "title": "拙海舍 · 梅花易数经典导读"
+    }
+  ],
+  "遁甲演义": [
+    {
+      "id": "BV1QFuRz5EC6",
+      "title": "相关参考：九贤老师奇门公开课导读"
+    }
+  ],
+  "奇门遁甲统宗": [
+    {
+      "id": "BV1QFuRz5EC6",
+      "title": "相关参考：奇门公开课导读（非统宗逐章讲解）"
+    }
+  ],
+  "地理五诀": [
+    {
+      "id": "BV1k8Q7B7E5k",
+      "title": "青云客雂 · 龙穴砂水向"
+    }
+  ],
+  "葬书": [
+    {
+      "id": "BV1k8Q7B7E5k",
+      "title": "相关参考：传统形势堪舆（非葬书逐章讲解）"
+    }
+  ],
+  "青囊经": [
+    {
+      "id": "BV1k8Q7B7E5k",
+      "title": "相关参考：传统地理五诀（非青囊经讲解）"
+    }
   ]
 }
 function CourseShelf(){
