@@ -59,18 +59,18 @@ const server = http.createServer(async (req, res) => {
     }
     const payload = JSON.parse(raw)
     const messages = payload?.messages
-    if (!Array.isArray(messages) || messages.length !== 2 || !messages.every((m) => ['system', 'user'].includes(m.role) && typeof m.content === 'string')) {
+    if (!Array.isArray(messages) || messages.length < 2 || messages.length > 12 || messages[0]?.role !== 'system' || !messages.every((m,i) => m && typeof m.content === 'string' && m.content.trim() && m.role === (i === 0 ? 'system' : i % 2 === 1 ? 'user' : 'assistant')) || messages.at(-1)?.role !== 'user') {
       return sendJson(res, 400, { error: '无效的解读请求' })
     }
 
     const system = messages.find((m) => m.role === 'system')?.content || ''
-    const user = messages.find((m) => m.role === 'user')?.content || ''
+    const contents = messages.slice(1).map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }))
     const upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:streamGenerateContent?alt=sse`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_API_KEY },
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: system }] },
-        contents: [{ role: 'user', parts: [{ text: user }] }],
+        contents,
         generationConfig: { temperature: 0.45, maxOutputTokens: 12000 },
       }),
       signal: AbortSignal.timeout(180_000),
