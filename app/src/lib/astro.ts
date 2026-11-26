@@ -99,7 +99,7 @@ export function hasLunarLeapMonth(year: number, month: number): boolean {
   return reference.monthlyList(year, true).some((item) => item.month === month && item.isLeapMonth)
 }
 
-export function getTimeIndex(hour: number, minute = 0): number {
+export function getTimeIndex(hour: number): number {
   // 00:00–00:59 is early Zi (0); 23:00–23:59 is late Zi (12).
   if (hour === 0) return 0
   if (hour === 23) return 12
