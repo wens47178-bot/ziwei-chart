@@ -256,7 +256,17 @@ function CourseShelf(){
 
 
 
-const books = KNOWLEDGE_SOURCES.filter((source) => source.type === 'classic' || source.type === 'modern-commentary')
+const readingLinks: Record<string, string> = {
+  'book.ziwei-doushu-quanshu': 'https://zh.wikisource.org/wiki/紫微斗數全書',
+  'book.quanshu-wikisource': 'https://zh.wikisource.org/wiki/紫微斗數全書',
+}
+const books = KNOWLEDGE_SOURCES.filter((source) => (source.type === 'classic' || source.type === 'modern-commentary') && source.id !== 'book.quanshu-wikisource').map(source => ({...source, url: readingLinks[source.id]}))
+books.push(...[
+  {id:'reading.ditiansui',title:'滴天髓',url:'https://zh.wikisource.org/zh-hans/滴天髓',note:'传统四柱命理原典，在线阅读。'},
+  {id:'reading.meihua',title:'梅花易数',url:'https://zh.wikisource.org/zh-hans/梅花易數',note:'传统象数易学原典，在线阅读。'},
+  {id:'reading.zengshan',title:'增删卜易',url:'https://zh.wikisource.org/zh-hans/增刪卜易',note:'传统六爻占卜原典，在线阅读。'},
+].map(book=>({...book,type:'classic' as const})))
+books.sort((a,b)=>Number(Boolean(b.url))-Number(Boolean(a.url)))
 const readingPaths = [
   { level: '入门', title: '先建立紫微斗数框架', detail: '从十二宫、命身宫、主辅星与基本排盘概念开始。', books: ['紫微斗数入门', '中州派紫微斗数初级讲义', '紫微斗数全书（维基文库原典）'] },
   { level: '进阶', title: '理解星曜与组合', detail: '比较不同星曜的性质、亮度与同宫组合，注意不同流派的解释差异。', books: ['紫微斗数进阶篇', '紫微斗数讲义：星曜性质', '图解经典紫微斗数·上册：命理卷', '图解经典紫微斗数·下册：推理卷'] },
@@ -281,7 +291,7 @@ export function AcademicCenter() {
             <span className="academic-book-type">{book.type === 'classic' ? '古典典籍' : '现代讲义 / 研究'}</span>
             <h4>{book.title}</h4>
             <p>{book.author ? '作者：' + book.author + '。' : ''}{book.note}</p>
-            {book.url ? <a href={book.url} target="_blank" rel="noreferrer">查看书目资料 <b>↗</b></a> : <span className="academic-no-link">书目资料整理中</span>}
+            {book.url ? <a href={book.url} target="_blank" rel="noreferrer">免费在线阅读 <b>↗</b></a> : <span className="academic-no-link">暂无已核实的授权全文</span>}
           </div>
         </article>)}
       </div>
