@@ -13,6 +13,8 @@ export interface Birthplace {
   longitude: number
   latitude?: number
   timeZone?: string
+  country?: string
+  aliases?: string[]
 }
 
 export interface ResolveBirthTimeInput {
@@ -53,7 +55,6 @@ export interface ResolvedBirthTime {
 const BEIJING_STANDARD_LONGITUDE = 120
 const MINUTES_PER_LONGITUDE_DEGREE = 4
 const CHINA_TIME_ZONE = 'Asia/Shanghai'
-const CHINA_STANDARD_OFFSET_MINUTES = 8 * 60
 
 const SHICHEN_NAMES = [
   '子时',
@@ -102,31 +103,33 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
   const originalTimeIndex = hourToTimeIndex(input.hour)
   const originalShichen = shichenNameForTimeIndex(originalTimeIndex)
   const location = findBirthplaceInData(input.birthplace, input.birthplaces ?? [])
-  const shouldApply = input.enabled && location !== null
+  const timeZone = location?.timeZone ?? (location && !location.country ? CHINA_TIME_ZONE : null)
+  const shouldApply = input.enabled && location !== null && timeZone !== null
 
   // Birth input is a wall-clock time, not a timestamp in the browser's timezone.
   // Use UTC calendar arithmetic so DST and the viewer's timezone cannot shift the chart.
   const baseDate = createUtcCalendarDate(input.year, input.month, input.day, input.hour, input.minute ?? 0)
   const localClock = shouldApply
-    ? resolveLocalClockOffset(input, location.timeZone ?? CHINA_TIME_ZONE)
+    ? resolveLocalClockOffset(input, timeZone)
     : null
-  const dstAdjustmentMinutes = localClock
-    ? localClock.offsetMinutes - CHINA_STANDARD_OFFSET_MINUTES
+  const standardOffsetMinutes = shouldApply
+    ? getStandardUtcOffsetMinutes(input.year, timeZone)
+    : null
+  const dstAdjustmentMinutes = localClock && standardOffsetMinutes !== null
+    ? localClock.offsetMinutes - standardOffsetMinutes
     : 0
-  // Convert historical daylight-saving wall time back to China's UTC+8 standard clock first.
-  const standardClockDate = new Date(baseDate.getTime() - dstAdjustmentMinutes * 60_000)
-  const longitudeCorrectionMinutes = shouldApply
-    ? (location.longitude - BEIJING_STANDARD_LONGITUDE) * MINUTES_PER_LONGITUDE_DEGREE
+  const longitudeCorrectionMinutes = shouldApply && localClock
+    ? location.longitude * MINUTES_PER_LONGITUDE_DEGREE - localClock.offsetMinutes
     : 0
   const equationOfTimeMinutes = shouldApply
     ? getEquationOfTimeMinutes(
-      standardClockDate.getUTCFullYear(),
-      standardClockDate.getUTCMonth() + 1,
-      standardClockDate.getUTCDate(),
+      baseDate.getUTCFullYear(),
+      baseDate.getUTCMonth() + 1,
+      baseDate.getUTCDate(),
     )
     : 0
   const correctionMinutes = shouldApply
-    ? longitudeCorrectionMinutes + equationOfTimeMinutes - dstAdjustmentMinutes
+    ? longitudeCorrectionMinutes + equationOfTimeMinutes
     : 0
   const correctedDate = new Date(baseDate.getTime() + correctionMinutes * 60_000)
   const timeIndex = shouldApply
@@ -146,7 +149,7 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
     correctionMinutes: Math.round(correctionMinutes),
     longitudeCorrectionMinutes: Math.round(longitudeCorrectionMinutes),
     equationOfTimeMinutes: Math.round(equationOfTimeMinutes),
-    timeZone: localClock && location ? (location.timeZone ?? CHINA_TIME_ZONE) : null,
+    timeZone: localClock ? timeZone : null,
     utcOffsetMinutes: localClock ? Math.round(localClock.offsetMinutes) : null,
     dstAdjustmentMinutes: Math.round(dstAdjustmentMinutes),
     ambiguousLocalTime: localClock?.ambiguous ?? false,
@@ -173,10 +176,14 @@ function normalizePlace(input?: string): string {
 function scoreBirthplaceMatch(input: string, place: Birthplace): number {
   const fullTokens = [
     joinPlace(place.province, place.city, place.area),
+    joinPlace(place.city, place.country),
+    joinPlace(place.country, place.city),
     joinPlace(place.province, place.city),
     joinPlace(place.city, place.area),
+    joinPlace(place.city, place.country),
+    joinPlace(place.country, place.city),
   ].filter((token): token is string => !!token).map(normalizePlace)
-  const localTokens = [place.name, place.area, place.city]
+  const localTokens = [place.name, place.area, place.city, ...(place.aliases ?? [])]
     .filter((token): token is string => !!token)
     .map(normalizePlace)
   const tokens = getPlaceTokens(place)
@@ -199,6 +206,8 @@ function getPlaceTokens(place: Birthplace): string[] {
     place.province,
     place.city,
     place.area,
+    place.country,
+    ...(place.aliases ?? []),
     joinPlace(place.province, place.city),
     joinPlace(place.city, place.area),
     joinPlace(place.province, place.city, place.area),
@@ -272,6 +281,15 @@ function resolveLocalClockOffset(
     offsetMinutes: candidates[0].offsetMinutes,
     ambiguous: candidates.length > 1,
   }
+}
+
+function getStandardUtcOffsetMinutes(year: number, timeZone: string): number {
+  const offsets = Array.from({ length: 12 }, (_, index) =>
+    getUtcOffsetMinutes(createUtcCalendarDate(year, index + 1, 15, 12), timeZone),
+  )
+  // The lower annual offset is the non-DST baseline in ordinary modern civil-time rules,
+  // including southern-hemisphere zones whose daylight time falls in January.
+  return Math.min(...offsets)
 }
 
 function getUtcOffsetMinutes(date: Date, timeZone: string): number {
