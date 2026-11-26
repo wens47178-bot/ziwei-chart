@@ -1194,7 +1194,9 @@ export const OTHER_STARS: Record<string, StarInfo> = {
 
 export function getStarInfo(starName: string): StarInfo | undefined {
   // 移除可能的四化后缀
-  const cleanName = starName.replace(/化[禄权科忌]/, '')
+  const normalized = starName.normalize('NFKC').replace(/\s+/g, '').replace(/化[禄祿权權科忌]/g, '').replace(/星$/, '')
+  const aliases: Record<string, string> = {"祿存":"禄存","紅鸞":"红鸾","龍池":"龙池","龍德":"龙德","鳳閣":"凤阁","封誥":"封诰","鈴星":"铃星","天鉞":"天钺","天馬":"天马","天傷":"天伤","天壽":"天寿","天廚":"天厨","天貴":"天贵","天虛":"天虚","天機":"天机","太陽":"太阳","太陰":"太阴","貪狼":"贪狼","破軍":"破军","陰煞":"阴煞","右弼":"右弼","臺輔":"台辅","台輔":"台辅","三臺":"三台","劫煞":"劫杀","飛廉":"蜚廉","飞廉":"蜚廉","天才星":"天才"}
+  const cleanName = aliases[normalized] ?? aliases[normalized + '星'] ?? (MAJOR_STARS[normalized] || OTHER_STARS[normalized] ? normalized : normalized + '星')
   return MAJOR_STARS[cleanName] ?? OTHER_STARS[cleanName]
 }
 
