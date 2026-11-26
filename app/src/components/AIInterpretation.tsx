@@ -217,7 +217,9 @@ export function AIInterpretation({ view = 'both' }: { view?: 'report' | 'chat' |
     let reply = ''
     try {
       const context = buildPromptContext(extractKnowledge(chart))
-      for await (const token of streamHostedAI([{ role: 'system', content: '依据以下本命盘回答追问。区分传统解释与事实，不编造运限，不作医疗或投资预测。\n' + context }, ...next.slice(-12)])) {
+      const recent = next.slice(-11)
+      if (recent[0]?.role === 'assistant') recent.shift()
+      for await (const token of streamHostedAI([{ role: 'system', content: '依据以下本命盘回答追问。先直接回答问题，再列出盘面依据。使用简洁中文，控制在600字以内。区分传统解释与事实，不编造运限，不作医疗或投资预测。\n' + context }, ...recent])) {
         reply += token
         setAnswer(reply)
       }
