@@ -26,6 +26,7 @@ const FEATURES: Feature[] = [
   { key:'match', label:'双人合盘', en:'SYNASTRY', description:'并置两张命盘，探索双方宫位与星曜之间的对应关系。', eyebrow:'TWO CHARTS, ONE DIALOGUE', accent:'#d19caa', secondary:'#f4dcb9', symbol:'缘' },
   { key:'ai', label:'AI 深度解读', en:'AI INSIGHT', description:'以命盘为依据，生成结构化解读与多维度思考线索。', eyebrow:'INTELLIGENCE / INSIGHT', accent:'#b3a3d9', secondary:'#f0dfb5', symbol:'知' },
   { key:'share', label:'命盘典藏卡', en:'PERSONAL KEEPSAKE', description:'将命盘重点整理成专属典藏卡，便于保存与分享。', eyebrow:'YOUR DESTINY, PRESERVED', accent:'#d1b47c', secondary:'#f6e9c9', symbol:'藏' },
+  { key:'xiaoliuren', label:'小六壬', en:'SIX SPIRITS', description:'以农历月日与时辰起课，依六宫掌诀阅读传统象意。', eyebrow:'THE SIX SPIRITS METHOD', accent:'#c6a77c', secondary:'#f2e3c3', symbol:'壬' },
   { key:'academy', label:'学术中心', en:'ACADEMIC LIBRARY', description:'从命理典籍、流派参考与研读路径，系统了解传统知识。', eyebrow:'CLASSICS & STUDY', accent:'#b99b72', secondary:'#e8d9b9', symbol:'典' },
 ]
 const GROUPS: { title:string; en:string; keys:PageKey[] }[] = [
@@ -34,6 +35,7 @@ const GROUPS: { title:string; en:string; keys:PageKey[] }[] = [
   { title:'合盘分析', en:'SYNASTRY', keys:['match'] },
   { title:'智能解读', en:'AI INSIGHT', keys:['ai'] },
   { title:'命盘典藏', en:'ARCHIVE', keys:['share'] },
+  { title:'传统术数', en:'FOLK DIVINATION', keys:['xiaoliuren'] },
 ]
 function FeatureArtwork({ feature }: { feature:Feature }) {
   const k=feature.key
@@ -63,6 +65,7 @@ function FeatureArtwork({ feature }: { feature:Feature }) {
     {k==='match' && <><circle cx="195" cy="235" r="94" fill="none" stroke={feature.secondary} strokeWidth="3"/><circle cx="325" cy="235" r="94" fill="none" stroke={feature.accent} strokeWidth="3"/><path d="M195 140Q260 235 195 330M325 140Q260 235 325 330" fill="none" stroke={feature.secondary} opacity=".7"/><circle cx="260" cy="235" r="24" fill={feature.secondary}/></>}
     {k==='ai' && <>{Array.from({length:5},(_,i)=>Array.from({length:4},(_,j)=><circle key={i+'-'+j} cx={120+i*70} cy={160+j*52+(i%2)*15} r="7" fill={feature.secondary}/>))}<path d={Array.from({length:20},(_,i)=>`M${120+Math.floor(i/4)*70} ${160+(i%4)*52+(Math.floor(i/4)%2)*15}L${190+Math.floor(i/4)*70} ${160+((i*3)%4)*52+((Math.floor(i/4)+1)%2)*15}`).join(' ')} fill="none" stroke={feature.accent} opacity=".45"/><circle cx="260" cy="260" r="118" fill="none" stroke={feature.accent} strokeDasharray="5 9"/></>}
     {k==='share' && <><rect x="150" y="100" width="220" height="300" rx="8" fill="url(#artVeil)" stroke={feature.secondary} strokeWidth="2"/><rect x="170" y="120" width="180" height="260" rx="4" fill="none" stroke={feature.accent}/><path d="M260 145v200M190 245h140" stroke={feature.accent}/><circle cx="260" cy="245" r="52" fill="none" stroke={feature.secondary} strokeWidth="2"/></>}
+    {k==='xiaoliuren' && <><circle cx="260" cy="235" r="115" fill="none" stroke={feature.secondary} strokeWidth="2"/>{['大','留','速','赤','小','空'].map((s,i)=><g key={s} transform={'rotate(' + i*60 + ' 260 235)'}><path d="M260 120v42" stroke={feature.accent} strokeWidth="2"/><circle cx="260" cy="92" r="31" fill="#1b304a" stroke={feature.secondary}/><text x="260" y="100" textAnchor="middle" fill={feature.secondary} fontSize="20">{s}</text></g>)}<circle cx="260" cy="235" r="36" fill="url(#artVeil)" stroke={feature.accent}/><text x="260" y="243" textAnchor="middle" fill={feature.secondary} fontSize="25">壬</text></>}
     {k==='academy' && <><path d="M150 150L260 95 370 150V340H150Z" fill="url(#artVeil)" stroke={feature.secondary} strokeWidth="2"/><path d="M190 180h140M190 220h140M190 260h140M190 300h100" stroke={feature.accent} strokeWidth="3"/><path d="M130 350h260M170 380h180" stroke={feature.secondary}/></>}
     {Array.from({length:44},(_,i)=><circle key={'s'+i} cx={(i*83+19)%520} cy={(i*137+43)%660} r={i%7===0?2.5:1.2} fill={feature.secondary} opacity={i%3===0?.8:.4}/>)}
     <text x="260" y="585" textAnchor="middle" fill={feature.secondary} fontSize="12" letterSpacing="5" opacity=".82">{feature.en}</text>
