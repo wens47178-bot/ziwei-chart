@@ -231,6 +231,21 @@ describe('resolveBirthTime', () => {
     expect(result.utcOffsetMinutes).toBe(-240)
   })
 
+  it('resolves fractional-hour timezones such as Nepal UTC+05:45', () => {
+    const result = resolveBirthTime({
+      year: 2024,
+      month: 1,
+      day: 15,
+      hour: 12,
+      birthplace: 'Kathmandu, Nepal',
+      enabled: true,
+      birthplaces: ALL_BIRTHPLACE_DATA,
+    })
+
+    expect(result.timeZone).toBe('Asia/Kathmandu')
+    expect(result.utcOffsetMinutes).toBe(345)
+  })
+
   it('handles southern-hemisphere summer daylight time', () => {
     const result = resolveBirthTime({
       year: 2024,
