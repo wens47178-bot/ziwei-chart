@@ -670,6 +670,14 @@ export async function* streamHostedAI(messages: ChatMessage[]): AsyncGenerator<s
       throw new Error(message)
     }
 
+    if (response.headers.get('content-type')?.includes('application/json')) {
+      const data = await response.json() as { text?: string; error?: string; choices?: { message?: { content?: string } }[] }
+      if (data.error) throw new Error(data.error)
+      const text = data.text ?? data.choices?.[0]?.message?.content
+      if (!text?.trim()) throw new Error('平台 AI 服务没有返回有效文字')
+      yield text
+      return
+    }
     const reader = response.body?.getReader()
     if (!reader) throw new Error('平台 AI 服务没有返回内容')
     const decoder = new TextDecoder()
@@ -682,9 +690,10 @@ export async function* streamHostedAI(messages: ChatMessage[]): AsyncGenerator<s
         .filter(Boolean)
         .join('\n')
       if (!data || data === '[DONE]') return null
-      const payload = JSON.parse(data) as { text?: string; error?: string }
+      const payload = JSON.parse(data) as { text?: string; error?: string; choices?: { delta?: { content?: string } }[] }
       if (payload.error) throw new Error(payload.error)
-      return typeof payload.text === 'string' && payload.text.length > 0 ? payload.text : null
+      const text = payload.text ?? payload.choices?.[0]?.delta?.content
+      return typeof text === 'string' && text.length > 0 ? text : null
     }
 
     while (true) {
