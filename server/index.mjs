@@ -49,6 +49,7 @@ const server = http.createServer(async (req, res) => {
   recent.push(now)
   rateLimits.set(ip, recent)
 
+  console.log('[interpret] request received', { origin: origin || 'none', contentLength: req.headers['content-length'] || 'unknown' })
   try {
     let raw = ''
     for await (const chunk of req) {
@@ -73,6 +74,7 @@ const server = http.createServer(async (req, res) => {
       }),
       signal: AbortSignal.timeout(180_000),
     })
+    console.log('[interpret] upstream response', { status: upstream.status, model: MODEL })
     if (!upstream.ok) {
       const detail = (await upstream.text()).slice(0, 500)
       return sendJson(res, upstream.status === 429 ? 429 : 502, { error: upstream.status === 429 ? '平台 AI 服务暂时达到调用额度，请稍后重试。' : `AI 服务暂时不可用：${detail}` })
@@ -87,13 +89,18 @@ const server = http.createServer(async (req, res) => {
     const reader = upstream.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
+    let outputChars = 0
     const emit = (event) => {
       const data = event.split(/\r?\n/).filter((line) => line.startsWith('data:')).map((line) => line.slice(5).trim()).join('')
       if (!data || data === '[DONE]') return
       try {
         const json = JSON.parse(data)
+        if (json.error) throw new Error(json.error.message || '模型返回错误')
         const text = (json.candidates?.[0]?.content?.parts || []).map((part) => part.text || '').join('')
-        if (text) res.write(`data: ${JSON.stringify({ text })}\n\n`)
+        if (text) {
+          outputChars += text.length
+          res.write(`data: ${JSON.stringify({ text })}\n\n`)
+        }
       } catch { /* ignore incomplete upstream event */ }
     }
     while (true) {
@@ -106,11 +113,18 @@ const server = http.createServer(async (req, res) => {
     }
     buffer += decoder.decode()
     if (buffer.trim()) emit(buffer)
+    if (outputChars === 0) throw new Error('模型连接已结束，但没有生成任何报告文字。请检查模型额度或 API 权限。')
+    console.log('[interpret] stream completed', { outputChars })
     res.write('data: [DONE]\n\n')
     res.end()
   } catch (error) {
-    if (!res.headersSent) return sendJson(res, 500, { error: error instanceof Error ? error.message : 'AI 解读失败' })
-    res.end()
+    const message = error instanceof Error ? error.message : 'AI 解读失败'
+    console.error('[interpret] failed', { message })
+    if (!res.headersSent) return sendJson(res, 500, { error: message })
+    if (!res.writableEnded) {
+      res.write(`data: ${JSON.stringify({ error: message })}\n\n`)
+      res.end()
+    }
   }
 })
 
