@@ -184,9 +184,7 @@ const MarkdownComponents = {
 
 export function AIInterpretation() {
   const { chart, birthInfo } = useChartStore()
-  const { provider, providerSettings, enableThinking, enableWebSearch, searchApiKey } = useSettingsStore()
   const { aiInterpretation, setAiInterpretation } = useContentCacheStore()
-  const currentSettings = providerSettings[provider]
 
   // 显示的文本（逐字输出）
   const [displayText, setDisplayText] = useState(() => aiInterpretation ?? '')
