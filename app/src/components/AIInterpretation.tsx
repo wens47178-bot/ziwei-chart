@@ -6,10 +6,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useChartStore, useSettingsStore, useContentCacheStore } from '@/stores'
+import { useChartStore, useContentCacheStore } from '@/stores'
 import { extractKnowledge, buildPromptContext } from '@/knowledge'
 import { buildGuidancePromptContext } from '@/knowledge-db'
-import { streamChat, type ChatMessage, type LLMConfig } from '@/lib/llm'
+import { streamHostedAI, type ChatMessage } from '@/lib/llm'
 import { Button } from '@/components/ui'
 
 /* ------------------------------------------------------------
@@ -184,9 +184,7 @@ const MarkdownComponents = {
 
 export function AIInterpretation() {
   const { chart, birthInfo } = useChartStore()
-  const { provider, providerSettings, enableThinking, enableWebSearch, searchApiKey } = useSettingsStore()
   const { aiInterpretation, setAiInterpretation } = useContentCacheStore()
-  const currentSettings = providerSettings[provider]
 
   // 显示的文本（逐字输出）
   const [displayText, setDisplayText] = useState(() => aiInterpretation ?? '')
@@ -242,11 +240,6 @@ export function AIInterpretation() {
 
   const handleInterpret = useCallback(async () => {
     if (!chart || !birthInfo) return
-    if (!currentSettings.apiKey) {
-      setError('请先在设置中配置 API Key')
-      return
-    }
-
     // 重置状态
     loadingRef.current = true
     setLoading(true)
@@ -309,21 +302,12 @@ ${guidanceContext}
         { role: 'user', content: userMessage },
       ]
 
-      const config: LLMConfig = {
-        provider,
-        apiKey: currentSettings.apiKey,
-        baseUrl: currentSettings.customBaseUrl || undefined,
-        model: currentSettings.customModel || undefined,
-        enableThinking,
-        enableWebSearch,
-        searchApiKey: searchApiKey || undefined,
-      }
-
-      // 启动均匀输出动画
+      // 默认使用天衍平台托管模型；用户不需要选择供应商或填写 API Key。
+      // 模型密钥仅保存在 AI 服务端，不会进入浏览器或本地存储。
       startAnimation()
 
       // 流式接收，写入缓冲区
-      for await (const token of streamChat(config, messages)) {
+      for await (const token of streamHostedAI(messages)) {
         fullTextRef.current += token
       }
 
@@ -335,14 +319,14 @@ ${guidanceContext}
       loadingRef.current = false
       setLoading(false)
     }
-  }, [chart, birthInfo, provider, currentSettings, enableThinking, enableWebSearch, searchApiKey, startAnimation, setAiInterpretation])
+  }, [chart, birthInfo, startAnimation, setAiInterpretation])
 
   /* 排盘后自动生成报告；已有缓存则直接展示，避免重复消耗模型额度。 */
   useEffect(() => {
-    if (chart && currentSettings.apiKey && (!aiInterpretation || !aiInterpretation.includes('## 命格总评')) && !loadingRef.current) {
+    if (chart && !aiInterpretation && !loadingRef.current) {
       void handleInterpret()
     }
-  }, [chart, currentSettings.apiKey, aiInterpretation, handleInterpret])
+  }, [chart, aiInterpretation, handleInterpret])
 
   if (!chart) return null
 
@@ -360,8 +344,8 @@ ${guidanceContext}
             <p className="text-xs tracking-[0.2em] text-[#9a8056] mb-1">TIANYAN · NATAL ANALYSIS</p>
             <h2 className="text-xl lg:text-2xl font-semibold text-[#262626]" style={{ fontFamily: 'var(--font-serif)' }}>命盘分析</h2>
           </div>
-          <Button onClick={handleInterpret} disabled={loading || !currentSettings.apiKey} size="sm" variant="gold">
-            {loading ? '分析中…' : displayText ? '重新分析' : currentSettings.apiKey ? '开始分析' : '配置 API'}
+          <Button onClick={handleInterpret} disabled={loading} size="sm" variant="gold">
+            {loading ? '分析中…' : displayText ? '重新分析' : '重新生成报告'}
           </Button>
         </div>
 
@@ -386,13 +370,6 @@ ${guidanceContext}
               : missingReportTabs.length > 0
                 ? <span className="text-amber-700">尚缺：{missingReportTabs.map((tab) => tab.label).join('、')}。可点击“重新分析”补齐。</span>
                 : <span className="text-emerald-700">全部主题均已生成</span>}
-          </div>
-        )}
-
-        {!currentSettings.apiKey && !displayText && (
-          <div className="text-slate-500 text-sm py-10 text-center">
-            <div className="text-3xl mb-3 opacity-30">☆</div>
-            排盘后会自动生成分析报告。请先 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-[#9a8056] underline underline-offset-4">获取 Google AI Studio API Key</a>，再到设置中选择 Gemini 并填写。免费额度有限，排盘本身不受影响。
           </div>
         )}
 
