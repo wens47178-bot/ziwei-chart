@@ -160,8 +160,11 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
 }
 
 async function loadBirthplaceData(): Promise<Birthplace[]> {
-  const mod = await import('./birthplace-data.json')
-  return mod.default as Birthplace[]
+  const [china, global] = await Promise.all([
+    import('./birthplace-data.json'),
+    import('./global-birthplace-data.json'),
+  ])
+  return [...china.default, ...global.default] as Birthplace[]
 }
 
 export function shichenNameForTimeIndex(timeIndex: number): string {
