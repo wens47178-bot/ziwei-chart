@@ -81,6 +81,70 @@ export async function findBirthplaceAsync(input?: string): Promise<Birthplace | 
   return findRemoteBirthplace(input)
 }
 
+/** Search suggestions for the worldwide birthplace picker. Results are choices,
+ * not an automatic match: the user must select one before true-solar correction. */
+export async function searchBirthplacesAsync(input?: string): Promise<Birthplace[]> {
+  const raw = (input ?? '').trim()
+  if (raw.length < 2) return []
+  const birthplaces = await loadBirthplaceData()
+  const normalized = normalizePlace(raw)
+  const local = birthplaces
+    .filter((place) => isUsableCoordinate(place))
+    .map((place) => ({ place, score: scoreBirthplaceMatch(normalized, place) }))
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 8)
+    .map((item) => item.place)
+
+  const parts = raw.split(',').map((part) => part.trim()).filter(Boolean)
+  const cityQuery = parts[0] ?? raw
+  const qualifiers = parts.slice(1)
+  const remote: Birthplace[] = []
+  try {
+    const url = new URL(`${REMOTE_CITY_API}/search`)
+    url.searchParams.set('q', cityQuery)
+    url.searchParams.set('type', 'city')
+    url.searchParams.set('limit', '20')
+    const response = await fetch(url)
+    if (response.ok) {
+      const payload = await response.json() as { data?: RemoteCitySearchResult[] }
+      const candidates = (payload.data ?? [])
+        .filter((place) => place.type === 'city' && place.name && place.geonameId)
+        .filter((place) => !qualifiers.length || qualifiers.every((q) => matchesAdministrativeQualifier(place, q)))
+        .slice(0, 8)
+      const records = await Promise.all(candidates.map(async (candidate): Promise<Birthplace | null> => {
+        try {
+          const detail = await fetch(`${REMOTE_CITY_API}/cities/${candidate.geonameId}`)
+          if (!detail.ok) return null
+          const city = await detail.json() as RemoteCityRecord
+          const place: Birthplace = {
+            name: city.name || candidate.name || '',
+            city: city.name || candidate.name || '',
+            province: city.stateName || candidate.stateName || undefined,
+            country: city.countryName || candidate.countryName || undefined,
+            latitude: Number(city.latitude),
+            longitude: Number(city.longitude),
+            timeZone: city.timezone,
+          }
+          return isUsableCoordinate(place) && place.timeZone ? place : null
+        } catch {
+          return null
+        }
+      }))
+      remote.push(...records.filter((place): place is Birthplace => place !== null))
+    }
+  } catch {
+    // Keep usable local suggestions available if the remote gazetteer is offline.
+  }
+
+  const unique = new Map<string, Birthplace>()
+  for (const place of [...local, ...remote]) {
+    const key = [normalizePlace(place.name), normalizePlace(place.province), normalizePlace(place.country)].join('|')
+    if (!unique.has(key)) unique.set(key, place)
+  }
+  return Array.from(unique.values()).slice(0, 10)
+}
+
 export function findBirthplaceInData(input: string | undefined, birthplaces: Birthplace[]): Birthplace | null {
   const normalized = normalizePlace(input)
   if (!normalized) return null
