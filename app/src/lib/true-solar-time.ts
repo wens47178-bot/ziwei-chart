@@ -279,7 +279,7 @@ function getUtcOffsetMinutes(date: Date, timeZone: string): number {
     timeZone,
     timeZoneName: 'longOffset',
   }).formatToParts(date).find((part) => part.type === 'timeZoneName')?.value
-  const match = /^GMT(?:(\\+|-)(\\d{2}):(\\d{2})(?::(\\d{2}))?)?$/.exec(value ?? '')
+  const match = /^GMT(?:(\+|-)(\d{2}):(\d{2})(?::(\d{2}))?)?$/.exec(value ?? '')
   if (!match) throw new RangeError(`Unable to resolve the historical UTC offset for ${timeZone}.`)
   if (!match[1]) return 0
   const sign = match[1] === '+' ? 1 : -1
