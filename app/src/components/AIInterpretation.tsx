@@ -32,47 +32,68 @@ const SYSTEM_PROMPT = `# Role
 7. **平衡与谨慎**：优势与挑战并列，避免恐吓、宿命论和夸大准确度。健康只作传统文化角度的非医疗提醒，不推断疾病或器官病变。
 
 # Output Format
-请严格按以下结构输出。第一部分“命主优点”必须独立成节并放在报告最前面，不能混在缺点或总评里：
+请严格使用以下一级标题（标题文字必须完全一致，方便界面按主题切换），每个主题独立成节：
 
-## 一、命主优点｜值得发挥的长处
-- 单独列出 5–8 项有盘面依据的优势，每项包括：**优势特点**、**盘面依据**（具体宫位、星曜、亮度、四化或三方四正）、**现实中的表现**、**如何发挥**。
-- 只写当前命盘确实支持的优点；证据不足就不凑数，不用“聪明、善良、有贵人”等套话。
-- 明确这些是传统紫微斗数的倾向性解读，不是人格或未来的定论。
+## 命格总评
+- 开头先给出一句有辨识度的命格判断作为标题式结论（不超过16字），随后用2–4句普通人能听懂的话解释整体特点。
+- 简述最突出的优势、最值得留意的课题；所有判断都要能在后续章节找到盘面依据。
 
-## 二、需要留意的地方｜可改善的课题
-- 列出 3–5 项有依据的挑战，每项写明盘面依据、可能表现和可执行的调整方法；避免恐吓和宿命论。
+## 命主优点
+- 单独列出 5–8 项确有盘面依据的优势；每项写明：优势特点、具体宫位/星曜/亮度/四化/三方四正依据、现实中可能的表现、如何发挥。
+- 不凑数，不写空泛赞美。
 
-## 三、命格总览
-### 壹· 命格总断
-* **先看结论**：用3-5句通俗语言说明命盘主要特点、最突出的优势与最需要留意的课题。
-* **格局层次**：依据命宫三方四正的实际星曜组合说明结构特点；不得简单给命格贴“高/低”标签，必须解释判断依据。
-* **性情剖析**：结合命宫与福德宫，分析命主显露在外的处世风格，以及内心的真实欲求与精神境界。
+## 财运
+- 分析财帛宫及其三方四正，区分正财、经营/专业收入、偏财倾向与守财习惯；资料不足时说明边界，不预测确定金额。
 
-### 肆· 事业与财运
-* **官禄方向**：依据官禄宫星情与五行属性，指出命主最适合发展的行业性质（如：宜公职、宜经商、或宜技艺求财）。
-* **财运机缘**：分析财帛宫强弱。是正财稳健，还是偏财灵动？一生财源主要来自何方？有无漏财之虞？
+## 事业
+- 分析官禄宫、命宫、迁移宫及相关四化，说明适合的工作方式、优势岗位环境、发展阻力与可执行建议。
 
-### 伍· 婚姻与情感
-* **姻缘概况**：分析夫妻宫星曜，描述配偶可能的性格特征或相处模式。
-* **相处之道**：指出感情中可能存在的隐患（如：沟通不畅、聚少离多），并给出化解建议。
+## 感情
+- 分析夫妻宫及相关宫位，说明相处模式、择偶倾向、关系优势与沟通课题；不作婚姻必然成败断言。
 
-### 陆· 六亲与人际
-* **人际关系**：分析迁移宫及交友宫，判断在外是否有贵人扶持，或是易犯小人口舌。
-* **家庭关系**：简述与父母、子女的缘分深浅。
+## 性格
+- 结合命宫、身宫、福德宫，分别说明外在处事方式、内在需求、思考/决策习惯及成长优势。
 
-### 柒· 运势隐忧与建议
-* **健康提醒**：依据疾厄宫，指出先天体质上较弱的环节，提示需注意的身体部位。
-* **趋吉避凶**：综合全盘化忌与煞星的实际落点，说明最值得留意的行为模式，并给出日常可执行的改善建议；没有运限数据时不得指定应验年份或月份。
+## 健康
+- 只作传统术数文化角度的生活习惯提醒，不推断疾病、器官病变或替代医疗诊断；指出盘面依据与一般性保养建议。
 
-### 捌· 命格金句
-> 请用2-4句话，以诗意且戳心的方式概括命主的核心性格特质。要求：
-> - 语言凝练，朗朗上口，适合分享
-> - 风格可以是：自嘲式幽默、温柔共情、或霸气宣言
-> - 避免空泛的鸡汤，要有具体的性格洞察
-> - 格式：用引号包裹，每句话换行
+## 六亲与人际
+- 分析父母、兄弟、子女、交友、迁移等有数据支持的宫位；分别说明关系互动和人际边界，不把推测说成事实。
 
----
-*注：术数推演仅供参考，所谓命由天定，事在人为，望君善加把握。*`
+## 运势建议
+- 仅当本次输入包含真实的大限/流年/流月盘资料时才分析对应运限；否则明确说明当前只解读本命盘，不虚构年份或事件。
+- 提供3–5条具体、可执行的现实建议。
+
+## 命格金句
+- 用2–4句话凝练总结，避免空泛鸡汤。
+
+每个主题都采用“先讲人话结论 → 盘面依据 → 可能表现 → 实际建议”的顺序。重要结论必须引用真实宫位、星曜、亮度、四化或三方四正；不得编造数据。术语首次出现时紧跟白话解释。优势和挑战都要讲清楚，避免宿命论。`
+
+
+const REPORT_TABS = [
+  { id: '命格总评', label: '命格总览' },
+  { id: '命主优点', label: '命主优点' },
+  { id: '财运', label: '财运' },
+  { id: '事业', label: '事业' },
+  { id: '感情', label: '感情' },
+  { id: '性格', label: '性格' },
+  { id: '健康', label: '健康' },
+  { id: '六亲与人际', label: '六亲人际' },
+  { id: '运势建议', label: '运势建议' },
+  { id: '命格金句', label: '命格金句' },
+] as const
+
+function getReportSection(markdown: string, sectionId: string): string {
+  const lines = markdown.split('\n')
+  const headingIndex = lines.findIndex((line) => line.trim().replace(/^##\s+/, '').trim() === sectionId)
+  if (headingIndex < 0) return ''
+  const content: string[] = []
+  for (let i = headingIndex + 1; i < lines.length; i++) {
+    if (/^##\s+/.test(lines[i])) break
+    content.push(lines[i])
+  }
+  return content.join('\n').trim()
+}
 
 /* ------------------------------------------------------------
    字符输出速度（毫秒/字符）
@@ -144,6 +165,7 @@ export function AIInterpretation() {
   // 是否正在输出动画
   const [animating, setAnimating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<string>('命格总评')
 
   /* ------------------------------------------------------------
      均匀输出字符的定时器
@@ -214,7 +236,8 @@ export function AIInterpretation() {
 
       // 区分用户输入历法与排盘引擎采用的公历日期
       const inputCalendar = birthInfo.dateType === 'lunar' ? '农历' : '阳历'
-      const inputDate = `${birthInfo.year}年${birthInfo.month}月${birthInfo.day}日${birthInfo.dateType === 'lunar' && birthInfo.isLeapMonth ? '（闰月）' : ''}`
+      const leapLabel = birthInfo.isLeapMonth ? '（闰月）' : ''
+      const inputDate = String(birthInfo.year) + '年' + String(birthInfo.month) + '月' + String(birthInfo.day) + '日' + leapLabel
       const solarDate = chart.solarDate || '引擎未返回'
       const resolved = birthInfo.resolvedBirthTime
       const userMessage = `请严格依据以下真实命盘资料撰写完整报告。请先单独列出命主优点，再分析需要留意的地方。不得编造星曜、宫位、四化、格局或运限数据。
@@ -271,101 +294,82 @@ ${guidanceContext}
 
   /* 排盘后自动生成报告；已有缓存则直接展示，避免重复消耗模型额度。 */
   useEffect(() => {
-    if (chart && currentSettings.apiKey && !aiInterpretation && !loadingRef.current) {
+    if (chart && currentSettings.apiKey && (!aiInterpretation || !aiInterpretation.includes('## 命格总评')) && !loadingRef.current) {
       void handleInterpret()
     }
   }, [chart, currentSettings.apiKey, aiInterpretation, handleInterpret])
 
   if (!chart) return null
 
+  const isStructuredReport = displayText.includes('## 命格总评')
+  const activeContent = getReportSection(displayText, activeTab)
+
   return (
-    <div
-      className="
-        relative p-6 lg:p-8
-        bg-white border border-[#e9e5dc] rounded-2xl shadow-sm
-      "
-    >
-      {/* 顶部发光线 */}
-      <div
-        className="
-          absolute top-0 left-1/2 -translate-x-1/2
-          w-1/3 h-px
-          bg-gradient-to-r from-transparent via-gold/50 to-transparent
-        "
-      />
+    <div className="relative bg-white border border-[#e9e5dc] rounded-2xl shadow-sm overflow-hidden">
+      <div className="h-1 w-full bg-gradient-to-r from-[#d8c6a2] via-[#a98b5c] to-[#d8c6a2]" />
+      <div className="p-5 lg:p-7">
+        <div className="flex items-center justify-between gap-3 mb-5">
+          <div>
+            <p className="text-xs tracking-[0.2em] text-[#9a8056] mb-1">TIANYAN · NATAL ANALYSIS</p>
+            <h2 className="text-xl lg:text-2xl font-semibold text-[#262626]" style={{ fontFamily: 'var(--font-serif)' }}>命盘分析</h2>
+          </div>
+          <Button onClick={handleInterpret} disabled={loading || !currentSettings.apiKey} size="sm" variant="gold">
+            {loading ? '分析中…' : displayText ? '重新分析' : currentSettings.apiKey ? '开始分析' : '配置 API'}
+          </Button>
+        </div>
 
-      {/* 头部 */}
-      <div className="flex items-center justify-between mb-6">
-        <h2
-          className="
-            text-xl lg:text-2xl font-semibold
-            bg-gradient-to-r from-gold via-gold-light to-gold
-            bg-clip-text text-transparent
-          "
-          style={{ fontFamily: 'var(--font-serif)' }}
-        >
-          命盘解读报告
-        </h2>
-        <Button
-          onClick={handleInterpret}
-          disabled={loading || !currentSettings.apiKey}
-          size="sm"
-          variant="gold"
-        >
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              解读中
-            </span>
-          ) : currentSettings.apiKey ? '开始解读' : '请先配置 API'}
-        </Button>
+        {displayText && (
+          <nav className="flex gap-1.5 overflow-x-auto pb-3 mb-5 border-b border-[#eeeae2]" aria-label="命盘分析主题">
+            {REPORT_TABS.map((tab) => (
+              <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)}
+                className={`shrink-0 rounded-lg px-3 py-2 text-sm transition-colors ${activeTab === tab.id ? 'bg-[#f5f0e7] text-[#765d37] font-semibold border border-[#e5d8c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'} ${tab.id === '命主优点' ? 'font-semibold' : ''}`}>
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        )}
+
+        {error && <div className="p-3 rounded-lg bg-rose-50 text-rose-700 text-sm mb-4 border border-rose-100">{error}</div>}
+
+        {!currentSettings.apiKey && !displayText && (
+          <div className="text-slate-500 text-sm py-10 text-center">
+            <div className="text-3xl mb-3 opacity-30">☆</div>
+            排盘后会自动生成分析报告。请先 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-[#9a8056] underline underline-offset-4">获取 Google AI Studio API Key</a>，再到设置中选择 Gemini 并填写。免费额度有限，排盘本身不受影响。
+          </div>
+        )}
+
+        {displayText && (
+          <div className="min-h-[420px]">
+            {!isStructuredReport ? (
+              <div className="prose max-w-none prose-slate text-text-secondary text-[15px] lg:text-base leading-8">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={MarkdownComponents}>{displayText}</ReactMarkdown>
+              </div>
+            ) : activeContent ? (
+              <>
+                <div className="mb-4">
+                  <h3 className={`text-2xl lg:text-3xl font-semibold leading-tight ${activeTab === '命主优点' ? 'text-[#80633d]' : 'text-[#202020]'}`} style={{ fontFamily: 'var(--font-serif)' }}>
+                    {activeTab === '命格总评' ? (activeContent.split('\n').find((line) => line.trim())?.replace(/^#+\s*/, '').replace(/^[-*]\s*/, '').slice(0, 32) || '命格总览') : REPORT_TABS.find((tab) => tab.id === activeTab)?.label}
+                  </h3>
+                  {activeTab === '命主优点' && <p className="text-sm text-[#9a8056] mt-2">从真实星曜组合中提炼优势 · 盘面依据与发挥方向</p>}
+                </div>
+                <div className={`prose max-w-none prose-slate text-text-secondary text-[15px] lg:text-base leading-8 ${activeTab === '命主优点' ? 'rounded-xl border border-[#eee5d5] bg-[#fcfaf6] p-4 lg:p-5' : ''}`} style={{ fontFamily: 'var(--font-sans)' }}>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={MarkdownComponents}>{activeContent}</ReactMarkdown>
+                </div>
+              </>
+            ) : (
+              <div className="py-14 text-center text-slate-400">{loading ? '正在生成这一部分…' : '本次报告未提供这一主题的独立内容。'}</div>
+            )}
+            {animating && <span className="inline-block w-0.5 h-5 bg-[#a98b5c] animate-pulse ml-0.5 align-middle" />}
+          </div>
+        )}
+
+        {loading && !displayText && (
+          <div className="flex items-center justify-center gap-3 text-text-muted py-12">
+            <div className="w-5 h-5 border-2 border-star border-t-transparent rounded-full animate-spin" />
+            <span>正在分析命盘并整理各主题报告…</span>
+          </div>
+        )}
       </div>
-
-      {/* 错误提示 */}
-      {error && (
-        <div className="p-3 rounded-lg bg-misfortune/10 text-rose-700 text-sm mb-4 border border-misfortune/20">
-          {error}
-        </div>
-      )}
-
-      {/* 未配置提示 */}
-      {!currentSettings.apiKey && !displayText && (
-        <div className="text-slate-500 text-sm py-8 text-center">
-          <div className="text-3xl mb-3 opacity-30">☆</div>
-          排盘后会自动生成这份报告。首次使用请先 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-[#9a8056] underline underline-offset-4">免费获取 Google AI Studio API Key</a>，再到右上角「设置」中选择 Gemini 并填写。免费额度有限，达到上限后可稍后重试；排盘和其他本地分析功能不受影响。
-        </div>
-      )}
-
-      {/* 解读内容 - 分节报告 + Markdown 渲染 */}
-      {displayText && (
-        <div
-          className="
-            prose max-w-none prose-slate
-            text-text-secondary text-base leading-8
-          "
-          style={{ fontFamily: 'var(--font-sans)' }}
-        >
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={MarkdownComponents}
-          >
-            {displayText}
-          </ReactMarkdown>
-
-          {/* 光标指示器 */}
-          {animating && (
-            <span className="inline-block w-0.5 h-5 bg-gold/80 animate-pulse ml-0.5 align-middle" />
-          )}
-        </div>
-      )}
-
-      {/* 加载占位 */}
-      {loading && !displayText && (
-        <div className="flex items-center justify-center gap-3 text-text-muted py-12">
-          <div className="w-5 h-5 border-2 border-star border-t-transparent rounded-full animate-spin" />
-          <span>正在分析命盘...</span>
-        </div>
-      )}
     </div>
   )
 }
