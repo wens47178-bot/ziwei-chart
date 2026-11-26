@@ -5,9 +5,12 @@ The birthplace resolver retains the existing China administrative-area dataset a
 ## Search
 
 - Search by a city name; English and local-script names supported by the external catalogue can be used.
-- Add the country when a city name could be ambiguous, for example `New York, USA`.
+- Add the state/province and country when a city name could be ambiguous, for example `Springfield, Illinois, USA` or `New York, USA`.
+- Every supplied administrative qualifier must match; a state match cannot accidentally substitute for a country match.
+- Local and remote matches with equally strong but geographically distinct candidates are rejected instead of silently selecting the first result.
+- The birth form waits briefly after typing before querying the remote catalogue, and shows the matched city, region, country, and IANA timezone.
 - A country name by itself is intentionally not enough to select a birthplace: countries can contain multiple civil time zones.
-- If multiple exact city matches exist in different countries and no country is supplied, the resolver refuses to choose arbitrarily.
+- If multiple exact city matches exist in different countries or administrative regions and the input does not disambiguate them, the resolver refuses to choose arbitrarily.
 - The locally curated China and overseas records are checked first. The external catalogue is queried only when no local record matches.
 - If the external service is unavailable, the city is not found, or the returned record lacks valid coordinates or an IANA timezone, true-solar correction is not applied. The app must not guess a timezone from the user's current location.
 
@@ -21,7 +24,7 @@ The correction is calculated from the city's longitude, the resolved local UTC o
 
 - Worldwide city search: Geocoded API, `https://api.geocoded.me/v2`, no API key required. The provider documents approximately 235,000 cities and towns and identifies GeoNames and related public datasets as sources.
 - Geocoded data is published under CC BY 4.0. Attribution: Geocoded, `https://geocoded.me/`.
-- The external catalogue is a runtime dependency for cities not present in the curated local datasets. Search gracefully falls back to no match if the API is unavailable or rate-limited.
+- The external catalogue is a runtime dependency for cities not present in the curated local datasets. Search gracefully falls back to no match if the API is unavailable or rate-limited. The API implementation is open source under MIT; the underlying location data is published under CC BY 4.0, so attribution is retained here.
 
 ## Limits
 

@@ -164,6 +164,47 @@ describe('findBirthplace', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
+  it('refuses to guess when two local cities have the same best match', () => {
+    const duplicateCities: Birthplace[] = [
+      { name: 'Springfield', city: 'Springfield', country: 'United States', province: 'Illinois', latitude: 39.7817, longitude: -89.6501, timeZone: 'America/Chicago' },
+      { name: 'Springfield', city: 'Springfield', country: 'United States', province: 'Massachusetts', latitude: 42.1015, longitude: -72.5898, timeZone: 'America/New_York' },
+    ]
+
+    expect(findBirthplaceInData('Springfield', duplicateCities)).toBeNull()
+    expect(findBirthplaceInData('Springfield, Illinois, United States', duplicateCities)?.province).toBe('Illinois')
+  })
+
+  it('uses state and country qualifiers together for remote city disambiguation', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [
+            { type: 'city', name: 'Springfield', countryCode: 'US', countryName: 'United States', stateCode: 'IL', stateName: 'Illinois', geonameId: 4250542 },
+            { type: 'city', name: 'Springfield', countryCode: 'US', countryName: 'United States', stateCode: 'MA', stateName: 'Massachusetts', geonameId: 4951788 },
+          ],
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          name: 'Springfield',
+          countryName: 'United States',
+          stateName: 'Illinois',
+          latitude: '39.7817',
+          longitude: '-89.6501',
+          timezone: 'America/Chicago',
+        }),
+      })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const place = await findBirthplaceAsync('Springfield, Illinois, USA')
+
+    expect(place?.province).toBe('Illinois')
+    expect(place?.timeZone).toBe('America/Chicago')
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
   it('returns null when the birthplace cannot be matched', () => {
     expect(findBirthplaceInData(MARS_BASE, BIRTHPLACE_DATA)).toBeNull()
   })
