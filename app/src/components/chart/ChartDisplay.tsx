@@ -7,7 +7,8 @@
    - 命主/身主 + 纳音五行
    ============================================================ */
 
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import { createLocalCalendarDate } from '@/lib/horoscope'
 import { useChartStore } from '@/stores'
 import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
 
@@ -103,6 +104,7 @@ function StarTag({ star, tone = 'text-[#2457a7]' }: StarTagProps) {
    ------------------------------------------------------------ */
 
 interface PalaceCardProps extends PalaceData {
+  overlays?: string[]
   isSelected?: boolean
   relation?: '三合' | '对宫'
   onClick?: () => void
@@ -110,7 +112,7 @@ interface PalaceCardProps extends PalaceData {
 
 function PalaceCard({
   name, stem, branch, majorStars, minorStars, adjectiveStars, decadal,
-  boshi12, changsheng12, isLife, isBody, isSelected, relation, onClick
+  boshi12, changsheng12, isLife, isBody, overlays, isSelected, relation, onClick
 }: PalaceCardProps) {
   const decadalRange = decadal?.range ? `${decadal.range[0]}-${decadal.range[1]}` : ''
 
@@ -122,6 +124,7 @@ function PalaceCard({
         {minorStars.map((star,i) => <StarTag key={i} star={star} tone="text-[#6744a0]" />)}
         {adjectiveStars.map((name,i) => <StarTag key={i} star={{name}} />)}
       </div>
+      {overlays?.map(label => <span key={label} className="mt-1 text-[10px] text-indigo-700">{label}</span>)}
       {relation && <span className="mt-1 self-start rounded bg-blue-100 px-1 text-[10px] text-blue-800">{relation}</span>}
       <div className="mt-auto flex items-end justify-between gap-1 pt-3">
         <div className="flex flex-col text-[10px] leading-tight text-neutral-500"><span className="text-teal-700">{changsheng12}</span><span>{boshi12}</span></div>
@@ -333,6 +336,12 @@ export function ChartDisplay() {
   const [showMinor, setShowMinor] = useState(true)
   const [showAdjective, setShowAdjective] = useState(true)
 
+  const [year, setYear] = useState(new Date().getFullYear())
+  const [layer, setLayer] = useState<'origin' | 'decadal' | 'yearly' | 'both'>('origin')
+  const horoscope = useMemo(() => {
+    if (!chart || layer === 'origin' || !Number.isInteger(year) || year < 1 || year > 9999) return null
+    try { return chart.horoscope(createLocalCalendarDate(year, 6, 15)) } catch { return null }
+  }, [chart, layer, year])
   if (!chart || !birthInfo) return null
 
   const palaceData = parsePalaces(chart)
@@ -363,6 +372,11 @@ export function ChartDisplay() {
         {...palace}
         minorStars={showMinor ? palace.minorStars : []}
         adjectiveStars={showAdjective ? palace.adjectiveStars : []}
+        overlays={(['decadal','yearly'] as const).filter(scope => layer === scope || layer === 'both').flatMap(scope => {
+          const index = chart.palaces.find(p => p.earthlyBranch === palace.branch)?.index
+          const name = index === undefined ? undefined : horoscope?.[scope]?.palaceNames[index]
+          return name ? [(scope === 'decadal' ? '大限：' : '流年：') + name] : []
+        })}
         isSelected={selectedPalace === palace.name}
         relation={relationFor(palace.branch)}
         onClick={() => setSelectedPalace(selectedPalace === palace.name ? null : palace.name)}
@@ -374,6 +388,7 @@ export function ChartDisplay() {
     <div className="
       relative bg-white max-w-none mx-auto
     ">
+      <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">{(['origin','decadal','yearly','both'] as const).map((key,i) => <button key={key} type="button" aria-pressed={layer === key} onClick={() => setLayer(key)} className={layer === key ? 'rounded bg-neutral-900 px-2 py-1 text-white' : 'rounded border px-2 py-1'}>{['本命','大限','流年','叠盘'][i]}</button>)}<input aria-label="运限年份" type="number" min={1} max={9999} value={year} onChange={e => setYear(Number(e.target.value))} className="w-20 rounded border px-1 py-1" />{layer !== 'origin' && !horoscope && <span>无法取得运限资料</span>}</div>
       <div className="mb-1 grid grid-cols-4 text-center text-[10px] text-neutral-500"><span>南偏东</span><span>正南方</span><span>南偏西</span><span>西偏南</span></div>
 
       <div className="mb-2 flex items-center justify-between gap-2 text-xs text-neutral-600"><span>{selected ? `${selected.name} · 三方四正` : "点击任一宫位查看三方四正"}</span>{selected && <button type="button" onClick={() => setSelectedPalace(null)} className="text-blue-700">取消选择</button>}</div>
