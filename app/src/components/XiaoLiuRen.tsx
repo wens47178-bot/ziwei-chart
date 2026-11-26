@@ -28,12 +28,14 @@ const guidance: Record<string, string> = {
   学业: '检查学习进度，安排复习与反馈。'
 }
 function currentTime() {
+  try {
   const now = new Date()
   const parts = new Intl.DateTimeFormat('en-u-ca-chinese', {month:'numeric',day:'numeric'}).formatToParts(now)
   const month = parseInt(parts.find(p => p.type === 'month')?.value ?? '', 10)
   const day = parseInt(parts.find(p => p.type === 'day')?.value ?? '', 10)
   if (!(month >= 1 && month <= 12 && day >= 1 && day <= 30)) return null
   return {month, day, hour: Math.floor((now.getHours()+1)/2)%12}
+  } catch { return null }
 }
 export function XiaoLiuRen() {
   const [month, setMonth] = useState(() => currentTime()?.month ?? 1)
@@ -41,7 +43,7 @@ export function XiaoLiuRen() {
   const [hour, setHour] = useState(() => currentTime()?.hour ?? 0)
   const [category, setCategory] = useState('综合')
   const [history, setHistory] = useState<Cast[]>([])
-  const [timeError, setTimeError] = useState('')
+  const [timeError, setTimeError] = useState(() => currentTime() ? '' : '无法自动识别农历，请手动核对月日及时辰。')
   const [question, setQuestion] = useState('')
   const [cast, setCast] = useState<Cast | null>(null)
   const [step, setStep] = useState(0)
