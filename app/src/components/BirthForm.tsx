@@ -38,7 +38,8 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
-  const lunarMonthLength = dateType === 'lunar' ? getLunarMonthLength(year, month, isLeapMonth) : 30
+  const leapMonthAvailable = dateType === 'lunar' && hasLunarLeapMonth(year, month)
+  const lunarMonthLength = dateType === 'lunar' ? getLunarMonthLength(year, month, isLeapMonth && leapMonthAvailable) : 30
   const dayOptions = dateType === 'solar' ? getDayOptions(year, month) : Array.from({ length: lunarMonthLength }, (_, index) => ({ value: index + 1, label: `${index + 1}日` }))
 
   useEffect(() => {
@@ -136,7 +137,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
         error instanceof RangeError
           ? error.message.includes('does not exist')
             ? '该历史日期当地时钟曾向前调整，这个出生时间不存在，请核对出生记录。'
-            : '出生日期或时间无效，请检查后重试。'
+            : error.message || '出生日期或时间无效，请检查后重试。'
           : '排盘失败，请稍后重试。'
       )
     } finally {
@@ -194,8 +195,8 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
             />
           </div>
           {dateType === 'lunar' && <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#e9e5dc] bg-[#faf9f6] px-4 py-3">
-            <div><p className="text-sm text-[#5f594e]">闰月设置</p><p className="mt-1 text-xs text-[#918879]">只有出生月份确为闰月时才勾选</p></div>
-            <label className="flex items-center gap-2 text-sm text-[#625b50]"><input type="checkbox" checked={isLeapMonth} onChange={(event) => setIsLeapMonth(event.target.checked)} className="h-4 w-4 accent-[#8f7956]" />闰{month}月</label>
+            <div><p className="text-sm text-[#5f594e]">闰月设置</p><p className="mt-1 text-xs text-[#918879]">{leapMonthAvailable ? '该年存在此月份的闰月，如出生于闰月请勾选' : '该年份没有闰此月，无法选择闰月'}</p></div>
+            <label className={`flex items-center gap-2 text-sm ${leapMonthAvailable ? 'text-[#625b50]' : 'text-[#b7b1a8]'}`}><input type="checkbox" checked={isLeapMonth} disabled={!leapMonthAvailable} onChange={(event) => setIsLeapMonth(event.target.checked)} className="h-4 w-4 accent-[#8f7956]" />闰{month}月</label>
           </div>}
           <p className="text-xs text-[#918879]">{dateType === 'solar' ? '按公历年月日输入，系统直接按阳历排盘。' : '按农历年月日输入；日期天数会按该年该月的实际大小限制。闰月只有在该年确实存在时才能选择。启用真太阳时会先换算为对应公历日期。'}</p>
         </div>
