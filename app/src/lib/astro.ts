@@ -50,7 +50,7 @@ export interface BirthInfo {
 export function generateChart(info: BirthInfo): FunctionalAstrolabe {
   const { gender, fixLeap = true, dateType = 'solar', isLeapMonth = false } = info
   const dateStr = `${info.year}-${info.month}-${info.day}`
-  const timeIndex = info.resolvedBirthTime?.timeIndex ?? getTimeIndex(info.hour, info.minute ?? 0)
+  const timeIndex = info.resolvedBirthTime?.timeIndex ?? getTimeIndex(info.hour)
   const genderName = gender === 'male' ? '男' : '女'
 
   // Lunar dates are native inputs to iztro. If true-solar correction is enabled,
@@ -68,6 +68,7 @@ export function generateChart(info: BirthInfo): FunctionalAstrolabe {
       return astro.bySolar(`${resolved.year}-${resolved.month}-${resolved.day}`, resolved.timeIndex, genderName, fixLeap)
     }
     const resolved = info.resolvedBirthTime
+    if (!resolved) throw new Error('出生时间校正资料缺失，请重新排盘。')
     return astro.bySolar(`${resolved.year}-${resolved.month}-${resolved.day}`, resolved.timeIndex, genderName, fixLeap)
   }
 
