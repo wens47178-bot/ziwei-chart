@@ -253,26 +253,41 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
 
       {/* 信息列表 */}
       <div className="text-xs lg:text-sm text-text-secondary space-y-1.5 text-center">
-        <p><span className="text-text-muted">阳历</span> <span className="text-text">{solarDate}</span></p>
+        <p><span className="text-text-muted">原始阳历</span> <span className="text-text">{solarDate} {formatTime(birthInfo.hour, birthInfo.minute ?? 0)}</span></p>
         <p><span className="text-text-muted">农历</span> <span className="text-text">{chart.lunarDate}</span></p>
         <p><span className="text-text-muted">干支</span> <span className="text-text font-mono">{chart.chineseDate}</span></p>
-        <p><span className="text-text-muted">时辰</span> <span className="text-text">{chart.time} {chart.timeRange}</span></p>
+        <p><span className="text-text-muted">最终时辰</span> <span className="text-text">{chart.time} {chart.timeRange}</span></p>
         {showCorrection && resolvedTime && (
-          <p>
-            <span className="text-text-muted">真太阳时</span>{' '}
-            <span className="text-gold">
-              {resolvedTime.location?.name} {formatTime(resolvedTime.hour, resolvedTime.minute)}
-              {resolvedTime.originalShichen !== resolvedTime.correctedShichen
-                ? `，${resolvedTime.originalShichen}校正为${resolvedTime.correctedShichen}`
-                : '，时辰不变'}
-            </span>
-          </p>
+          <details className="w-full text-left rounded-lg border border-slate-200 bg-[#faf9f7] px-3 py-2">
+            <summary className="cursor-pointer text-xs font-medium text-[#806b45]">查看出生时间校正详情</summary>
+            <div className="mt-2 space-y-1.5 text-[11px] text-text-secondary">
+              <p>出生地：{resolvedTime.location?.name}</p>
+              <p>时区：{resolvedTime.timeZone}（标准时 UTC+08:00）</p>
+              <p>原始时间：{solarDate} {formatTime(birthInfo.hour, birthInfo.minute ?? 0)}</p>
+              <p>时区实际偏移：{formatUtcOffset(resolvedTime.utcOffsetMinutes ?? 480)}</p>
+              {resolvedTime.dstAdjustmentMinutes !== 0 && (
+                <p>历史夏令时：+{resolvedTime.dstAdjustmentMinutes} 分钟（校正时先扣除）</p>
+              )}
+              {resolvedTime.ambiguousLocalTime && (
+                <p className="text-amber-700">该时刻在夏令时回拨时段出现两次，系统按第一次出现的时间计算</p>
+              )}
+              <p>经度修正：{formatSignedMinutes(resolvedTime.longitudeCorrectionMinutes)} 分钟</p>
+              <p>均时差：{formatSignedMinutes(resolvedTime.equationOfTimeMinutes)} 分钟</p>
+              <p>总校正：{formatSignedMinutes(resolvedTime.correctionMinutes)} 分钟</p>
+              <p>校正后时间：{formatResolvedDateTime(resolvedTime.year, resolvedTime.month, resolvedTime.day, resolvedTime.hour, resolvedTime.minute)}</p>
+              <p>时辰变化：{resolvedTime.originalShichen} → {resolvedTime.correctedShichen}</p>
+              {resolvedTime.crossedDate && <p className="text-amber-700">校正跨越了民用日期边界，排盘采用校正后的日期</p>}
+            </div>
+          </details>
         )}
         {showUnmatched && (
           <p>
             <span className="text-text-muted">真太阳时</span>{' '}
-            <span className="text-text-muted">未匹配出生地，按原时辰排盘</span>
+            <span className="text-text-muted">出生地未匹配或坐标无效，未执行校正</span>
           </p>
+        )}
+        {!birthInfo.trueSolarEnabled && (
+          <p><span className="text-text-muted">时间校正</span> <span className="text-text-muted">已关闭，按原始出生时间排盘</span></p>
         )}
         <p><span className="text-text-muted">性别</span> <span className="text-text">{gender}</span></p>
         {nayin && (
@@ -306,6 +321,20 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
 
 function formatTime(hour: number, minute: number): string {
   return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+}
+
+function formatSignedMinutes(minutes: number): string {
+  return `${minutes > 0 ? '+' : ''}${minutes}`
+}
+
+function formatUtcOffset(minutes: number): string {
+  const sign = minutes >= 0 ? '+' : '-'
+  const absolute = Math.abs(minutes)
+  return `UTC${sign}${String(Math.floor(absolute / 60)).padStart(2, '0')}:${String(absolute % 60).padStart(2, '0')}`
+}
+
+function formatResolvedDateTime(year: number, month: number, day: number, hour: number, minute: number): string {
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')} ${formatTime(hour, minute)}`
 }
 
 /* ------------------------------------------------------------

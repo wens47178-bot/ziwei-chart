@@ -117,7 +117,9 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
       console.error('排盘失败:', error)
       setSubmitError(
         error instanceof RangeError
-          ? '出生日期或时间无效，请检查后重试。'
+          ? error.message.includes('does not exist')
+            ? '该历史日期当地时钟曾向前调整，这个出生时间不存在，请核对出生记录。'
+            : '出生日期或时间无效，请检查后重试。'
           : '排盘失败，请稍后重试。'
       )
     } finally {
@@ -247,7 +249,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
         {/* 出生地（可选） */}
         <Input
           label="出生地（可选）"
-          placeholder="如：北京、成都、乌鲁木齐"
+          placeholder="如：中国大陆城市：北京、成都、乌鲁木齐"
           hint={
             trueSolarEnabled
               ? matchingBirthplace
@@ -256,7 +258,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
                 ? `已匹配 ${matchedBirthplace.name}，系统会自动校正真太阳时`
                 : birthplace.trim()
                   ? '暂未匹配该出生地，将按原时辰排盘'
-                  : '直接输入出生地，系统会在后台自动匹配'
+                  : '出生地库目前覆盖中国大陆地区；未匹配时不会执行真太阳时校正'
               : '已关闭真太阳时校正'
           }
           value={birthplace}
