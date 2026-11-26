@@ -86,12 +86,13 @@ export function generateChart(info: BirthInfo): FunctionalAstrolabe {
 
 export function getLunarMonthLength(year: number, month: number, isLeapMonth = false): number {
   const reference = astro.bySolar(`${year}-1-1`, 0, '男', true)
-  const period = reference.monthlyList(year, true).find((item) => item.month === month && Boolean(item.isLeapMonth) === isLeapMonth)
-  if (!period) {
+  const periods = reference.monthlyList(year, true).filter((item) => item.month === month && Boolean(item.isLeapMonth) === isLeapMonth)
+  if (periods.length === 0) {
     if (isLeapMonth) throw new RangeError(`该年份没有闰${month}月`)
     throw new RangeError('无法取得该年份的农历月份资料')
   }
-  return period.dayRange[1]
+  // iztro represents a leap month as two half-month segments (1–15 and 16–29/30).
+  return Math.max(...periods.map((period) => period.dayRange[1]))
 }
 
 export function hasLunarLeapMonth(year: number, month: number): boolean {
