@@ -100,10 +100,7 @@ export function findBirthplaceInData(input: string | undefined, birthplaces: Bir
   const distinctLocations = new Set(tied.map(({ place }) => [
     normalizePlace(place.country),
     normalizePlace(place.province),
-    normalizePlace(place.city),
-    normalizePlace(place.area),
-    place.latitude,
-    place.longitude,
+    normalizePlace(place.city ?? place.area ?? place.name),
     place.timeZone ?? '',
   ].join('|')))
   return distinctLocations.size > 1 ? null : best.place
