@@ -200,12 +200,14 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
           <span className="text-sm text-text-secondary font-medium">出生时间（当地钟表时间）</span>
           <div className="rounded-2xl border border-[#dedbd5] bg-[#f8f7f4] p-3"><div className="grid grid-cols-2 gap-3">
             <Select
+              aria-label="出生小时"
               disabled={approximateTime}
               options={HOUR_OPTIONS}
               value={hour}
               onChange={(e) => setHour(Number(e.target.value))}
             />
             <Select
+              aria-label="出生分钟"
               disabled={approximateTime}
               options={MINUTE_OPTIONS}
               value={minute}
