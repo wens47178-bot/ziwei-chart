@@ -261,7 +261,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
           <details className="w-full text-left rounded-lg border border-slate-200 bg-[#faf9f7] px-3 py-2">
             <summary className="cursor-pointer text-xs font-medium text-[#806b45]">查看出生时间校正详情</summary>
             <div className="mt-2 space-y-1.5 text-[11px] text-text-secondary">
-              <p>出生地：{resolvedTime.location?.name}</p>
+              <p>出生地：{resolvedTime.location?.name}{resolvedTime.location?.country ? `，${resolvedTime.location.country}` : ''}</p>
               <p>时区：{resolvedTime.timeZone}（按出生日期的当地时区规则）</p>
               <p>原始时间：{solarDate} {formatTime(birthInfo.hour, birthInfo.minute ?? 0)}</p>
               <p>时区实际偏移：{formatUtcOffset(resolvedTime.utcOffsetMinutes ?? 480)}</p>
