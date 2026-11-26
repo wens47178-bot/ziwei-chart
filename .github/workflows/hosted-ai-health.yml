@@ -1,0 +1,28 @@
+name: Hosted AI health
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/hosted-ai-health.yml']
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Probe hosted AI with synthetic prompt
+        run: |
+          node --input-type=module <<'JS'
+          const url = 'https://tianyan-ai-api.onrender.com/api/interpret';
+          const origin = 'https://tianyan-ziwei-main.onrender.com';
+          const pre = await fetch(url,{method:'OPTIONS',headers:{Origin:origin,'Access-Control-Request-Method':'POST','Access-Control-Request-Headers':'content-type'},signal:AbortSignal.timeout(90000)});
+          console.log('CORS',pre.status,pre.headers.get('access-control-allow-origin'));
+          const res = await fetch(url,{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'system',content:'Reply briefly.'},{role:'user',content:'Reply with OK.'}]}),signal:AbortSignal.timeout(180000)});
+          console.log('HTTP',res.status,'content-type',res.headers.get('content-type'),'CORS',res.headers.get('access-control-allow-origin'));
+          const body = await res.text();
+          const events = body.split(/\r?\n/).filter(x=>x.startsWith('data:')).map(x=>{try{return JSON.parse(x.slice(5))}catch{return null}});
+          console.log('Text events:',events.filter(x=>typeof x?.text==='string' && x.text.trim()).length,'Error events:',events.filter(x=>x?.error).length);
+          if(!res.ok || !events.some(x=>typeof x?.text==='string' && x.text.trim()) || events.some(x=>x?.error)) throw Error('Hosted AI did not return a successful text stream');
+          JS
