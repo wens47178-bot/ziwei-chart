@@ -4,14 +4,15 @@
 
 import { useEffect, useState } from 'react'
 import { Button, Input, Select } from '@/components/ui'
-import { generateChart, getShichenOptions, type BirthInfo, type Gender } from '@/lib/astro'
+import { generateChart, type BirthInfo, type Gender } from '@/lib/astro'
 import { clampDayToMonth, getDayOptions, getMonthOptions, getYearOptions } from '@/lib/birth-date'
 import { findBirthplaceAsync, resolveBirthTimeAsync, type Birthplace } from '@/lib/true-solar-time'
 import { useChartStore } from '@/stores'
 
 const YEAR_OPTIONS = getYearOptions()
 const MONTH_OPTIONS = getMonthOptions()
-const HOUR_OPTIONS = getShichenOptions()
+const HOUR_OPTIONS = Array.from({ length: 24 }, (_, hour) => ({ value: hour, label: `${String(hour).padStart(2, '0')} 时` }))
+const MINUTE_OPTIONS = Array.from({ length: 60 }, (_, minute) => ({ value: minute, label: `${String(minute).padStart(2, '0')} 分` }))
 
 const GENDER_OPTIONS = [
   { value: 'male', label: '男', icon: '♂' },
@@ -25,6 +26,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
   const [month, setMonth] = useState(1)
   const [day, setDay] = useState(1)
   const [hour, setHour] = useState(12)
+  const [minute, setMinute] = useState(0)
   const [gender, setGender] = useState<Gender>('male')
   const [birthplace, setBirthplace] = useState('')
   const [trueSolarEnabled, setTrueSolarEnabled] = useState(true)
@@ -91,6 +93,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
         month,
         day: safeDay,
         hour,
+        minute,
         birthplace,
         enabled: trueSolarEnabled,
       })
@@ -99,6 +102,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
         month,
         day: safeDay,
         hour,
+        minute,
         gender,
         birthplace: birthplace.trim() || undefined,
         trueSolarEnabled,
@@ -177,13 +181,25 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
           </div>
         </div>
 
-        {/* 出生时辰 */}
-        <Select
-          label="出生时辰"
-          options={HOUR_OPTIONS}
-          value={hour}
-          onChange={(e) => setHour(Number(e.target.value))}
-        />
+        {/* 精确出生时间 */}
+        <div className="space-y-2">
+          <span className="text-sm text-text-secondary font-medium">出生时间（尽量填写准确时分）</span>
+          <div className="grid grid-cols-2 gap-3">
+            <Select
+              label="小时"
+              options={HOUR_OPTIONS}
+              value={hour}
+              onChange={(e) => setHour(Number(e.target.value))}
+            />
+            <Select
+              label="分钟"
+              options={MINUTE_OPTIONS}
+              value={minute}
+              onChange={(e) => setMinute(Number(e.target.value))}
+            />
+          </div>
+          <p className="text-xs text-text-muted">系统会按具体出生时分判断时辰；23:00–23:59 为晚子时，00:00–00:59 为早子时。</p>
+        </div>
 
         {/* 性别选择 - 胶囊按钮组 */}
         <div className="space-y-2">
