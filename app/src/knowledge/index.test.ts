@@ -86,12 +86,15 @@ describe('palace relationship and flying transformation context', () => {
   })
 
   it('includes explicit trine and flying-transformation evidence in the AI prompt context', () => {
-    const context = extractKnowledge(chartWithPalaces([
-      { name: '命宫', index: 0, majorStars: [{ name: '紫微' }] },
-      { name: '财帛宫', index: 4, majorStars: [{ name: '廉贞' }] },
-      { name: '官禄宫', index: 8, majorStars: [{ name: '破军' }] },
-      { name: '迁移宫', index: 6, majorStars: [{ name: '武曲' }] },
-    ]))
+    const chart = {
+      palaces: [
+        { name: '命宫', index: 0, heavenlyStem: '甲', majorStars: [{ name: '紫微' }], minorStars: [], adjectiveStars: [] },
+        { name: '财帛宫', index: 4, heavenlyStem: '乙', majorStars: [{ name: '廉贞' }], minorStars: [], adjectiveStars: [] },
+        { name: '官禄宫', index: 8, heavenlyStem: '丙', majorStars: [{ name: '破军' }], minorStars: [], adjectiveStars: [] },
+        { name: '迁移宫', index: 6, heavenlyStem: '丁', majorStars: [{ name: '武曲' }], minorStars: [], adjectiveStars: [] },
+      ],
+    } as unknown as FunctionalAstrolabe
+    const context = extractKnowledge(chart)
     const prompt = buildPromptContext(context)
 
     expect(prompt).toContain('十二宫三方四正关系')
