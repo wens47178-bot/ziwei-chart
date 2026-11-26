@@ -130,8 +130,8 @@ describe('findBirthplace', () => {
         json: async () => ({
           name: 'Akureyri',
           countryName: 'Iceland',
-          latitude: '64.1466',
-          longitude: '-21.9426',
+          latitude: '65.6835',
+          longitude: '-18.0878',
           timezone: 'Atlantic/Akureyri',
         }),
       })
@@ -141,7 +141,7 @@ describe('findBirthplace', () => {
 
     expect(place?.name).toBe('Akureyri')
     expect(place?.timeZone).toBe('Atlantic/Akureyri')
-    expect(place?.latitude).toBeCloseTo(64.1466)
+    expect(place?.latitude).toBeCloseTo(65.6835)
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
