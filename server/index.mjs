@@ -3,11 +3,14 @@ import http from 'node:http'
 const PORT = Number(process.env.PORT || 10000)
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || ''
 const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite'
+const additionalOrigins = (process.env.AI_ALLOWED_ORIGINS || '').split(',')
+  .map((origin) => origin.trim()).filter(Boolean)
 const ALLOWED_ORIGINS = new Set([
   'https://tianyan-ziwei-main.onrender.com',
   'https://ouranic.cn',
   'https://www.ouranic.cn',
   'http://localhost:5173',
+  ...additionalOrigins,
 ])
 const rateLimits = new Map()
 const MAX_BODY_BYTES = 180_000
@@ -86,25 +89,25 @@ const server = http.createServer(async (req, res) => {
     const decoder = new TextDecoder()
     let buffer = ''
     const emit = (event) => {
-      const data = event.split(/\\r?\\n/).filter((line) => line.startsWith('data:')).map((line) => line.slice(5).trim()).join('')
+      const data = event.split(/\r?\n/).filter((line) => line.startsWith('data:')).map((line) => line.slice(5).trim()).join('\n')
       if (!data || data === '[DONE]') return
       try {
         const json = JSON.parse(data)
         const text = (json.candidates?.[0]?.content?.parts || []).map((part) => part.text || '').join('')
-        if (text) res.write(`data: ${JSON.stringify({ text })}\\n\\n`)
+        if (text) res.write(`data: ${JSON.stringify({ text })}\n\n`)
       } catch { /* ignore incomplete upstream event */ }
     }
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
       buffer += decoder.decode(value, { stream: true })
-      const events = buffer.split(/\\r?\\n\\r?\\n/)
+      const events = buffer.split(/\r?\n\r?\n/)
       buffer = events.pop() || ''
       for (const event of events) emit(event)
     }
     buffer += decoder.decode()
     if (buffer.trim()) emit(buffer)
-    res.write('data: [DONE]\\n\\n')
+    res.write('data: [DONE]\n\n')
     res.end()
   } catch (error) {
     if (!res.headersSent) return sendJson(res, 500, { error: error instanceof Error ? error.message : 'AI 解读失败' })

@@ -95,6 +95,18 @@ ZWKNOWS_SYNC_TOKEN
 The token must have access to `ruijayfeng/zwknows` and include permissions needed
 to update workflow files, currently `repo` and `workflow` for a classic PAT.
 
+## Tianyan Render Deployment
+
+- Create a separate Static Site for the short `onrender.com` address. Use `app`
+  as the root directory, `npm ci && npm run build` as the build command, and
+  `dist` as the publish directory. Keep the original site in service.
+- On the hosted AI service running `node server/index.mjs` from the repository
+  root, set `AI_ALLOWED_ORIGINS` to the new site's exact HTTPS origin. Append to
+  existing values with a comma. `GEMINI_API_KEY` belongs on the AI service only.
+- Check `/health`, a browser preflight from both site origins, and a streamed
+  report using synthetic chart data. A configured health response only confirms
+  that the key is present. Use a free-tier AI project for live tests.
+
 ## Sync Debugging
 
 Check recent runs:
