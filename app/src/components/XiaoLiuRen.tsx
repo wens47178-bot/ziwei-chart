@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import { streamHostedAI } from '@/lib/llm'
 import { calculateXiaoLiuRen, XIAO_LIU_REN_PALACES } from '@/lib/xiaoliuren'
 
 const SHICHEN = [
@@ -49,12 +50,28 @@ export function XiaoLiuRen() {
   const [step, setStep] = useState(0)
   const result = calculateXiaoLiuRen(cast?.month ?? month, cast?.day ?? day, cast?.hour ?? hour)
   const casting = !!cast && step < 3
+  const [tick, setTick] = useState(0)
+  const [reading, setReading] = useState('')
+  const [readingError, setReadingError] = useState('')
+  const [readingBusy, setReadingBusy] = useState(false)
+  const readingId = useRef(0)
+  const counts = [cast?.month ?? month, cast?.day ?? day, (cast?.hour ?? hour) + 1]
+  const starts = [0, result.monthPalaceIndex, result.dayPalaceIndex]
+  const explain = async (entry: Cast) => {
+    const id = ++readingId.current
+    setReading(''); setReadingError(''); setReadingBusy(true)
+    const p = calculateXiaoLiuRen(entry.month, entry.day, entry.hour)
+    try {
+      for await (const token of streamHostedAI([{role:'system',content:'你是传统民俗小六壬解说助手。用中文针对具体问题解释月宫、日宫、时宫及最终象意，给出实际可行的建议。不要编造结果，不保证未来，不作医疗、法律或投资预测。控制在500字以内。'}, {role:'user',content:`所问：${entry.question}\n类别：${entry.category}\n月宫：${XIAO_LIU_REN_PALACES[p.monthPalaceIndex].name}\n日宫：${XIAO_LIU_REN_PALACES[p.dayPalaceIndex].name}\n最终落宫：${p.palace.name}\n传统象意：${p.palace.detail}`}])) { if (id === readingId.current) setReading(v => v + token) }
+    } catch { if (id === readingId.current) setReadingError('AI解说暂时不可用，可重试；上方传统象意仍可参考。') }
+    finally { if (id === readingId.current) setReadingBusy(false) }
+  }
   useEffect(() => {
     if (!cast || step >= 3) return
-    const timer = window.setTimeout(() => setStep(value => value + 1), window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 20 : 650)
+    const timer = window.setTimeout(() => { if (tick + 1 >= counts[step]) { setTick(0); setStep(value => value + 1) } else setTick(value => value + 1) }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 20 : Math.max(100, 1100 / counts[step]))
     return () => window.clearTimeout(timer)
-  }, [cast, step])
-  const highlighted = step === 0 ? 0 : step === 1 ? result.monthPalaceIndex : step === 2 ? result.dayPalaceIndex : result.resultIndex
+  }, [cast, step, tick, counts[0], counts[1], counts[2]])
+  const highlighted = step < 3 ? (starts[step] + tick) % 6 : result.resultIndex
   const monthName = XIAO_LIU_REN_PALACES[result.monthPalaceIndex].name
   const dayName = XIAO_LIU_REN_PALACES[result.dayPalaceIndex].name
 
@@ -67,7 +84,7 @@ export function XiaoLiuRen() {
         <div className="xiaoliuren-tags"><span>大安</span><i /> <span>留连</span><i /> <span>速喜</span><i /> <span>赤口</span><i /> <span>小吉</span><i /> <span>空亡</span></div>
       </section>
 
-      <form className="xiaoliuren-input-card" onSubmit={event => { event.preventDefault(); if (!question.trim() || casting) return; setStep(0); const entry = {month, day, hour, question: question.trim(), category, timestamp: new Date().toISOString()}; setCast(entry); setHistory(items => [entry, ...items].slice(0,20)) }}>
+      <form className="xiaoliuren-input-card" onSubmit={event => { event.preventDefault(); if (!question.trim() || casting) return; setStep(0); setTick(0); const entry = {month, day, hour, question: question.trim(), category, timestamp: new Date().toISOString()}; setCast(entry); void explain(entry); setHistory(items => [entry, ...items].slice(0,20)) }}>
         <div className="xiaoliuren-card-heading"><div><small>01 / CAST YOUR READING</small><h3>起课资料</h3></div><span>手动输入农历</span></div>
         <label className="mb-4 block text-sm font-semibold">您想了解什么？<textarea required maxLength={300} rows={3} value={question} disabled={casting} onChange={event => setQuestion(event.target.value)} placeholder="例如：近期工作安排应注意什么？" className="mt-2 block w-full rounded-xl border border-neutral-300 bg-white p-3 text-sm font-normal" /></label>
         <div className="mb-4 flex flex-wrap gap-2">{categories.map(item => <button key={item} type="button" disabled={casting} aria-pressed={category === item} onClick={() => setCategory(item)} className={category === item ? 'rounded-full bg-neutral-900 px-3 py-1 text-sm text-white' : 'rounded-full border border-neutral-300 px-3 py-1 text-sm'}>{item}</button>)}</div>
@@ -97,10 +114,11 @@ export function XiaoLiuRen() {
       {cast && <section className="xiaoliuren-result-card" aria-live="polite">
         <div className="xiaoliuren-card-heading"><div><small>02 / THE RESULT</small><h3>本课落宫</h3></div><span>常见六宫掌诀法</span></div>
         <p className="mb-4 break-words text-sm text-neutral-600">所问事项：{cast.question}</p>
-        {casting ? <div role="status" className="rounded-xl bg-neutral-50 p-6 text-center"><div className="mx-auto mb-3 h-10 w-10 rounded-full border-2 border-neutral-200 border-t-amber-700 motion-safe:animate-spin" /><p>{["正月起大安 · 正在数月","月宫起初一 · 正在数日","日宫起子时 · 正在数时"][step]}</p></div> : <div className="xiaoliuren-result-main">
+        {casting ? <div role="status" className="rounded-xl bg-neutral-50 p-6 text-center"><div className="mx-auto mb-3 h-10 w-10 rounded-full border-2 border-neutral-200 border-t-amber-700 motion-safe:animate-spin" /><p>{["正月起大安 · 正在数月","月宫起初一 · 正在数日","日宫起子时 · 正在数时"][step]} · {tick + 1}/{counts[step]}</p><div className="mt-4 grid grid-cols-3 gap-2">{XIAO_LIU_REN_PALACES.map((p,i)=><div key={p.name} className={i===highlighted ? "rounded-xl border-2 border-amber-600 bg-amber-100 p-4 font-bold text-amber-900 transition-all" : "rounded-xl border border-neutral-200 bg-white p-4 text-neutral-500"}>{p.name}</div>)}</div></div> : <div className="xiaoliuren-result-main">
           <div className="xiaoliuren-seal"><span>{result.palace.nature === '吉' ? '吉' : result.palace.nature === '平' ? '平' : '慎'}</span><strong>{result.palace.name}</strong><small>{result.palace.element} · {result.palace.direction}</small></div>
           <div className="xiaoliuren-reading"><span className={'xiaoliuren-nature nature-' + result.palace.nature}>{result.palace.nature}象</span><h4>{result.palace.summary}</h4><p>{result.palace.detail}</p><p className="mt-3 text-sm">{cast.category}事项建议：{guidance[cast.category]} 以上仅为传统象意与一般行动建议，不是确定预测。</p></div>
         </div>}
+        {!casting && <div className="mt-5 rounded-xl border border-neutral-200 p-4"><h4 className="mb-2 font-semibold">AI问事解说</h4><p className="whitespace-pre-wrap break-words text-sm leading-relaxed">{reading || (readingBusy ? "正在结合本课与您的问题解说…" : readingError ? "" : "暂无解说")}</p>{readingError && <p role="alert">{readingError}</p>}{!readingBusy && <button type="button" className="mt-3 text-sm underline" onClick={()=>void explain(cast)}>重新生成解说</button>}</div>}
         <div className="xiaoliuren-steps">
           <div><small>起月</small><strong>{cast.month}月 → {step >= 1 ? monthName : "待定"}</strong><span>正月起大安，逐月顺数</span></div>
           <div><small>数日</small><strong>{cast.day}日 → {step >= 2 ? dayName : "待定"}</strong><span>从月宫起初一，逐日顺数</span></div>
@@ -116,7 +134,7 @@ export function XiaoLiuRen() {
           </article>)}
         </div>
       </section>
-      {history.length > 0 && <section className="xiaoliuren-input-card"><div className="flex items-center justify-between"><h3 className="font-semibold">本次会话起课记录</h3><button type="button" onClick={() => setHistory([])} className="text-sm underline">清空记录</button></div>{history.map((item,index) => <button key={item.timestamp + index} type="button" disabled={casting} onClick={() => {setCast(item);setStep(3)}} className="mt-2 block w-full rounded-lg border border-neutral-200 p-3 text-left"><strong>{item.category} · {calculateXiaoLiuRen(item.month,item.day,item.hour).palace.name}</strong><p className="break-words text-sm">{item.question}</p><small>{new Date(item.timestamp).toLocaleString()}</small></button>)}</section>}
+      {history.length > 0 && <section className="xiaoliuren-input-card"><div className="flex items-center justify-between"><h3 className="font-semibold">本次会话起课记录</h3><button type="button" onClick={() => setHistory([])} className="text-sm underline">清空记录</button></div>{history.map((item,index) => <button key={item.timestamp + index} type="button" disabled={casting} onClick={() => {setCast(item);setStep(3);void explain(item)}} className="mt-2 block w-full rounded-lg border border-neutral-200 p-3 text-left"><strong>{item.category} · {calculateXiaoLiuRen(item.month,item.day,item.hour).palace.name}</strong><p className="break-words text-sm">{item.question}</p><small>{new Date(item.timestamp).toLocaleString()}</small></button>)}</section>}
       <p className="xiaoliuren-disclaimer">说明：小六壬属于传统民俗术数的象意参考，不是经科学验证的预测工具。此处采用常见“正月起大安、月日起日宫、时辰起课”的掌诀法；各地与师承在起课、闰月及子时换日等细节上可能有差异。请勿将结果作为医疗、法律、投资或其他重大决策的唯一依据。</p>
     </div>
   )
