@@ -57,8 +57,26 @@ const SYSTEM_PROMPT = `# Role
 ## 健康
 - 只作传统术数文化角度的生活习惯提醒，不推断疾病、器官病变或替代医疗诊断；指出盘面依据与一般性保养建议。
 
-## 六亲与人际
-- 分析父母、兄弟、子女、交友、迁移等有数据支持的宫位；分别说明关系互动和人际边界，不把推测说成事实。
+## 兄弟合伙
+- 依据兄弟宫及相关三方四正，分析同辈手足互动、合作方式、利益分配与合伙边界；资料不足时说明无法判断。
+
+## 子女
+- 依据子女宫分析传统术数中的子女缘分、教养互动与晚辈缘分；不得据此推断生育能力、子女性别或具体数量。
+
+## 迁移外出
+- 依据迁移宫及命宫对照，分析外地发展、环境适应、出行处事风格与外部机会；不虚构具体事件。
+
+## 人际贵人
+- 依据交友宫、迁移宫及相关四化，分析交友圈层、合作对象、贵人助力与人际界限；不轻率断言小人。
+
+## 田宅
+- 依据田宅宫分析居住环境、家庭资产观念与安定需求；不预测具体房产数量或必然置业年份。
+
+## 福德
+- 依据福德宫分析内在需求、精神满足、休息方式、压力调节与享受生活的倾向。
+
+## 父母长辈
+- 依据父母宫及相关宫位分析长辈互动、沟通方式与可获得的支持；避免将传统象意当成真实家庭事实。
 
 ## 运势建议
 - 仅当本次输入包含真实的大限/流年/流月盘资料时才分析对应运限；否则明确说明当前只解读本命盘，不虚构年份或事件。
@@ -78,7 +96,13 @@ const REPORT_TABS = [
   { id: '感情', label: '感情' },
   { id: '性格', label: '性格' },
   { id: '健康', label: '健康' },
-  { id: '六亲与人际', label: '六亲人际' },
+  { id: '兄弟合伙', label: '兄弟合伙' },
+  { id: '子女', label: '子女' },
+  { id: '迁移外出', label: '迁移外出' },
+  { id: '人际贵人', label: '人际贵人' },
+  { id: '田宅', label: '田宅' },
+  { id: '福德', label: '福德' },
+  { id: '父母长辈', label: '父母长辈' },
   { id: '运势建议', label: '运势建议' },
   { id: '命格金句', label: '命格金句' },
 ] as const
@@ -319,10 +343,10 @@ ${guidanceContext}
         </div>
 
         {displayText && (
-          <nav className="flex gap-1.5 overflow-x-auto pb-3 mb-5 border-b border-[#eeeae2]" aria-label="命盘分析主题">
+          <nav className="flex flex-wrap gap-1.5 rounded-xl bg-[#f2f2f2] p-2 mb-5" aria-label="命盘分析主题">
             {REPORT_TABS.map((tab) => (
               <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)}
-                className={`shrink-0 rounded-lg px-3 py-2 text-sm transition-colors ${activeTab === tab.id ? 'bg-[#f5f0e7] text-[#765d37] font-semibold border border-[#e5d8c1]' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'} ${tab.id === '命主优点' ? 'font-semibold' : ''}`}>
+                className={`shrink-0 rounded-lg px-3 py-2 text-sm transition-colors ${activeTab === tab.id ? 'bg-white text-[#765d37] font-semibold shadow-sm border border-[#e8e2d7]' : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'} ${tab.id === '命主优点' ? 'font-semibold' : ''}`}>
                 {tab.label}
               </button>
             ))}
