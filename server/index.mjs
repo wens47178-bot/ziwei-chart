@@ -30,10 +30,11 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end() }
 
-  if (req.method === 'GET' && req.url === '/health') {
+  const pathname = new URL(req.url || '/', 'http://localhost').pathname.replace(/\\/$/, '') || '/'
+  if (req.method === 'GET' && pathname === '/health') {
     return sendJson(res, 200, { ok: true, configured: Boolean(GEMINI_API_KEY) })
   }
-  if (req.method !== 'POST' || req.url !== '/api/interpret') {
+  if (req.method !== 'POST' || pathname !== '/api/interpret') {
     return sendJson(res, 404, { error: 'Not found' })
   }
   if (!GEMINI_API_KEY) {
