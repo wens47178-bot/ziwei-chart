@@ -230,6 +230,7 @@ export function AIInterpretation() {
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current)
+        timerRef.current = null
       }
     }
   }, [])
@@ -239,7 +240,7 @@ export function AIInterpretation() {
      ------------------------------------------------------------ */
 
   const handleInterpret = useCallback(async () => {
-    if (!chart || !birthInfo) return
+    if (!chart || !birthInfo || loadingRef.current) return
     // 重置状态
     loadingRef.current = true
     setLoading(true)
@@ -323,10 +324,10 @@ ${guidanceContext}
 
   /* 排盘后自动生成报告；已有缓存则直接展示，避免重复消耗模型额度。 */
   useEffect(() => {
-    if (chart && !aiInterpretation && !loadingRef.current) {
+    if (chart && !aiInterpretation && !loadingRef.current && !error) {
       void handleInterpret()
     }
-  }, [chart, aiInterpretation, handleInterpret])
+  }, [chart, aiInterpretation, handleInterpret, error])
 
   const printReport = () => {
     const target = window.open('', '_blank')
