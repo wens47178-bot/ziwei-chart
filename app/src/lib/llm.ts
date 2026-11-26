@@ -641,3 +641,58 @@ export async function chat(
 
   return fullText
 }
+
+/* ------------------------------------------------------------
+   天衍平台托管 AI：用户无需自行申请或填写模型 API Key
+   密钥只保存在服务端环境变量，不下发到浏览器。
+   ------------------------------------------------------------ */
+const HOSTED_AI_ENDPOINT = 'https://tianyan-ai-api.onrender.com/api/interpret'
+
+export async function* streamHostedAI(messages: ChatMessage[]): AsyncGenerator<string> {
+  const response = await fetch(HOSTED_AI_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages }),
+  })
+
+  if (!response.ok) {
+    let message = `平台 AI 服务请求失败（${response.status}）`
+    try {
+      const data = await response.json()
+      if (typeof data.error === 'string') message = data.error
+    } catch { /* keep fallback message */ }
+    throw new Error(message)
+  }
+
+  const reader = response.body?.getReader()
+  if (!reader) throw new Error('平台 AI 服务没有返回内容')
+  const decoder = new TextDecoder()
+  let buffer = ''
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    buffer += decoder.decode(value, { stream: true })
+    const events = buffer.split(/\\r?\\n\\r?\\n/)
+    buffer = events.pop() || ''
+    for (const event of events) {
+      const data = event.split(/\\r?\\n/).find((line) => line.startsWith('data:'))?.slice(5).trim()
+      if (!data || data === '[DONE]') continue
+      try {
+        const payload = JSON.parse(data) as { text?: string }
+        if (payload.text) yield payload.text
+      } catch { /* ignore malformed event */ }
+    }
+  }
+
+  buffer += decoder.decode()
+  if (buffer.trim()) {
+    const data = buffer.split(/\\r?\\n/).find((line) => line.startsWith('data:'))?.slice(5).trim()
+    if (data && data !== '[DONE]') {
+      try {
+        const payload = JSON.parse(data) as { text?: string }
+        if (payload.text) yield payload.text
+      } catch { /* ignore incomplete final event */ }
+    }
+  }
+}
