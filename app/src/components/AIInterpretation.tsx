@@ -136,7 +136,7 @@ function getReportSection(markdown: string, sectionId: string): string {
    字符输出速度（毫秒/字符）
    ------------------------------------------------------------ */
 
-const CHAR_INTERVAL = 35
+const CHAR_INTERVAL = 16
 
 /* ------------------------------------------------------------
    Markdown 自定义样式组件
@@ -212,7 +212,7 @@ export function AIInterpretation() {
     setAnimating(true)
     timerRef.current = setInterval(() => {
       if (displayIndexRef.current < fullTextRef.current.length) {
-        displayIndexRef.current++
+        displayIndexRef.current = Math.min(fullTextRef.current.length, displayIndexRef.current + 5)
         setDisplayText(fullTextRef.current.slice(0, displayIndexRef.current))
       } else if (!loadingRef.current) {
         // 输出完成且不再加载
