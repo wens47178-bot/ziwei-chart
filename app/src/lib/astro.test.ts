@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generateChart, getShichenOptions, getSolarDateFromLunar, hourToShichen } from './astro'
+import { generateChart, getShichenOptions, getSolarDateFromLunar, getLunarMonthLength, hourToShichen } from './astro'
 
 describe('iztro chart engine integration', () => {
   it('generates a twelve-palace chart with the current supported engine', () => {
@@ -31,6 +31,11 @@ describe('iztro chart engine integration', () => {
     expect(lunar.chineseDate).toBe(solar.chineseDate)
     expect(lunar.fiveElementsClass).toBe(solar.fiveElementsClass)
     expect(lunar.palaces.map((palace) => palace.name)).toEqual(solar.palaces.map((palace) => palace.name))
+  })
+
+  it('uses the correct number of days for regular and leap lunar months', () => {
+    expect(getLunarMonthLength(2023, 2, false)).toBe(30)
+    expect(getLunarMonthLength(2023, 2, true)).toBe(29)
   })
 
   it('converts lunar input to the corresponding Gregorian date for true-solar correction', () => {
