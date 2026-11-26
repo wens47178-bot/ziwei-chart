@@ -146,7 +146,7 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
     correctionMinutes: Math.round(correctionMinutes),
     longitudeCorrectionMinutes: Math.round(longitudeCorrectionMinutes),
     equationOfTimeMinutes: Math.round(equationOfTimeMinutes),
-    timeZone: localClock ? (location.timeZone ?? CHINA_TIME_ZONE) : null,
+    timeZone: localClock && location ? (location.timeZone ?? CHINA_TIME_ZONE) : null,
     utcOffsetMinutes: localClock ? Math.round(localClock.offsetMinutes) : null,
     dstAdjustmentMinutes: Math.round(dstAdjustmentMinutes),
     ambiguousLocalTime: localClock?.ambiguous ?? false,
