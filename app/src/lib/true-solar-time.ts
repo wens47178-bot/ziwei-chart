@@ -316,6 +316,8 @@ function scoreBirthplaceMatch(input: string, place: Birthplace): number {
   const fullTokens = [
     joinPlace(place.province, place.city, place.area),
     joinPlace(place.province, place.city),
+    joinPlace(place.city, place.province, place.country),
+    joinPlace(place.province, place.city, place.country),
     joinPlace(place.city, place.area),
     joinPlace(place.city, place.country),
     joinPlace(place.country, place.city),
@@ -347,6 +349,8 @@ function getPlaceTokens(place: Birthplace): string[] {
     joinPlace(place.province, place.city),
     joinPlace(place.city, place.area),
     joinPlace(place.province, place.city, place.area),
+    joinPlace(place.city, place.province, place.country),
+    joinPlace(place.province, place.city, place.country),
     joinPlace(place.city, place.country),
     joinPlace(place.country, place.city),
   ]
