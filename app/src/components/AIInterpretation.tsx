@@ -32,32 +32,39 @@ const SYSTEM_PROMPT = `# Role
 7. **平衡与谨慎**：优势与挑战并列，避免恐吓、宿命论和夸大准确度。健康只作传统文化角度的非医疗提醒，不推断疾病或器官病变。
 
 # Output Format
-请按照以下结构输出分析报告：
+请严格按以下结构输出。第一部分“命主优点”必须独立成节并放在报告最前面，不能混在缺点或总评里：
 
-## 紫微命盘综合批注
+## 一、命主优点｜值得发挥的长处
+- 单独列出 5–8 项有盘面依据的优势，每项包括：**优势特点**、**盘面依据**（具体宫位、星曜、亮度、四化或三方四正）、**现实中的表现**、**如何发挥**。
+- 只写当前命盘确实支持的优点；证据不足就不凑数，不用“聪明、善良、有贵人”等套话。
+- 明确这些是传统紫微斗数的倾向性解读，不是人格或未来的定论。
 
+## 二、需要留意的地方｜可改善的课题
+- 列出 3–5 项有依据的挑战，每项写明盘面依据、可能表现和可执行的调整方法；避免恐吓和宿命论。
+
+## 三、命格总览
 ### 壹· 命格总断
 * **先看结论**：用3-5句通俗语言说明命盘主要特点、最突出的优势与最需要留意的课题。
 * **格局层次**：依据命宫三方四正的实际星曜组合说明结构特点；不得简单给命格贴“高/低”标签，必须解释判断依据。
 * **性情剖析**：结合命宫与福德宫，分析命主显露在外的处世风格，以及内心的真实欲求与精神境界。
 
-### 贰· 事业与财运
+### 肆· 事业与财运
 * **官禄方向**：依据官禄宫星情与五行属性，指出命主最适合发展的行业性质（如：宜公职、宜经商、或宜技艺求财）。
 * **财运机缘**：分析财帛宫强弱。是正财稳健，还是偏财灵动？一生财源主要来自何方？有无漏财之虞？
 
-### 叁· 婚姻与情感
+### 伍· 婚姻与情感
 * **姻缘概况**：分析夫妻宫星曜，描述配偶可能的性格特征或相处模式。
 * **相处之道**：指出感情中可能存在的隐患（如：沟通不畅、聚少离多），并给出化解建议。
 
-### 肆· 六亲与人际
+### 陆· 六亲与人际
 * **人际关系**：分析迁移宫及交友宫，判断在外是否有贵人扶持，或是易犯小人口舌。
 * **家庭关系**：简述与父母、子女的缘分深浅。
 
-### 伍· 运势隐忧与建议
+### 柒· 运势隐忧与建议
 * **健康提醒**：依据疾厄宫，指出先天体质上较弱的环节，提示需注意的身体部位。
 * **趋吉避凶**：综合全盘化忌与煞星的实际落点，说明最值得留意的行为模式，并给出日常可执行的改善建议；没有运限数据时不得指定应验年份或月份。
 
-### 陆· 命格金句
+### 捌· 命格金句
 > 请用2-4句话，以诗意且戳心的方式概括命主的核心性格特质。要求：
 > - 语言凝练，朗朗上口，适合分享
 > - 风格可以是：自嘲式幽默、温柔共情、或霸气宣言
@@ -82,7 +89,9 @@ const MarkdownComponents = {
     <h1 className="text-2xl font-bold text-amber-700 mt-6 mb-3 first:mt-0">{children}</h1>
   ),
   h2: ({ children }: { children?: React.ReactNode }) => (
-    <h2 className="text-xl font-semibold text-amber-800 mt-5 mb-2">{children}</h2>
+    <h2 className={String(children).includes('命主优点')
+      ? 'text-xl font-semibold text-[#5f5037] mt-5 mb-3 rounded-xl border border-[#e9dfcc] bg-[#faf7f0] px-4 py-3'
+      : 'text-xl font-semibold text-amber-800 mt-5 mb-2'}>{children}</h2>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
     <h3 className="text-lg font-medium text-[#8a7653] mt-4 mb-2">{children}</h3>
@@ -203,19 +212,29 @@ export function AIInterpretation() {
         limit: 12,
       })
 
-      // 构建用户消息
-      const userMessage = `请解读以下命盘：
+      // 区分用户输入历法与排盘引擎采用的公历日期
+      const inputCalendar = birthInfo.dateType === 'lunar' ? '农历' : '阳历'
+      const inputDate = `${birthInfo.year}年${birthInfo.month}月${birthInfo.day}日${birthInfo.dateType === 'lunar' && birthInfo.isLeapMonth ? '（闰月）' : ''}`
+      const solarDate = chart.solarDate || '引擎未返回'
+      const resolved = birthInfo.resolvedBirthTime
+      const userMessage = `请严格依据以下真实命盘资料撰写完整报告。请先单独列出命主优点，再分析需要留意的地方。不得编造星曜、宫位、四化、格局或运限数据。
 
-## 基本信息
-- 阳历：${birthInfo.year}年${birthInfo.month}月${birthInfo.day}日
+## 出生资料
+- 输入历法：${inputCalendar}
+- 输入日期：${inputDate}
+- 对应阳历日期：${solarDate}
+- 出生时间：${String(birthInfo.hour).padStart(2, '0')}:${String(birthInfo.minute ?? 0).padStart(2, '0')}
 - 性别：${birthInfo.gender === 'male' ? '男' : '女'}
+- 出生地：${birthInfo.birthplace || '未提供'}
+- 真太阳时：${birthInfo.trueSolarEnabled ? (resolved?.applied ? `已应用，校正后时间 ${String(resolved.hour).padStart(2, '0')}:${String(resolved.minute).padStart(2, '0')}，修正 ${resolved.correctionMinutes} 分钟，时区 ${resolved.timeZone || '未识别'}` : '已开启但未取得可确认的地点校正资料') : '未启用'}
 - 五行局：${chart.fiveElementsClass}
 
+## 命盘资料
 ${contextStr}
 
 ${guidanceContext}
 
-请给出详细但通俗易懂的命盘解读。`
+请按系统规定的章节结构输出。每项优点必须引用实际宫位、星曜或四化依据，并说明现实表现和发挥方法。使用普通人能理解的中文，不要只堆砌术语。`
 
       const messages: ChatMessage[] = [
         { role: 'system', content: SYSTEM_PROMPT },
@@ -250,6 +269,13 @@ ${guidanceContext}
     }
   }, [chart, birthInfo, provider, currentSettings, enableThinking, enableWebSearch, searchApiKey, startAnimation, setAiInterpretation])
 
+  /* 排盘后自动生成报告；已有缓存则直接展示，避免重复消耗模型额度。 */
+  useEffect(() => {
+    if (chart && currentSettings.apiKey && !aiInterpretation && !loadingRef.current) {
+      void handleInterpret()
+    }
+  }, [chart, currentSettings.apiKey, aiInterpretation, handleInterpret])
+
   if (!chart) return null
 
   return (
@@ -278,7 +304,7 @@ ${guidanceContext}
           "
           style={{ fontFamily: 'var(--font-serif)' }}
         >
-          AI 命盘解读
+          命盘解读报告
         </h2>
         <Button
           onClick={handleInterpret}
@@ -306,11 +332,11 @@ ${guidanceContext}
       {!currentSettings.apiKey && !displayText && (
         <div className="text-slate-500 text-sm py-8 text-center">
           <div className="text-3xl mb-3 opacity-30">☆</div>
-          默认推荐 Gemini 2.5 Flash-Lite 免费模型。首次使用请先 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-[#9a8056] underline underline-offset-4">免费获取 Google AI Studio API Key</a>，再到右上角「设置」中选择 Gemini 并填写。免费额度有限，达到上限后可稍后重试；排盘和其他本地分析功能不受影响。
+          排盘后会自动生成这份报告。首次使用请先 <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-[#9a8056] underline underline-offset-4">免费获取 Google AI Studio API Key</a>，再到右上角「设置」中选择 Gemini 并填写。免费额度有限，达到上限后可稍后重试；排盘和其他本地分析功能不受影响。
         </div>
       )}
 
-      {/* 解读内容 - 书法字体 + Markdown 渲染 */}
+      {/* 解读内容 - 分节报告 + Markdown 渲染 */}
       {displayText && (
         <div
           className="

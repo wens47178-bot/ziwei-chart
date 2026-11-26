@@ -49,7 +49,7 @@ export default function App() {
 
   const renderWorkspace = (): ReactNode => {
     if (activePage === 'birth') return <BirthForm onSuccess={() => setActivePage('chart')} />
-    if (activePage === 'chart') return chart ? <ChartDisplay /> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'chart') return chart ? <div className="space-y-6"><ChartDisplay /><AIInterpretation /></div> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'palaces' || activePage === 'sihua' || activePage === 'decadal' || activePage === 'stars' || activePage === 'patterns' || activePage === 'trines') return chart ? <AdvancedAnalysis mode={activePage as AdvancedMode} /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'fortune') return chart ? <YearlyFortune /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'lunar') return chart ? <LunarMonthlyKLine chart={chart} /> : <PageEmpty onClick={() => setActivePage('birth')} />
