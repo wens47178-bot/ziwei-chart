@@ -22,12 +22,14 @@ const GENDER_OPTIONS = [
 export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
   const { setBirthInfo, setChart } = useChartStore()
 
+  const [name, setName] = useState('')
+  const [approximateTime, setApproximateTime] = useState(false)
   const [dateType, setDateType] = useState<'solar' | 'lunar'>('solar')
   const [isLeapMonth, setIsLeapMonth] = useState(false)
   const [year, setYear] = useState(1990)
   const [month, setMonth] = useState(1)
   const [day, setDay] = useState(1)
-  const [hour, setHour] = useState(12)
+  const [hour, setHour] = useState(8)
   const [minute, setMinute] = useState(0)
   const [gender, setGender] = useState<Gender>('male')
   const [birthplace, setBirthplace] = useState('')
@@ -114,6 +116,8 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
         enabled: trueSolarEnabled,
       }) : undefined
       const birthInfo: BirthInfo = {
+        name: name.trim() || undefined,
+        approximateTime,
         year,
         month,
         day: safeDay,
@@ -153,28 +157,18 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
         bg-transparent border-0 rounded-none shadow-none
       "
     >
-      {/* 标题区域 */}
-      <div className="text-left mb-8">
-        <h2
-          className="
-            text-2xl font-semibold mb-2 text-[#25231f]
-          "
-          style={{ fontFamily: 'var(--font-serif)' }}
-        >
-          输入您的出生信息
-        </h2>
-        <p className="text-sm text-text-muted">
-          精准排盘，探索命运轨迹
-        </p>
+      <div className="mb-6 text-center">
+        <h2 className="text-xl tracking-[.25em] text-[#92794d]">—— 输入生辰八字 ——</h2>
+        <div className="mt-5 grid grid-cols-4 gap-1.5" aria-hidden="true">{[0,1,2,3].map(i => <span key={i} className="h-1 rounded bg-[#e9e5dc]" />)}</div>
       </div>
-
-      <div className="space-y-6">
+      <div className="space-y-5">
+        <Input label="姓名（可选）" placeholder="请输入姓名" value={name} onChange={e => setName(e.target.value)} maxLength={60} />
         {/* 出生日期区块 */}
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-sm text-[#716b5e] font-medium">出生日期</span>
+            <span className="text-sm text-[#716b5e] font-medium">出生日期（{dateType === 'solar' ? '公历' : '农历'}）</span>
             <div className="flex rounded-xl border border-[#e4dfd5] bg-[#f7f5f1] p-1">
-              {(['solar', 'lunar'] as const).map((type) => <button key={type} type="button" onClick={() => { setDateType(type); setIsLeapMonth(false); setDay(1) }} className={`rounded-lg px-4 py-2 text-sm transition ${dateType === type ? 'bg-[#28251f] text-white shadow-sm' : 'text-[#766b56] hover:bg-white'}`}>{type === 'solar' ? '阳历' : '农历'}</button>)}
+              {(['solar', 'lunar'] as const).map((type) => <button key={type} type="button" onClick={() => { setDateType(type); setIsLeapMonth(false); setDay(1) }} className={`rounded-lg px-4 py-2 text-sm transition ${dateType === type ? 'bg-white text-neutral-900 shadow-sm' : 'text-[#766b56] hover:bg-white'}`}>{type === 'solar' ? '公历' : '农历'}</button>)}
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
@@ -203,22 +197,24 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
 
         {/* 精确出生时间 */}
         <div className="space-y-2">
-          <span className="text-sm text-text-secondary font-medium">出生时间（尽量填写准确时分）</span>
-          <div className="grid grid-cols-2 gap-3">
+          <span className="text-sm text-text-secondary font-medium">出生时间（当地钟表时间）</span>
+          <div className="rounded-2xl border border-[#dedbd5] bg-[#f8f7f4] p-3"><div className="grid grid-cols-2 gap-3">
             <Select
-              label="小时"
+              disabled={approximateTime}
               options={HOUR_OPTIONS}
               value={hour}
               onChange={(e) => setHour(Number(e.target.value))}
             />
             <Select
-              label="分钟"
+              disabled={approximateTime}
               options={MINUTE_OPTIONS}
               value={minute}
               onChange={(e) => setMinute(Number(e.target.value))}
             />
           </div>
-          <p className="text-xs text-text-muted">系统会按具体出生时分判断时辰；23:00–23:59 为晚子时，00:00–00:59 为早子时。</p>
+          <div className="mt-4 flex items-center gap-4"><span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#d9bc80] text-2xl font-semibold text-[#92794d]">{'子丑寅卯辰巳午未申酉戌亥'[Math.floor((hour+1)/2)%12]}</span><span className="text-sm text-[#716b5e]">钟表时间 → <strong>{String(hour).padStart(2,'0')}:{String(minute).padStart(2,'0')} · {'子丑寅卯辰巳午未申酉戌亥'[Math.floor((hour+1)/2)%12]}时</strong></span></div></div>
+          <label className="flex items-center gap-2 text-sm text-[#716b5e]"><input type="checkbox" checked={approximateTime} onChange={e => {setApproximateTime(e.target.checked); if(e.target.checked){setHour(0);setMinute(0)}}} />不知道出生时间，以子时（00:00）暂起盘</label>
+          {approximateTime && <p className="text-xs text-amber-800">出生时辰未知，排盘结果仅供参考。</p>}
         </div>
 
         {/* 性别选择 - 胶囊按钮组 */}
