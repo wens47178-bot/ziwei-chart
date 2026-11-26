@@ -7,6 +7,9 @@ import { extractKnowledge, getStarInfo, getAllStars } from '@/knowledge'
 export type AdvancedMode = 'palaces' | 'sihua' | 'decadal' | 'stars' | 'patterns' | 'trines'
 
 const MUTAGENS = ['禄', '权', '科', '忌'] as const
+const PALACE_MEANINGS: Record<string,string> = {
+ 命宫:'性格、行为方式与自我定位',兄弟宫:'手足、同辈与协作',夫妻宫:'伴侣期待与沟通',子女宫:'亲子互动与教育观',财帛宫:'资源运用与财富观念',疾厄宫:'传统身心象意，不作医学诊断',迁移宫:'外部环境与社会适应',交友宫:'人脉与合作边界',仆役宫:'人脉与合作边界',官禄宫:'职业兴趣与责任取向',田宅宫:'家庭与居住环境',福德宫:'精神生活与价值观',父母宫:'长辈互动与成长背景'
+}
 const PALACE_ORDER = ['命宫', '兄弟宫', '夫妻宫', '子女宫', '财帛宫', '疾厄宫', '迁移宫', '交友宫', '官禄宫', '田宅宫', '福德宫', '父母宫']
 
 const MODE_META: Record<AdvancedMode, { title: string; subtitle: string }> = {
@@ -87,6 +90,16 @@ export function AdvancedAnalysis({ mode }: { mode: AdvancedMode }) {
             <div><p className="mb-2 text-xs text-[#9a907f]">杂曜</p><div className="flex flex-wrap gap-2">{(selected.adjectiveStars ?? []).map((star, i) => <Pill key={i}>{star.name}</Pill>)}{!selected.adjectiveStars?.length && <span className="text-sm text-[#8c8579]">暂无杂曜记录</span>}</div></div>
             <div><p className="mb-2 text-xs text-[#9a907f]">宫位辅助信息</p><div className="flex flex-wrap gap-2"><Pill>长生：{selected.changsheng12 || '—'}</Pill><Pill>博士：{selected.boshi12 || '—'}</Pill><Pill>宫干：{selected.heavenlyStem || '—'}</Pill></div></div>
           </div>
+          <section className="mt-5 space-y-3 border-t border-stone-200 pt-4">
+            <h4 className="font-semibold">宫位综合解析</h4>
+            <p className="text-sm">{PALACE_MEANINGS[String(selected.name)]}</p>
+            {selected.isBodyPalace && <p className="text-sm">身宫同落此宫，传统上兼看后天实践与行动取向。</p>}
+            {[...(selected.majorStars ?? []),...(selected.minorStars ?? [])].map((star,i)=>{const info=getStarInfo(String(star.name));return <div key={i} className="rounded-lg bg-white p-3 text-sm"><strong>{star.name}{star.mutagen ? ' · 化'+star.mutagen : ''}</strong><p className="mt-1 leading-6">{info?.description ?? '暂无整理释义'}</p></div>})}
+            <h4 className="font-semibold">三方四正</h4>
+            <div className="grid gap-2 sm:grid-cols-2">{trinePalaces.map(({label,palace})=>palace && <button key={label} onClick={()=>setSelectedPalace(String(palace.name))} className="rounded-lg border border-stone-200 bg-white p-3 text-left text-sm"><strong>{label} · {palace.name}</strong><p>{palace.majorStars?.map(star=>star.name).join('、') || '无主星'}</p></button>)}</div>
+            {!selected.majorStars?.length && <p className="text-sm">空宫参考对宫主星，不将借星视为实际坐守。</p>}
+            <p className="text-xs text-stone-500">传统象意须结合全盘，不代表确定预测。</p>
+          </section>
         </div>}
       </>}
 
