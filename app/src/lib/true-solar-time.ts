@@ -52,7 +52,6 @@ export interface ResolvedBirthTime {
   location: Birthplace | null
 }
 
-const BEIJING_STANDARD_LONGITUDE = 120
 const MINUTES_PER_LONGITUDE_DEGREE = 4
 const CHINA_TIME_ZONE = 'Asia/Shanghai'
 
