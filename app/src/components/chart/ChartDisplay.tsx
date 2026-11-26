@@ -312,7 +312,7 @@ function parsePalaces(chart: FunctionalAstrolabe): PalaceData[] {
    主命盘组件
    ------------------------------------------------------------ */
 
-export function ChartDisplay() {
+export function ChartDisplay({ activeLayer }: { activeLayer?: 'origin' | 'decadal' | 'yearly' | 'both' } = {}) {
   const { chart, birthInfo } = useChartStore()
   const [selectedPalace, setSelectedPalace] = useState<string | null>(null)
   const chartRef = useRef<HTMLDivElement>(null)
@@ -340,7 +340,8 @@ export function ChartDisplay() {
   const [showFlying, setShowFlying] = useState(false)
   const flying = useMemo(() => chart ? extractKnowledge(chart).宫干飞化 : [], [chart])
   const [year, setYear] = useState(new Date().getFullYear())
-  const [layer, setLayer] = useState<'origin' | 'decadal' | 'yearly' | 'both'>('origin')
+  const [localLayer, setLayer] = useState<'origin' | 'decadal' | 'yearly' | 'both'>('origin')
+  const layer = activeLayer ?? localLayer
   const horoscope = useMemo(() => {
     if (!chart || layer === 'origin' || !Number.isInteger(year) || year < 1 || year > 9999) return null
     try { return chart.horoscope(createLocalCalendarDate(year, 6, 15)) } catch { return null }
@@ -392,7 +393,7 @@ export function ChartDisplay() {
     <div className="
       relative bg-white max-w-none mx-auto
     ">
-      <details className="mb-1 text-xs"><summary className="cursor-pointer text-neutral-500">盘面设置 · 运限 · 导出</summary><div className="flex flex-wrap items-center gap-2 py-1">{(['origin','decadal','yearly','both'] as const).map((key,i) => <button key={key} type="button" aria-pressed={layer === key} onClick={() => setLayer(key)} className={layer === key ? 'rounded bg-neutral-900 px-2 py-1 text-white' : 'rounded border px-2 py-1'}>{['本命','大限','流年','叠盘'][i]}</button>)}<input aria-label="运限年份" type="number" min={1} max={9999} value={year} onChange={e => setYear(Number(e.target.value))} className="w-20 rounded border px-1 py-1" />{layer !== 'origin' && !horoscope && <span>无法取得运限资料</span>}</div>
+      <details className="mb-1 text-xs"><summary className="cursor-pointer text-neutral-500">盘面设置 · 运限 · 导出</summary><div className="flex flex-wrap items-center gap-2 py-1">{activeLayer === undefined && (['origin','decadal','yearly','both'] as const).map((key,i) => <button key={key} type="button" aria-pressed={layer === key} onClick={() => setLayer(key)} className={layer === key ? 'rounded bg-neutral-900 px-2 py-1 text-white' : 'rounded border px-2 py-1'}>{['本命','大限','流年','叠盘'][i]}</button>)}<input aria-label="运限年份" type="number" min={1} max={9999} value={year} onChange={e => setYear(Number(e.target.value))} className="w-20 rounded border px-1 py-1" />{layer !== 'origin' && !horoscope && <span>无法取得运限资料</span>}</div>
       
 
       <div className="mb-2 flex items-center justify-between gap-2 text-xs text-neutral-600"><span>{selected ? `${selected.name} · 三方四正` : "点击任一宫位查看三方四正"}</span>{selected && <button type="button" onClick={() => setSelectedPalace(null)} className="text-blue-700">取消选择</button>}</div>
