@@ -70,9 +70,9 @@ export function AdvancedAnalysis({ mode }: { mode: AdvancedMode }) {
 
       {mode === 'palaces' && <>
         <div className="mb-5 rounded-xl border border-neutral-200 p-3">
-          <h3 className="text-sm font-semibold">六宫星曜结构雷达</h3>
-          <p className="text-xs text-neutral-500">按实际主星与辅星数量展示结构，不代表吉凶或人生评分。</p>
-          <div className="h-64 w-full min-w-0"><ResponsiveContainer width="100%" height="100%"><RadarChart data={['命宫','财帛宫','官禄宫','夫妻宫','福德宫','迁移宫'].map(name => { const p = palaces.find(item => item.name === name); return { name, 主星: p?.majorStars?.length ?? 0, 辅星: p?.minorStars?.length ?? 0 } })}><PolarGrid /><PolarAngleAxis dataKey="name" tick={{ fontSize: 11 }} /><PolarRadiusAxis allowDecimals={false} /><Radar name="主星" dataKey="主星" stroke="#a52b24" fill="#a52b24" fillOpacity={0.15} /><Radar name="辅星" dataKey="辅星" stroke="#2457a7" fill="#2457a7" fillOpacity={0.12} /><Tooltip /></RadarChart></ResponsiveContainer></div>
+          <h3 className="text-sm font-semibold">十二宫星曜结构雷达</h3>
+          <p className="text-xs text-neutral-500">覆盖十二宫，按实际主星与辅星数量展示结构，不代表吉凶或人生评分。</p>
+          <div className="h-64 w-full min-w-0"><ResponsiveContainer width="100%" height="100%"><RadarChart data={PALACE_ORDER.map(name => { const p = palaces.find(item => item.name === name); return { name, 主星: p?.majorStars?.length ?? 0, 辅星: p?.minorStars?.length ?? 0 } })}><PolarGrid /><PolarAngleAxis dataKey="name" tick={{ fontSize: 11 }} onClick={(entry) => { const name = String(entry.value); if (PALACE_ORDER.includes(name)) setSelectedPalace(name) }} /><PolarRadiusAxis allowDecimals={false} /><Radar name="主星" dataKey="主星" stroke="#a52b24" fill="#a52b24" fillOpacity={0.15} /><Radar name="辅星" dataKey="辅星" stroke="#2457a7" fill="#2457a7" fillOpacity={0.12} /><Tooltip /></RadarChart></ResponsiveContainer></div>
           <p className="text-center text-xs"><span className="text-red-700">主星</span> · <span className="text-blue-700">辅星</span></p>
         </div>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
