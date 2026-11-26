@@ -44,6 +44,16 @@ jobs:
               await page.getByRole('navigation',{name:'命盘功能'}).getByRole('button',{name:label,exact:true}).click();
               await page.getByRole('navigation',{name:'命盘功能'}).waitFor();
             }
+            await page.getByRole('button',{name:'星曜图鉴',exact:true}).first().click();
+            const stars = page.getByRole('button',{name:/^(大耗|恩光|八座|地劫|地空|文昌|左辅)$/});
+            await stars.first().waitFor({timeout:30000});
+            const count = await stars.count();
+            for (let i=0;i<count;i++) {
+              await stars.nth(i).click();
+              await page.getByText('传统紫微斗数象征释义：',{exact:false}).first().waitFor({timeout:10000});
+              if(await page.getByText('知识库暂未收录这颗星曜',{exact:false}).isVisible()) throw Error('Missing star profile');
+            }
+            await page.screenshot({path:'star-atlas.png',fullPage:true});
             await page.setViewportSize({width:390,height:844});
             await page.screenshot({path:'chart-mobile.png',fullPage:true});
             if(errors.length) throw Error(errors.join('\n'));
