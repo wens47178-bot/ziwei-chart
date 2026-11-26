@@ -61,22 +61,47 @@ jobs:
             await page.screenshot({path:'star-atlas.png',fullPage:true});
             await page.setViewportSize({width:390,height:844});
             await page.screenshot({path:'chart-mobile.png',fullPage:true});
-            await page.getByLabel('更多功能').selectOption('chart');
-            await page.getByRole('button',{name:'AI 对话',exact:true}).click();
-            for (const question of ['请简述命宫的传统象意','请补充盘面依据']) {
-              const before = await page.getByText('天衍 AI',{exact:true}).count();
-              await page.getByLabel('命盘追问').fill(question);
-              await page.getByRole('button',{name:'发送',exact:true}).click();
-              await page.waitForFunction(n => [...document.querySelectorAll('strong')].filter(e=>e.textContent==='天衍 AI' && e.parentElement.textContent.trim().length>8).length>n,before,{timeout:180000});
-              await page.getByRole('button',{name:'发送',exact:true}).waitFor({timeout:180000});
+            const failures = [];
+            async function check(name, fn) {
+              try { await fn(); console.log('PASS '+name); }
+              catch(e) { failures.push(name+': '+e.message); console.error('FAIL '+name+': '+e.message); await page.screenshot({path:name+'-failure.png'}).catch(()=>{}); }
             }
-            await page.screenshot({path:'ai-followup.png'});
-            await page.getByLabel('更多功能').selectOption('xiaoliuren');
-            await page.getByPlaceholder('例如：近期工作安排应注意什么？').fill('测试工作安排');
-            await page.getByRole('button',{name:'开始起课',exact:true}).click();
-            await page.getByRole('status').filter({hasText:/起课|推演/}).waitFor({timeout:5000});
-            await page.getByRole('button',{name:'重新起课',exact:true}).waitFor({timeout:10000});
-            await page.screenshot({path:'xiaoliuren.png',fullPage:true});
+            await check('export', async () => {
+              await page.getByLabel('更多功能').selectOption('chart');
+              await page.getByText('盘面设置 · 运限 · 导出',{exact:true}).click();
+              const download = page.waitForEvent('download',{timeout:30000});
+              await page.getByRole('button',{name:'保存命盘图片',exact:true}).click();
+              const file = await download;
+              if(await file.failure()) throw Error('Download failed');
+              console.log('Downloaded '+file.suggestedFilename());
+            });
+            await check('xiaoliuren', async () => {
+              await page.getByLabel('更多功能').selectOption('xiaoliuren');
+              await page.getByPlaceholder('例如：近期工作安排应注意什么？').fill('测试工作安排');
+              await page.getByRole('button',{name:'开始起课',exact:true}).click();
+              await page.getByRole('status').filter({hasText:/正在数/}).waitFor({timeout:5000});
+              await page.getByRole('button',{name:'重新起课',exact:true}).waitFor({timeout:10000});
+              await page.getByText('测试工作安排',{exact:true}).first().waitFor();
+              await page.screenshot({path:'xiaoliuren.png',fullPage:true});
+            });
+            await check('ai', async () => {
+              await page.goto('https://tianyan-ziwei-main.onrender.com/');
+              await page.getByRole('button',{name:'进入起紫微命盘',exact:true}).click();
+              await page.getByRole('button',{name:'开始排盘',exact:true}).click();
+              await page.getByRole('button',{name:'AI 对话',exact:true}).click();
+              page.on('response', r=>{if(r.url().includes('/api/interpret')) console.log('AI HTTP '+r.status());});
+              page.on('requestfailed', r=>{if(r.url().includes('/api/interpret')) console.log('AI network '+r.failure()?.errorText);});
+              for (const question of ['请简述命宫的传统象意','请补充盘面依据']) {
+                const before = await page.getByText('天衍 AI',{exact:true}).count();
+                await page.getByLabel('命盘追问').fill(question);
+                await page.getByRole('button',{name:'发送',exact:true}).click();
+                await page.waitForFunction(n => document.querySelector('[role="alert"]') || [...document.querySelectorAll('strong')].filter(e=>e.textContent==='天衍 AI' && e.parentElement.textContent.trim().length>8).length>n,before,{timeout:180000});
+                if(await page.getByRole('alert').count()) throw Error(await page.getByRole('alert').first().innerText());
+                await page.getByRole('button',{name:'发送',exact:true}).waitFor({timeout:180000});
+              }
+              await page.screenshot({path:'ai-followup.png'});
+            });
+            if(failures.length) throw Error(failures.join('; '));
             if(errors.length) throw Error(errors.join('\n'));
           } finally { await browser.close(); }
           JS
