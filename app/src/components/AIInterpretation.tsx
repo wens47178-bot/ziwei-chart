@@ -328,6 +328,28 @@ ${guidanceContext}
     }
   }, [chart, aiInterpretation, handleInterpret])
 
+  const printReport = () => {
+    const target = window.open('', '_blank')
+    if (!target) { setError('请允许弹出窗口后重试打印'); return }
+    const doc = target.document
+    doc.title = '天衍 · 命盘分析报告'
+    const style = doc.createElement('style')
+    style.textContent = '@page { size: A4; margin: 18mm; } body { font: 14px/1.8 sans-serif; color: #222; max-width: 760px; margin: auto; } h1,h2,h3 { break-after: avoid; } p { white-space: pre-wrap; overflow-wrap: anywhere; }'
+    doc.head.appendChild(style)
+    const title = doc.createElement('h1')
+    title.textContent = '天衍 · 命盘分析报告'
+    doc.body.appendChild(title)
+    for (const line of displayText.split('\n')) {
+      const heading = line.match(/^(#{1,6})\s+(.+)$/)
+      const element = doc.createElement(heading ? (heading[1].length <= 2 ? 'h2' : 'h3') : 'p')
+      element.textContent = (heading ? heading[2] : line).replace(/\*\*/g, '')
+      if (line.trim()) doc.body.appendChild(element)
+    }
+    target.opener = null
+    target.focus()
+    target.print()
+  }
+
   const exportReport = () => {
     const url = URL.createObjectURL(new Blob(['\uFEFF', '# 天衍 · 命盘分析\n\n', displayText], { type: 'text/markdown;charset=utf-8' }))
     const link = document.createElement('a')
@@ -359,7 +381,7 @@ ${guidanceContext}
         </div>
 
         {displayText && !loading && !animating && (
-          <div className="mb-3 flex flex-wrap justify-end gap-2"><button type="button" onClick={exportReport} className="rounded border border-neutral-300 px-3 py-1.5 text-xs">导出完整报告</button></div>
+          <div className="mb-3 flex flex-wrap justify-end gap-2"><button type="button" onClick={exportReport} className="rounded border border-neutral-300 px-3 py-1.5 text-xs">导出完整报告</button><button type="button" onClick={printReport} className="rounded border border-neutral-300 px-3 py-1.5 text-xs">打印 / 保存 PDF</button></div>
         )}
 
         {displayText && (
