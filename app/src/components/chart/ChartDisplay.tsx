@@ -325,12 +325,18 @@ export function ChartDisplay({ activeLayer }: { activeLayer?: 'origin' | 'decada
     try {
       const { default: html2canvas } = await import('html2canvas')
       const node = chartRef.current
-      const canvas = await html2canvas(node, { backgroundColor: '#ffffff', scale: 2, width: node.scrollWidth, height: node.scrollHeight })
+      const canvas = await html2canvas(node, { backgroundColor: '#ffffff', scale: 2, width: node.scrollWidth, height: node.scrollHeight, onclone: (doc) => { const win = doc.defaultView; if (!win) return; doc.querySelectorAll<HTMLElement>('*').forEach(el => { const style = win.getComputedStyle(el); for (const prop of ['color','background-color','border-top-color','border-right-color','border-bottom-color','border-left-color','outline-color']) { const value = style.getPropertyValue(prop); if (/oklch|oklab|color\(/i.test(value)) { const c = doc.createElement('canvas').getContext('2d'); if (c) { c.fillStyle = value; c.fillRect(0,0,1,1); const [red,green,blue,alpha] = c.getImageData(0,0,1,1).data; el.style.setProperty(prop, `rgba(${red},${green},${blue},${alpha/255})`, 'important'); } } } if (/oklch|oklab|color\(/i.test(style.boxShadow)) el.style.boxShadow = 'none'; }); } })
       const link = document.createElement('a')
       link.download = '天衍-紫微命盘.png'
-      link.href = canvas.toDataURL('image/png')
+      const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error('PNG encoding failed')), 'image/png'))
+      const url = URL.createObjectURL(blob)
+      link.href = url
+      document.body.appendChild(link)
       link.click()
-    } catch {
+      link.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 30000)
+    } catch (error) {
+      console.error('Chart export failed', error)
       setExportError('导出失败，请重试')
     } finally { setExporting(false) }
   }
