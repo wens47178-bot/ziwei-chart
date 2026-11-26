@@ -2,6 +2,7 @@ declare const process: { env: Record<string, string | undefined> }
 
 import { describe, expect, it } from 'vitest'
 import birthplaceData from './birthplace-data.json'
+import globalBirthplaceData from './global-birthplace-data.json'
 import {
   type Birthplace,
   findBirthplaceInData,
@@ -23,6 +24,8 @@ const WU_SHICHEN = '午时'
 const SI_SHICHEN = '巳时'
 const ZI_SHICHEN = '子时'
 const BIRTHPLACE_DATA = birthplaceData as Birthplace[]
+const GLOBAL_BIRTHPLACE_DATA = globalBirthplaceData as Birthplace[]
+const ALL_BIRTHPLACE_DATA = [...BIRTHPLACE_DATA, ...GLOBAL_BIRTHPLACE_DATA] as Birthplace[]
 
 describe('birth date and time validation', () => {
   it('rejects an impossible calendar date instead of rolling it into the next month', () => {
@@ -95,6 +98,14 @@ describe('findBirthplace', () => {
     expect(yanAn.location?.longitude).toBeCloseTo(109.5, 1)
   })
 
+  it('matches overseas cities by Chinese, English, and country-qualified names', () => {
+    expect(findBirthplaceInData('金边', GLOBAL_BIRTHPLACE_DATA)?.city).toBe('Phnom Penh')
+    expect(findBirthplaceInData('Phnom Penh, Cambodia', GLOBAL_BIRTHPLACE_DATA)?.timeZone).toBe('Asia/Phnom_Penh')
+    expect(findBirthplaceInData('New York, USA', GLOBAL_BIRTHPLACE_DATA)?.timeZone).toBe('America/New_York')
+    expect(findBirthplaceInData('东京', GLOBAL_BIRTHPLACE_DATA)?.timeZone).toBe('Asia/Tokyo')
+    expect(findBirthplaceInData('United States', GLOBAL_BIRTHPLACE_DATA)).toBeNull()
+  })
+
   it('returns null when the birthplace cannot be matched', () => {
     expect(findBirthplaceInData(MARS_BASE, BIRTHPLACE_DATA)).toBeNull()
   })
@@ -164,9 +175,91 @@ describe('resolveBirthTime', () => {
     expect(result.utcOffsetMinutes).toBe(540)
     expect(result.dstAdjustmentMinutes).toBe(60)
     expect(result.correctionMinutes).toBe(
-      result.longitudeCorrectionMinutes + result.equationOfTimeMinutes - 60,
+      result.longitudeCorrectionMinutes + result.equationOfTimeMinutes,
     )
     expect(result.hour).toBe(10)
+  })
+
+  it('uses the actual New York timezone offset and daylight-saving rule', () => {
+    const result = resolveBirthTime({
+      year: 2024,
+      month: 7,
+      day: 1,
+      hour: 12,
+      minute: 0,
+      birthplace: 'New York, USA',
+      enabled: true,
+      birthplaces: ALL_BIRTHPLACE_DATA,
+    })
+
+    expect(result.applied).toBe(true)
+    expect(result.timeZone).toBe('America/New_York')
+    expect(result.utcOffsetMinutes).toBe(-240)
+    expect(result.dstAdjustmentMinutes).toBe(60)
+    expect(result.correctionMinutes).toBe(
+      result.longitudeCorrectionMinutes + result.equationOfTimeMinutes,
+    )
+    expect(result.hour).toBe(11)
+  })
+
+  it('rejects nonexistent overseas wall times during a daylight-saving spring-forward', () => {
+    expect(() => resolveBirthTime({
+      year: 2024,
+      month: 3,
+      day: 10,
+      hour: 2,
+      minute: 30,
+      birthplace: 'New York, USA',
+      enabled: true,
+      birthplaces: ALL_BIRTHPLACE_DATA,
+    })).toThrow(/does not exist/)
+  })
+
+  it('flags repeated overseas wall times during a daylight-saving fall-back', () => {
+    const result = resolveBirthTime({
+      year: 2024,
+      month: 11,
+      day: 3,
+      hour: 1,
+      minute: 30,
+      birthplace: 'New York, USA',
+      enabled: true,
+      birthplaces: ALL_BIRTHPLACE_DATA,
+    })
+
+    expect(result.ambiguousLocalTime).toBe(true)
+    expect(result.utcOffsetMinutes).toBe(-240)
+  })
+
+  it('resolves fractional-hour timezones such as Nepal UTC+05:45', () => {
+    const result = resolveBirthTime({
+      year: 2024,
+      month: 1,
+      day: 15,
+      hour: 12,
+      birthplace: 'Kathmandu, Nepal',
+      enabled: true,
+      birthplaces: ALL_BIRTHPLACE_DATA,
+    })
+
+    expect(result.timeZone).toBe('Asia/Kathmandu')
+    expect(result.utcOffsetMinutes).toBe(345)
+  })
+
+  it('handles southern-hemisphere summer daylight time', () => {
+    const result = resolveBirthTime({
+      year: 2024,
+      month: 1,
+      day: 15,
+      hour: 12,
+      birthplace: 'Sydney, Australia',
+      enabled: true,
+      birthplaces: ALL_BIRTHPLACE_DATA,
+    })
+
+    expect(result.timeZone).toBe('Australia/Sydney')
+    expect(result.utcOffsetMinutes).toBe(660)
+    expect(result.dstAdjustmentMinutes).toBe(60)
   })
 
   it('does not apply a daylight-saving adjustment outside the historical DST period', () => {

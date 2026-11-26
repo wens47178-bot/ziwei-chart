@@ -261,22 +261,23 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
           <details className="w-full text-left rounded-lg border border-slate-200 bg-[#faf9f7] px-3 py-2">
             <summary className="cursor-pointer text-xs font-medium text-[#806b45]">查看出生时间校正详情</summary>
             <div className="mt-2 space-y-1.5 text-[11px] text-text-secondary">
-              <p>出生地：{resolvedTime.location?.name}</p>
-              <p>时区：{resolvedTime.timeZone}（标准时 UTC+08:00）</p>
+              <p>出生地：{resolvedTime.location?.name}{resolvedTime.location?.country ? `，${resolvedTime.location.country}` : ''}</p>
+              <p>时区：{resolvedTime.timeZone}（按出生日期的当地时区规则）</p>
               <p>原始时间：{solarDate} {formatTime(birthInfo.hour, birthInfo.minute ?? 0)}</p>
               <p>时区实际偏移：{formatUtcOffset(resolvedTime.utcOffsetMinutes ?? 480)}</p>
               {resolvedTime.dstAdjustmentMinutes !== 0 && (
-                <p>历史夏令时：+{resolvedTime.dstAdjustmentMinutes} 分钟（校正时先扣除）</p>
+                <p>相对本年最小 UTC 偏移：{formatSignedMinutes(resolvedTime.dstAdjustmentMinutes)} 分钟（仅作时差说明；校正使用上方实际偏移）</p>
               )}
               {resolvedTime.ambiguousLocalTime && (
                 <p className="text-amber-700">该时刻在夏令时回拨时段出现两次，系统按第一次出现的时间计算</p>
               )}
-              <p>经度修正：{formatSignedMinutes(resolvedTime.longitudeCorrectionMinutes)} 分钟</p>
+              <p>经度与当地时区修正：{formatSignedMinutes(resolvedTime.longitudeCorrectionMinutes)} 分钟</p>
               <p>均时差：{formatSignedMinutes(resolvedTime.equationOfTimeMinutes)} 分钟</p>
               <p>总校正：{formatSignedMinutes(resolvedTime.correctionMinutes)} 分钟</p>
               <p>校正后时间：{formatResolvedDateTime(resolvedTime.year, resolvedTime.month, resolvedTime.day, resolvedTime.hour, resolvedTime.minute)}</p>
               <p>时辰变化：{resolvedTime.originalShichen} → {resolvedTime.correctedShichen}</p>
               {resolvedTime.crossedDate && <p className="text-amber-700">校正跨越了民用日期边界，排盘采用校正后的日期</p>}
+              <p className="text-text-muted">说明：时区规则来自 IANA 时区数据库；1970 年以前部分地区的历史民用时间记录可能不完整，早年出生时间需结合当地历史资料核对</p>
             </div>
           </details>
         )}
