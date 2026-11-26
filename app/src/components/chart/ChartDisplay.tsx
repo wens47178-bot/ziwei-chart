@@ -116,7 +116,7 @@ function PalaceCard({
 
   return (
     <button type="button" onClick={onClick} aria-pressed={!!isSelected}
-      className={`relative flex h-full min-h-[170px] sm:min-h-[205px] min-w-0 flex-col bg-white p-1.5 text-left hover:bg-neutral-50 ${relation ? 'bg-blue-50/70' : ''} ${isSelected ? 'ring-2 ring-inset ring-blue-500' : ''}`}>
+      className={`relative flex h-full min-h-[170px] sm:min-h-[205px] min-w-0 flex-col p-1.5 text-left hover:bg-neutral-50 ${relation ? 'bg-blue-50' : 'bg-white'} ${isSelected ? 'ring-2 ring-inset ring-blue-500' : ''}`}>
       <div className="flex flex-wrap content-start items-start gap-x-[3px] gap-y-1">
         {majorStars.map((star,i) => <StarTag key={i} star={star} tone="text-[#ad3028]" />)}
         {minorStars.map((star,i) => <StarTag key={i} star={star} tone="text-[#6744a0]" />)}
@@ -311,6 +311,8 @@ function parsePalaces(chart: FunctionalAstrolabe): PalaceData[] {
 export function ChartDisplay() {
   const { chart, birthInfo } = useChartStore()
   const [selectedPalace, setSelectedPalace] = useState<string | null>(null)
+  const [showMinor, setShowMinor] = useState(true)
+  const [showAdjective, setShowAdjective] = useState(true)
 
   if (!chart || !birthInfo) return null
 
@@ -340,6 +342,8 @@ export function ChartDisplay() {
       <PalaceCard
         key={key}
         {...palace}
+        minorStars={showMinor ? palace.minorStars : []}
+        adjectiveStars={showAdjective ? palace.adjectiveStars : []}
         isSelected={selectedPalace === palace.name}
         relation={relationFor(palace.branch)}
         onClick={() => setSelectedPalace(selectedPalace === palace.name ? null : palace.name)}
@@ -354,6 +358,7 @@ export function ChartDisplay() {
       <div className="mb-1 grid grid-cols-4 text-center text-[10px] text-neutral-500"><span>南偏东</span><span>正南方</span><span>南偏西</span><span>西偏南</span></div>
 
       <div className="mb-2 flex items-center justify-between gap-2 text-xs text-neutral-600"><span>{selected ? `${selected.name} · 三方四正` : "点击任一宫位查看三方四正"}</span>{selected && <button type="button" onClick={() => setSelectedPalace(null)} className="text-blue-700">取消选择</button>}</div>
+      <div className="mb-2 flex flex-wrap items-center gap-3 text-xs text-neutral-700"><label className="flex items-center gap-1"><input type="checkbox" checked={showMinor} onChange={e => setShowMinor(e.target.checked)} />辅星</label><label className="flex items-center gap-1"><input type="checkbox" checked={showAdjective} onChange={e => setShowAdjective(e.target.checked)} />杂曜</label><button type="button" className="ml-auto text-blue-700" onClick={() => { setShowMinor(true); setShowAdjective(true); setSelectedPalace(null) }}>恢复完整盘面</button></div>
       <div className="overflow-x-auto">
       {/* 4x4 网格 */}
       <div className="grid min-w-[540px] grid-cols-4 auto-rows-fr gap-px overflow-hidden rounded-xl border border-neutral-300 bg-neutral-300">
