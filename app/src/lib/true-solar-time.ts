@@ -103,31 +103,30 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
   const originalShichen = shichenNameForTimeIndex(originalTimeIndex)
   const location = findBirthplaceInData(input.birthplace, input.birthplaces ?? [])
   const timeZone = location?.timeZone ?? (location && !location.country ? CHINA_TIME_ZONE : null)
-  const shouldApply = input.enabled && location !== null && timeZone !== null
-
   // Birth input is a wall-clock time, not a timestamp in the browser's timezone.
   // Use UTC calendar arithmetic so DST and the viewer's timezone cannot shift the chart.
   const baseDate = createUtcCalendarDate(input.year, input.month, input.day, input.hour, input.minute ?? 0)
-  const localClock = shouldApply
+  const localClock = input.enabled && location && timeZone
     ? resolveLocalClockOffset(input, timeZone)
     : null
-  const standardOffsetMinutes = shouldApply
+  const shouldApply = localClock !== null
+  const standardOffsetMinutes = localClock && timeZone
     ? getStandardUtcOffsetMinutes(input.year, timeZone)
     : null
   const dstAdjustmentMinutes = localClock && standardOffsetMinutes !== null
     ? localClock.offsetMinutes - standardOffsetMinutes
     : 0
-  const longitudeCorrectionMinutes = shouldApply && localClock
+  const longitudeCorrectionMinutes = localClock && location
     ? location.longitude * MINUTES_PER_LONGITUDE_DEGREE - localClock.offsetMinutes
     : 0
-  const equationOfTimeMinutes = shouldApply
+  const equationOfTimeMinutes = localClock
     ? getEquationOfTimeMinutes(
       baseDate.getUTCFullYear(),
       baseDate.getUTCMonth() + 1,
       baseDate.getUTCDate(),
     )
     : 0
-  const correctionMinutes = shouldApply
+  const correctionMinutes = localClock
     ? longitudeCorrectionMinutes + equationOfTimeMinutes
     : 0
   const correctedDate = new Date(baseDate.getTime() + correctionMinutes * 60_000)
