@@ -150,8 +150,9 @@ describe('findBirthplace', () => {
       ok: true,
       json: async () => ({
         data: [
-          { type: 'city', name: 'Springfield', countryCode: 'US', countryName: 'United States', geonameId: 4250542 },
-          { type: 'city', name: 'Springfield', countryCode: 'AU', countryName: 'Australia', geonameId: 214959 },
+          { type: 'city', name: 'Springfield', countryCode: 'US', countryName: 'United States', stateCode: 'IL', stateName: 'Illinois', geonameId: 4250542 },
+          { type: 'city', name: 'Springfield', countryCode: 'US', countryName: 'United States', stateCode: 'MA', stateName: 'Massachusetts', geonameId: 4951788 },
+          { type: 'city', name: 'Springfield', countryCode: 'AU', countryName: 'Australia', stateCode: 'QLD', stateName: 'Queensland', geonameId: 214959 },
         ],
       }),
     })
