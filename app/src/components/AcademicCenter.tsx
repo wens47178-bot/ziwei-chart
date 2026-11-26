@@ -1,4 +1,31 @@
 import { KNOWLEDGE_SOURCES } from '@/knowledge-db'
+import { useEffect, useState } from 'react'
+
+const groups = [
+ {name:'天纪', subtitle:'上知天文', topics:['十四主星与辅煞星','十二宫','格局','四化','疾厄','方法论','易理总纲','六十四卦','占断','堪舆','铁板神数']},
+ {name:'人纪', subtitle:'中知人事', topics:['针灸大成','黄帝内经','神农本草经','伤寒论','金匮要略','仲景心法']},
+ {name:'地纪', subtitle:'下知地理 · 未竟', topics:['国家地理志','堪舆理论基础','遗稿与后学']},
+]
+const videos: Record<string,{id:string;title:string}[]> = {
+ '十四主星与辅煞星':[{id:'BV191PjzhE39',title:'紫微斗数公开课程合集'}],
+ '十二宫':[{id:'BV1FcGbzbEnv',title:'天纪公开课程合集（含十二宫初识等）'}],
+ '针灸大成':[{id:'BV1ah6PYzEaR',title:'针灸大成公开课程合集'}],
+ '黄帝内经':[{id:'BV1wxV7ziE6G',title:'黄帝内经公开课程合集'}],
+}
+function CourseShelf(){
+ const [group,setGroup]=useState(0)
+ const [topic,setTopic]=useState<number|null>(null)
+ const [lesson,setLesson]=useState(0)
+ const g=groups[group]
+ const name=topic===null?'':g.topics[topic]
+ const list=videos[name]??[]
+ const video=list[lesson]
+ useEffect(()=>{if(topic===null)return;const close=(e:KeyboardEvent)=>{if(e.key==='Escape')setTopic(null)};window.addEventListener('keydown',close);return()=>window.removeEventListener('keydown',close)},[topic])
+ const cover=(title:string,i:number,series:string)=><div className="relative mx-auto flex aspect-[3/4] w-full max-w-44 flex-col justify-between rounded-r-md border border-stone-300 bg-gradient-to-r from-stone-200 via-[#faf8f0] to-[#f3efe4] p-5 text-left shadow-[4px_5px_0_#ded7c5,7px_9px_12px_#0002]"><span className="text-xs tracking-widest text-stone-500">{String(i+1).padStart(2,'0')}　{series}</span><svg viewBox="0 0 100 80" className="mx-auto w-20 text-stone-700" fill="none" stroke="currentColor"><circle cx="50" cy="40" r="32"/><path d="M18 40H82M50 8V72M27 17L73 63M27 63L73 17"/><circle cx="50" cy="40" r="10"/></svg><strong className="font-serif text-lg text-stone-800">{title}</strong><span className="text-xs text-stone-500">免费研读</span><span className="absolute -bottom-3 left-8 h-4 w-2 bg-red-800"/></div>
+ return <section className="academic-section"><div className="academic-section-head"><div><small>VIDEO CLASS / OPEN ACCESS</small><h3>三纪课堂 · 视频讲学</h3></div><span>免费开放</span></div><div className="grid gap-4 md:grid-cols-3">{groups.map((item,i)=><button type="button" key={item.name} onClick={()=>{setGroup(i);setTopic(null)}} aria-pressed={group===i} className={'rounded-2xl border p-6 text-left transition hover:shadow-md '+(group===i?'border-stone-700':'border-stone-200')}><div className="mb-8 flex items-center justify-center gap-1">{cover(item.topics[0],0,item.name)}{cover(item.topics[1],1,item.name)}</div><h4 className="text-2xl font-bold">{item.name}</h4><p className="mt-2 text-stone-600">{item.subtitle}</p><p className="mt-3 text-sm">{item.topics.slice(0,4).join(' · ')}</p><span className="mt-4 block text-sm">进入课堂 →</span></button>)}</div><h3 className="my-8 text-2xl font-bold">{g.name} · 专题书架</h3><div className="grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-6">{g.topics.map((t,i)=><button key={t} type="button" className="transition hover:-translate-y-1 focus-visible:outline-2" onClick={()=>{setLesson(0);setTopic(i)}}>{cover(t,i,g.name)}</button>)}</div>{topic!==null&&<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-3 backdrop-blur-sm" onClick={()=>setTopic(null)}><div role="dialog" aria-modal="true" aria-label={name} onClick={e=>e.stopPropagation()} className="max-h-[90vh] w-full max-w-5xl overflow-auto rounded-2xl bg-white text-stone-900 shadow-2xl"><header className="flex flex-wrap items-center gap-3 border-b p-5"><strong className="mr-auto text-xl">{g.name} · {name}</strong><button disabled={topic===0} onClick={()=>{setTopic(topic-1);setLesson(0)}}>上一单元</button><button disabled={topic===g.topics.length-1} onClick={()=>{setTopic(topic+1);setLesson(0)}}>下一单元</button><button autoFocus aria-label="关闭课堂" onClick={()=>setTopic(null)} className="rounded-full bg-stone-100 px-3 py-1">×</button></header><div className="grid md:grid-cols-2"><div className="p-5">{video?<><iframe key={video.id} title={video.title} className="aspect-video w-full rounded bg-black" src={'https://player.bilibili.com/player.html?bvid='+video.id+'&autoplay=0'} allowFullScreen referrerPolicy="strict-origin-when-cross-origin"/><a className="my-3 block underline" href={'https://www.bilibili.com/video/'+video.id+'/'} target="_blank" rel="noreferrer">在原平台观看完整选集 ↗</a></>:<div className="flex aspect-video items-center justify-center rounded bg-stone-100 p-6 text-center">{group===2?'地纪未竟，本专题暂不提供原课程视频。':'本专题视频来源待核实，暂未收录。'}</div>}{list.map((v,i)=><button className="block w-full border-b py-4 text-left" key={v.id} onClick={()=>setLesson(i)}>{String(i+1).padStart(2,'0')}　{v.title}</button>)}</div><aside className="border-stone-200 p-6 md:border-l"><h4 className="text-xl font-bold">免费课程导读</h4><p className="mt-4 leading-relaxed">本专题：{name}。建议结合原始课程、经典书目和不同流派观点进行研读。本站不冒充原作者，不提供未经核实的逐句字幕或时间轴。</p><p className="mt-4 text-sm text-stone-600">{group===1?'中医课程仅供历史文化学习，不作为诊疗依据，请勿自行模仿针灸或用药。':'传统术数属于文化研究，不作为现实决策或预测的科学依据。'}</p><p className="mt-6 text-sm">本站不收费。视频由第三方平台提供，播放及版权以原平台为准。</p></aside></div></div></div>}</section>
+}
+
+
 
 const books = KNOWLEDGE_SOURCES.filter((source) => source.type === 'classic' || source.type === 'modern-commentary')
 const readingPaths = [
@@ -15,6 +42,7 @@ export function AcademicCenter() {
       <p>新增入门、进阶与专题书目，结合古典原典与现代讲义，建立可追溯、可比较的研读路径。</p>
       <div className="academic-meta"><span>典籍书目</span><i /> <span>流派参考</span><i /> <span>循序研读</span></div>
     </div>
+    <CourseShelf />
     <section className="academic-section">
       <div className="academic-section-head"><div><small>01 / READING COLLECTION</small><h3>命理书籍</h3></div><span>{books.length.toString().padStart(2, '0')} TITLES</span></div>
       <div className="academic-book-grid">
