@@ -33,6 +33,19 @@ jobs:
             await page.getByText('输入生辰八字',{exact:false}).first().waitFor({timeout:30000});
             await page.getByPlaceholder('请输入姓名').waitFor();
             await page.screenshot({path:'birth-entry.png',fullPage:true});
+            await page.getByPlaceholder('请输入姓名').fill('QA Test');
+            await page.getByRole('button',{name:'开始排盘',exact:true}).click();
+            await page.getByRole('navigation',{name:'命盘功能'}).waitFor({timeout:60000});
+            await page.getByRole('button',{name:'命盘分析',exact:true}).waitFor();
+            await page.screenshot({path:'chart-desktop.png',fullPage:true});
+            await page.getByRole('button',{name:'AI 对话',exact:true}).click();
+            await page.screenshot({path:'chart-ai.png',fullPage:true});
+            for (const label of ['大限','流年','流月','本命']) {
+              await page.getByRole('navigation',{name:'命盘功能'}).getByRole('button',{name:label,exact:true}).click();
+              await page.getByRole('navigation',{name:'命盘功能'}).waitFor();
+            }
+            await page.setViewportSize({width:390,height:844});
+            await page.screenshot({path:'chart-mobile.png',fullPage:true});
             if(errors.length) throw Error(errors.join('\n'));
           } finally { await browser.close(); }
           JS
