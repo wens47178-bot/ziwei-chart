@@ -1,10 +1,11 @@
 declare const process: { env: Record<string, string | undefined> }
 
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import birthplaceData from './birthplace-data.json'
 import globalBirthplaceData from './global-birthplace-data.json'
 import {
   type Birthplace,
+  findBirthplaceAsync,
   findBirthplaceInData,
   resolveBirthTime,
   resolveBirthTimeAsync,
@@ -26,6 +27,10 @@ const ZI_SHICHEN = '子时'
 const BIRTHPLACE_DATA = birthplaceData as Birthplace[]
 const GLOBAL_BIRTHPLACE_DATA = globalBirthplaceData as Birthplace[]
 const ALL_BIRTHPLACE_DATA = [...BIRTHPLACE_DATA, ...GLOBAL_BIRTHPLACE_DATA] as Birthplace[]
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 describe('birth date and time validation', () => {
   it('rejects an impossible calendar date instead of rolling it into the next month', () => {
@@ -104,6 +109,58 @@ describe('findBirthplace', () => {
     expect(findBirthplaceInData('New York, USA', GLOBAL_BIRTHPLACE_DATA)?.timeZone).toBe('America/New_York')
     expect(findBirthplaceInData('东京', GLOBAL_BIRTHPLACE_DATA)?.timeZone).toBe('Asia/Tokyo')
     expect(findBirthplaceInData('United States', GLOBAL_BIRTHPLACE_DATA)).toBeNull()
+  })
+
+  it('finds cities outside the curated list through the global city catalogue', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [{
+            type: 'city',
+            name: 'Reykjavik',
+            countryCode: 'IS',
+            countryName: 'Iceland',
+            geonameId: 3413829,
+          }],
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          name: 'Reykjavik',
+          countryName: 'Iceland',
+          latitude: '64.1466',
+          longitude: '-21.9426',
+          timezone: 'Atlantic/Reykjavik',
+        }),
+      })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const place = await findBirthplaceAsync('Reykjavik, Iceland')
+
+    expect(place?.name).toBe('Reykjavik')
+    expect(place?.timeZone).toBe('Atlantic/Reykjavik')
+    expect(place?.latitude).toBeCloseTo(64.1466)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not select an arbitrary remote city when a name is ambiguous', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        data: [
+          { type: 'city', name: 'Springfield', countryCode: 'US', countryName: 'United States', geonameId: 4250542 },
+          { type: 'city', name: 'Springfield', countryCode: 'AU', countryName: 'Australia', geonameId: 214959 },
+        ],
+      }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const place = await findBirthplaceAsync('Springfield')
+
+    expect(place).toBeNull()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
   it('returns null when the birthplace cannot be matched', () => {
