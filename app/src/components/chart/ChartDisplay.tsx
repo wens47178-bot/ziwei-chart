@@ -262,16 +262,16 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
             <summary className="cursor-pointer text-xs font-medium text-[#806b45]">查看出生时间校正详情</summary>
             <div className="mt-2 space-y-1.5 text-[11px] text-text-secondary">
               <p>出生地：{resolvedTime.location?.name}</p>
-              <p>时区：{resolvedTime.timeZone}（标准时 UTC+08:00）</p>
+              <p>时区：{resolvedTime.timeZone}（按出生日期的当地时区规则）</p>
               <p>原始时间：{solarDate} {formatTime(birthInfo.hour, birthInfo.minute ?? 0)}</p>
               <p>时区实际偏移：{formatUtcOffset(resolvedTime.utcOffsetMinutes ?? 480)}</p>
               {resolvedTime.dstAdjustmentMinutes !== 0 && (
-                <p>历史夏令时：+{resolvedTime.dstAdjustmentMinutes} 分钟（校正时先扣除）</p>
+                <p>相对本年标准偏移：{formatSignedMinutes(resolvedTime.dstAdjustmentMinutes)} 分钟（已计入当地时区修正）</p>
               )}
               {resolvedTime.ambiguousLocalTime && (
                 <p className="text-amber-700">该时刻在夏令时回拨时段出现两次，系统按第一次出现的时间计算</p>
               )}
-              <p>经度修正：{formatSignedMinutes(resolvedTime.longitudeCorrectionMinutes)} 分钟</p>
+              <p>经度与当地时区修正：{formatSignedMinutes(resolvedTime.longitudeCorrectionMinutes)} 分钟</p>
               <p>均时差：{formatSignedMinutes(resolvedTime.equationOfTimeMinutes)} 分钟</p>
               <p>总校正：{formatSignedMinutes(resolvedTime.correctionMinutes)} 分钟</p>
               <p>校正后时间：{formatResolvedDateTime(resolvedTime.year, resolvedTime.month, resolvedTime.day, resolvedTime.hour, resolvedTime.minute)}</p>
