@@ -200,12 +200,16 @@ export function AIInterpretation({ view = 'both' }: { view?: 'report' | 'chat' |
   // 是否正在输出动画
   const [animating, setAnimating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [chatError, setChatError] = useState<string | null>(null)
+  const askingRef = useRef(false)
   const [question, setQuestion] = useState('')
   const [dialog, setDialog] = useState<ChatMessage[]>([])
   const [asking, setAsking] = useState(false)
   const [answer, setAnswer] = useState('')
   const ask = async () => {
-    if (!chart || asking || !question.trim()) return
+    if (!chart || askingRef.current || loadingRef.current || !question.trim()) return
+    askingRef.current = true
+    setChatError(null)
     const next: ChatMessage[] = [...dialog, { role: 'user', content: question.trim() }]
     setQuestion('')
     setAsking(true)
@@ -219,8 +223,12 @@ export function AIInterpretation({ view = 'both' }: { view?: 'report' | 'chat' |
       }
       setDialog([...next, { role: 'assistant', content: reply }])
       setAnswer('')
-    } catch { setError('追问失败，请重试'); setQuestion(next[next.length - 1].content) }
-    finally { setAsking(false) }
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : ''
+      setChatError(detail.includes('170 秒') ? 'AI 回复超时，请稍后重试。' : /429|额度|频率/.test(detail) ? 'AI 服务暂时达到额度或频率限制，请稍后重试。' : 'AI 服务暂时无法完成回复，请重试。已保留您的问题。')
+      setAnswer('')
+      setQuestion(next[next.length - 1].content)
+    } finally { askingRef.current = false; setAsking(false) }
   }
   const [activeTab, setActiveTab] = useState<string>('命格总评')
 
@@ -407,7 +415,7 @@ ${guidanceContext}
           <div className="mb-3 flex flex-wrap justify-end gap-2"><button type="button" onClick={exportReport} className="rounded border border-neutral-300 px-3 py-1.5 text-xs">导出完整报告</button><button type="button" onClick={printReport} className="rounded border border-neutral-300 px-3 py-1.5 text-xs">打印 / 保存 PDF</button></div>
         )}
 
-        {displayText && (
+        {view !== 'chat' && displayText && (
           <nav className="flex flex-wrap gap-1.5 rounded-xl bg-[#f2f2f2] p-2 mb-5" aria-label="命盘分析主题">
             {REPORT_TABS.map((tab) => (
               <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)}
@@ -418,9 +426,9 @@ ${guidanceContext}
           </nav>
         )}
 
-        {error && <div className="p-3 rounded-lg bg-rose-50 text-rose-700 text-sm mb-4 border border-rose-100">{error}</div>}
+        {view !== 'chat' && error && <div className="p-3 rounded-lg bg-rose-50 text-rose-700 text-sm mb-4 border border-rose-100">{error}</div>}
 
-        {displayText && isStructuredReport && (
+        {view !== 'chat' && displayText && isStructuredReport && (
           <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-[#faf9f6] px-3 py-2 text-xs">
             <span className="font-semibold text-[#66563d]">报告完整度：{availableReportTabs.length}/{REPORT_TABS.length} 个主题</span>
             {loading
@@ -431,7 +439,7 @@ ${guidanceContext}
           </div>
         )}
 
-        {displayText && (
+        {view !== 'chat' && displayText && (
           <div className="min-h-0">
             {!isStructuredReport ? (
               <div className="prose max-w-none prose-slate text-text-secondary text-[15px] lg:text-base leading-8">
@@ -441,7 +449,7 @@ ${guidanceContext}
               <>
                 <div className="mb-4">
                   <h3 className={`text-2xl lg:text-3xl font-semibold leading-tight ${activeTab === '命主优点' ? 'text-[#80633d]' : 'text-[#202020]'}`} style={{ fontFamily: 'var(--font-serif)' }}>
-                    {activeTab === '命格总评' ? (activeContent.split('\n').find((line) => line.trim())?.replace(/^#+\s*/, '').replace(/^[-*]\s*/, '').slice(0, 32) || '命格总览') : REPORT_TABS.find((tab) => tab.id === activeTab)?.label}
+                    {activeTab === '命格总评' ? (activeContent.split('\n').find((line) => line.trim())?.replace(/^#+\s*/, '').replace(/^[-*]\s+/, '').replace(/\*\*|__|`/g, '').slice(0, 32) || '命格总览') : REPORT_TABS.find((tab) => tab.id === activeTab)?.label}
                   </h3>
                   {activeTab === '命主优点' && <p className="text-sm text-[#9a8056] mt-2">从真实星曜组合中提炼优势 · 盘面依据与发挥方向</p>}
                 </div>
@@ -458,6 +466,9 @@ ${guidanceContext}
 
         <section hidden={view === "report"} className="mt-2 pt-4">
           <h3 className="mb-3 font-semibold">AI 命盘追问</h3>
+          {chatError && <div role="alert" className="mb-3 rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-rose-700">{chatError}</div>}
+          {asking && <p role="status" className="mb-2 text-xs text-neutral-500">正在生成回复，请稍候…</p>}
+          {!dialog.length && !asking && <p className="mb-4 text-sm text-neutral-500">可针对命宫、星曜组合或报告内容继续提问。</p>}
           {dialog.map((message, i) => <div key={i} className="mb-2 rounded-lg bg-neutral-50 p-3 text-sm"><strong>{message.role === 'user' ? '你' : '天衍 AI'}</strong><ReactMarkdown>{message.content}</ReactMarkdown></div>)}
           {answer && <div className="mb-2 rounded-lg bg-neutral-50 p-3 text-sm"><ReactMarkdown>{answer}</ReactMarkdown></div>}
           <form className="flex gap-2" onSubmit={e => { e.preventDefault(); void ask() }}><input aria-label="命盘追问" value={question} onChange={e => setQuestion(e.target.value)} maxLength={1000} placeholder="输入想进一步了解的问题" className="min-w-0 flex-1 rounded border border-neutral-300 px-3 py-2 text-sm" /><button type="submit" disabled={asking || !question.trim() || loading} className="rounded bg-neutral-900 px-3 text-sm text-white disabled:opacity-50">{asking ? '回答中' : '发送'}</button></form>
