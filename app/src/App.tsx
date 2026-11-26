@@ -44,6 +44,7 @@ const PAGES: PageMeta[] = [
 export default function App() {
   const { chart, birthInfo } = useChartStore()
   const [activePage, setActivePage] = useState<PageKey | 'home'>('home')
+  const [pendingPage, setPendingPage] = useState<PageKey>('chart')
   const [showSettings, setShowSettings] = useState(false)
   const [expandedChart, setExpandedChart] = useState(false)
   const [analysisView, setAnalysisView] = useState<'report' | 'chat'>('report')
@@ -52,7 +53,7 @@ export default function App() {
   const chartPages: PageKey[] = ['chart','palaces','sihua','decadal','stars','patterns','trines','fortune','lunar','kline','ai','share']
   const hasChartWorkspace = !!chart && chartPages.includes(activePage as PageKey)
   const renderWorkspace = (): ReactNode => {
-    if (activePage === 'birth') return <BirthForm onSuccess={() => setActivePage('chart')} />
+    if (activePage === 'birth') return <BirthForm onSuccess={() => setActivePage(pendingPage)} />
     if (activePage === 'chart') return chart ? <><AIInterpretation view={analysisView} />{analysisView === 'report' && <div className="mt-6 divide-y rounded-xl border border-neutral-200">{([['palaces','命盘依据'],['patterns','命盘推演'],['trines','三方四正联动'],['sihua','四化路径分析'],['decadal','大限运程'],['stars','星曜详情']] as const).map(([mode,label]) => <details key={mode} className="p-4"><summary className="cursor-pointer font-semibold">{label}</summary><AdvancedAnalysis mode={mode} /></details>)}</div>}</> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'palaces' || activePage === 'sihua' || activePage === 'decadal' || activePage === 'stars' || activePage === 'patterns' || activePage === 'trines') return chart ? <AdvancedAnalysis mode={activePage as AdvancedMode} /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'fortune') return chart ? <YearlyFortune /> : <PageEmpty onClick={() => setActivePage('birth')} />
@@ -68,7 +69,7 @@ export default function App() {
 
   if (activePage === 'home') return (
     <>
-      <HomeLanding onEnter={(key) => setActivePage(key)} onSettings={() => setShowSettings(true)} />
+      <HomeLanding onEnter={(key) => { if (!chart && chartPages.includes(key)) { setPendingPage(key); setActivePage('birth') } else { setPendingPage('chart'); setActivePage(key) } }} onSettings={() => setShowSettings(true)} />
       {showSettings && <div className="settings-overlay" onClick={(event) => event.target === event.currentTarget && setShowSettings(false)}><div><SettingsPanel onClose={() => setShowSettings(false)} /></div></div>}
       <Analytics />
     </>
@@ -90,7 +91,18 @@ export default function App() {
         </div>
       </header>
 
-      <main className="reference-layout" style={{ gridTemplateColumns: "minmax(0, 1fr)", maxWidth: "none", width: "100%", padding: 0, gap: 0 }}>
+      {activePage === 'birth' ? <main className="mx-auto grid w-full max-w-[1440px] grid-cols-1 items-center gap-12 px-6 py-8 lg:grid-cols-[1fr_1fr] lg:gap-20 lg:px-20">
+        <section className="min-w-0 lg:pl-8">
+          <button type="button" onClick={() => setActivePage('home')} className="mb-10 text-sm text-neutral-500">‹ 返回首页</button>
+          <p className="text-sm tracking-[.25em] text-[#92794d]">01 / DESTINY ENGINE</p>
+          <h1 className="mt-5 text-5xl font-bold tracking-tight lg:text-7xl">起紫微命盘</h1>
+          <p className="mt-5 text-neutral-500">输入出生年月日時</p>
+          <div className="my-8 h-px w-24 bg-neutral-300" />
+          <div className="flex justify-between text-sm text-neutral-500"><span>最近命盘 {chart && birthInfo ? 1 : 0}</span><span>本机保存</span></div>
+          {chart && birthInfo ? <button type="button" onClick={() => setActivePage(pendingPage)} className="mt-4 flex w-full items-center justify-between border-b border-neutral-200 py-4 text-left"><span>{birthInfo.dateType === 'lunar' ? '农历' : '公历'}{birthInfo.year}年{birthInfo.month}月{birthInfo.day}日<br/><small className="text-neutral-500">{birthInfo.birthplace || '未填写出生地'} · {birthInfo.gender === 'male' ? '男' : '女'}</small></span><span>›</span></button> : <p className="mt-4 text-sm text-neutral-400">暂无命盘</p>}
+        </section>
+        <section className="min-w-0 rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8"><Suspense fallback={<div>正在载入…</div>}>{renderWorkspace()}</Suspense></section>
+      </main> : <main className="reference-layout" style={{ gridTemplateColumns: "minmax(0, 1fr)", maxWidth: "none", width: "100%", padding: 0, gap: 0 }}>
         <section className="editorial-panel" style={{ display: "none" }}>
           <div className="editorial-inner">
             <p className="eyebrow">{page.en}</p>
@@ -143,7 +155,7 @@ export default function App() {
             <Suspense fallback={<div className="workspace-loading">正在载入功能内容…</div>}>{hasChartWorkspace ? <div className="min-w-0"><div className="hidden"><span className="text-xs text-neutral-600">本命十二宫 · {page.label}</span><button type="button" onClick={() => setExpandedChart(v => !v)} aria-pressed={expandedChart} className="rounded border px-2 py-1 text-xs">{expandedChart ? '恢复分栏' : '放大命盘'}</button></div><div className={expandedChart ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-1 lg:grid-cols-[minmax(0,41fr)_minmax(0,59fr)] items-start gap-0'}><div className={expandedChart ? 'mx-auto w-full max-w-[900px]' : 'min-w-0 border-r border-neutral-200 px-4 lg:sticky lg:top-0 lg:max-h-[calc(100dvh-56px)] lg:overflow-y-auto'}><ChartDisplay activeLayer={activePage === 'decadal' ? 'decadal' : activePage === 'fortune' ? 'yearly' : activePage === 'chart' ? 'origin' : undefined} /></div><div className="min-w-0 px-5 pt-4 lg:max-h-[calc(100dvh-56px)] lg:overflow-y-auto"><button type="button" title="放大或恢复命盘" aria-label="放大或恢复命盘" aria-pressed={expandedChart} onClick={() => setExpandedChart(v => !v)} className="float-right rounded-lg border border-neutral-200 px-3 py-2 text-neutral-600">{expandedChart ? "↙" : "↗"}</button>{activePage === 'chart' && <nav aria-label="命盘分析" className="sticky top-0 z-10 mb-4 flex items-center gap-1 rounded-xl bg-neutral-100 p-1 w-fit">{([['report','命盘分析'],['chat','AI 对话']] as const).map(([key,label]) => <button key={key} type="button" aria-pressed={analysisView === key} onClick={() => setAnalysisView(key)} className={analysisView === key ? 'rounded-lg bg-white px-5 py-3 font-semibold shadow-sm' : 'rounded-lg px-5 py-3 text-neutral-600'}>{label}</button>)}</nav>}{renderWorkspace()}</div></div></div> : renderWorkspace()}</Suspense>
           </div>
         </section>
-      </main>
+      </main>}
 
       {showSettings && (
         <div className="settings-overlay" onClick={(event) => event.target === event.currentTarget && setShowSettings(false)}>
