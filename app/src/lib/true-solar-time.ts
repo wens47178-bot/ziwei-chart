@@ -207,7 +207,6 @@ function getPlaceTokens(place: Birthplace): string[] {
     place.province,
     place.city,
     place.area,
-    place.country,
     ...(place.aliases ?? []),
     joinPlace(place.province, place.city),
     joinPlace(place.city, place.area),
