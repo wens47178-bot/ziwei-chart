@@ -8,6 +8,7 @@
    ============================================================ */
 
 import { useMemo, useRef, useState } from 'react'
+import { extractKnowledge } from '@/knowledge'
 import { createLocalCalendarDate } from '@/lib/horoscope'
 import { useChartStore } from '@/stores'
 import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
@@ -336,6 +337,8 @@ export function ChartDisplay() {
   const [showMinor, setShowMinor] = useState(true)
   const [showAdjective, setShowAdjective] = useState(true)
 
+  const [showFlying, setShowFlying] = useState(false)
+  const flying = useMemo(() => chart ? extractKnowledge(chart).宫干飞化 : [], [chart])
   const [year, setYear] = useState(new Date().getFullYear())
   const [layer, setLayer] = useState<'origin' | 'decadal' | 'yearly' | 'both'>('origin')
   const horoscope = useMemo(() => {
@@ -352,7 +355,7 @@ export function ChartDisplay() {
     if (pos) grid[pos.row][pos.col] = p
   })
 
-  const solarDate = `${birthInfo.year}年${birthInfo.month}月${birthInfo.day}日`
+  const solarDate = chart.solarDate || `${birthInfo.year}年${birthInfo.month}月${birthInfo.day}日`
   const gender = birthInfo.gender === 'male' ? '男' : '女'
 
   const branches = '子丑寅卯辰巳午未申酉戌亥'
@@ -364,6 +367,7 @@ export function ChartDisplay() {
     const distance = (index - selectedIndex + 12) % 12
     return distance === 6 ? '对宫' : distance === 4 || distance === 8 ? '三合' : undefined
   }
+  const flights = flying.filter(f => f.sourcePalace === selectedPalace)
   const renderPalace = (palace: PalaceData | null, key: string) => {
     if (!palace) return <div key={key} />
     return (
@@ -394,9 +398,10 @@ export function ChartDisplay() {
       <div className="mb-2 flex items-center justify-between gap-2 text-xs text-neutral-600"><span>{selected ? `${selected.name} · 三方四正` : "点击任一宫位查看三方四正"}</span>{selected && <button type="button" onClick={() => setSelectedPalace(null)} className="text-blue-700">取消选择</button>}</div>
       <div className="mb-2 flex flex-wrap items-center gap-3 text-xs text-neutral-700"><label className="flex items-center gap-1"><input type="checkbox" checked={showMinor} onChange={e => setShowMinor(e.target.checked)} />辅星</label><label className="flex items-center gap-1"><input type="checkbox" checked={showAdjective} onChange={e => setShowAdjective(e.target.checked)} />杂曜</label><button type="button" className="ml-auto text-blue-700" onClick={() => { setShowMinor(true); setShowAdjective(true); setSelectedPalace(null) }}>恢复完整盘面</button></div>
       <div className="mb-2 flex items-center justify-end gap-2"><span role="status" className="text-xs text-red-700">{exportError}</span><button type="button" disabled={exporting} onClick={exportChart} className="rounded border border-neutral-300 px-3 py-1 text-xs disabled:opacity-50">{exporting ? "正在导出…" : "保存命盘图片"}</button></div>
+      <label className="mb-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={showFlying} onChange={e => setShowFlying(e.target.checked)} />宫干飞化箭头（选择来源宫）</label>
       <div className="overflow-x-auto">
       {/* 4x4 网格 */}
-      <div ref={chartRef} className="grid min-w-[540px] grid-cols-4 auto-rows-fr gap-px overflow-hidden rounded-xl border border-neutral-300 bg-neutral-300">
+      <div ref={chartRef} className="relative grid min-w-[540px] grid-cols-4 auto-rows-fr gap-px overflow-hidden rounded-xl border border-neutral-300 bg-neutral-300">
         {/* Row 0 */}
         {grid[0].map((p, c) => renderPalace(p, `0-${c}`))}
 
@@ -413,10 +418,24 @@ export function ChartDisplay() {
 
         {/* Row 3 */}
         {grid[3].map((p, c) => renderPalace(p, `3-${c}`))}
+        {showFlying && selected && <svg aria-label="宫干飞化方向" viewBox="0 0 400 400" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 h-full w-full">
+          <defs>{['化禄','化权','化科','化忌'].map((t,i) => <marker key={t} id={'fly-'+i} markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 Z" fill={['#27834a','#a52b24','#2457a7','#c93636'][i]} /></marker>)}</defs>
+          {flights.map((f,i) => {
+            const from = PALACE_POSITIONS[selected.branch]
+            const target = palaceData.find(p => p.name === f.targetPalace)
+            const to = target && PALACE_POSITIONS[target.branch]
+            if (!from || !to) return null
+            const x = from.col*100+50, y = from.row*100+50, tx = to.col*100+50, ty = to.row*100+50
+            const k = ['化禄','化权','化科','化忌'].indexOf(f.transformation)
+            const color = ['#27834a','#a52b24','#2457a7','#c93636'][k]
+            return <path key={i} d={x===tx && y===ty ? `M${x} ${y} c-35 -35 35 -35 0 0` : `M${x} ${y} Q${200+i*8} ${200-i*8} ${tx} ${ty}`} fill="none" stroke={color} strokeWidth="1.6" opacity=".85" markerEnd={`url(#fly-${k})`} />
+          })}
+        </svg>}
       </div>
 
       </div>
       <div className="mt-1 grid grid-cols-4 text-center text-[10px] text-neutral-500"><span>东偏北</span><span>北偏东</span><span>正北方</span><span>北偏西</span></div>
+      {showFlying && selected && <div className="mt-2 space-y-1 text-xs">{flights.map((f,i) => <div key={i}>{f.sourcePalace} · {f.star}{f.transformation} → {f.targetPalace ?? '未定位'}{f.targetPalace === f.sourcePalace ? '（同宫）' : ''}</div>)}</div>}
       {/* 图例 */}
       <div className="flex flex-wrap items-center justify-center gap-4 mt-3 pt-3 border-t border-slate-200 text-[10px]">
         <div className="flex items-center gap-1">
