@@ -49,9 +49,11 @@ export default function App() {
   const [chartTab, setChartTab] = useState<'palaces' | 'sihua' | 'decadal' | 'stars' | 'trines' | 'ai'>('palaces')
   const page = PAGES.find((item) => item.key === activePage) ?? PAGES[0]
 
+  const chartPages: PageKey[] = ['chart','palaces','sihua','decadal','stars','patterns','trines','fortune','lunar','kline','ai','share']
+  const hasChartWorkspace = !!chart && chartPages.includes(activePage as PageKey)
   const renderWorkspace = (): ReactNode => {
     if (activePage === 'birth') return <BirthForm onSuccess={() => setActivePage('chart')} />
-    if (activePage === 'chart') return chart ? <div className="min-w-0"><div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200 pb-2"><span className="text-sm font-semibold text-neutral-800">本命十二宫</span><button type="button" aria-pressed={expandedChart} onClick={() => setExpandedChart(v => !v)} className="rounded-md border border-neutral-200 bg-white px-3 py-1.5 text-xs text-neutral-700 hover:bg-neutral-100">{expandedChart ? '退出放大' : '放大命盘 ↗'}</button></div><div className={expandedChart ? 'grid grid-cols-1 gap-5' : 'grid grid-cols-1 lg:grid-cols-[minmax(540px,44fr)_minmax(0,56fr)] items-start gap-4'}><div className={expandedChart ? 'mx-auto w-full max-w-[900px]' : 'min-w-0'}><ChartDisplay /></div><div className="min-w-0"><nav aria-label="命盘分析" className="mb-3 flex flex-wrap gap-1 border-b border-neutral-200 pb-2">{([["palaces","命盘分析"],["sihua","四化飞星"],["decadal","大限流年"],["stars","星曜详情"],["trines","三方四正"],["ai","AI 解读"]] as const).map(([key,label]) => <button type="button" key={key} aria-pressed={chartTab === key} onClick={() => setChartTab(key)} className={`rounded px-2 py-1.5 text-xs ${chartTab === key ? "bg-neutral-900 text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>{label}</button>)}</nav>{chartTab === "ai" && <AIInterpretation />}{chartTab !== "ai" && <AdvancedAnalysis mode={chartTab} />}</div></div></div> : <PageEmpty onClick={() => setActivePage('birth')} />
+    if (activePage === 'chart') return chart ? (chartTab === 'ai' ? <AIInterpretation /> : <AdvancedAnalysis mode={chartTab} />) : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'palaces' || activePage === 'sihua' || activePage === 'decadal' || activePage === 'stars' || activePage === 'patterns' || activePage === 'trines') return chart ? <AdvancedAnalysis mode={activePage as AdvancedMode} /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'fortune') return chart ? <YearlyFortune /> : <PageEmpty onClick={() => setActivePage('birth')} />
     if (activePage === 'lunar') return chart ? <LunarMonthlyKLine chart={chart} /> : <PageEmpty onClick={() => setActivePage('birth')} />
@@ -87,8 +89,8 @@ export default function App() {
         </div>
       </header>
 
-      <main className="reference-layout" style={activePage === "chart" ? { gridTemplateColumns: "minmax(0, 1fr)", maxWidth: "none", width: "100%" } : undefined}>
-        <section className="editorial-panel" style={activePage === "chart" ? { display: "none" } : undefined}>
+      <main className="reference-layout" style={{ gridTemplateColumns: "minmax(0, 1fr)", maxWidth: "none", width: "100%" }}>
+        <section className="editorial-panel" style={{ display: "none" }}>
           <div className="editorial-inner">
             <p className="eyebrow">{page.en}</p>
             <h1>{page.title}</h1>
@@ -135,8 +137,9 @@ export default function App() {
             <div><span className="workspace-kicker">YOUR PERSONAL STAR MAP</span><span className="workspace-current">{page.label}</span></div>
             <div className="workspace-actions"><button className="workspace-settings" onClick={() => setActivePage("home")}>← 返回首页</button><button className="workspace-settings" onClick={() => setShowSettings(true)}>偏好设置 <span>↗</span></button></div>
           </div>
+          <nav aria-label="全部功能" className="flex flex-wrap gap-1 border-b border-neutral-200 px-3 py-2">{PAGES.map(item => <button key={item.key} type="button" aria-current={activePage === item.key ? 'page' : undefined} onClick={() => { setActivePage(item.key); setExpandedChart(false) }} className={activePage === item.key ? 'rounded bg-neutral-900 px-2 py-1.5 text-xs text-white' : 'rounded px-2 py-1.5 text-xs text-neutral-700 hover:bg-neutral-100'}>{item.label}</button>)}</nav>
           <div className={activePage === 'birth' ? 'workspace-content birth-workspace' : 'workspace-content'}>
-            <Suspense fallback={<div className="workspace-loading">正在载入功能内容…</div>}>{renderWorkspace()}</Suspense>
+            <Suspense fallback={<div className="workspace-loading">正在载入功能内容…</div>}>{hasChartWorkspace ? <div className="min-w-0"><div className="mb-2 flex items-center justify-between gap-2"><span className="text-xs text-neutral-600">本命十二宫 · {page.label}</span><button type="button" onClick={() => setExpandedChart(v => !v)} aria-pressed={expandedChart} className="rounded border px-2 py-1 text-xs">{expandedChart ? '恢复分栏' : '放大命盘'}</button></div><div className={expandedChart ? 'grid grid-cols-1 gap-4' : 'grid grid-cols-1 lg:grid-cols-[minmax(540px,44fr)_minmax(0,56fr)] items-start gap-4'}><div className={expandedChart ? 'mx-auto w-full max-w-[900px]' : 'min-w-0'}><ChartDisplay /></div><div className="min-w-0">{activePage === 'chart' && <nav aria-label="命盘分析" className="mb-3 flex flex-wrap gap-1 border-b pb-2">{([['palaces','命盘分析'],['sihua','四化飞星'],['decadal','大限流年'],['stars','星曜详情'],['trines','三方四正'],['ai','AI 对话']] as const).map(([key,label]) => <button key={key} type="button" aria-pressed={chartTab === key} onClick={() => setChartTab(key)} className={chartTab === key ? 'rounded bg-neutral-900 px-2 py-1 text-xs text-white' : 'rounded px-2 py-1 text-xs'}>{label}</button>)}</nav>}{renderWorkspace()}</div></div></div> : renderWorkspace()}</Suspense>
           </div>
         </section>
       </main>
