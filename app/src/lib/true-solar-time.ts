@@ -91,7 +91,22 @@ export function findBirthplaceInData(input: string | undefined, birthplaces: Bir
     .filter((candidate) => candidate.score > 0)
     .sort((left, right) => right.score - left.score)
 
-  return ranked[0]?.place ?? null
+  const best = ranked[0]
+  if (!best) return null
+
+  // Do not silently choose the first of two equally strong but geographically
+  // different matches (for example, cities sharing the same English name).
+  const tied = ranked.filter((candidate) => candidate.score === best.score)
+  const distinctLocations = new Set(tied.map(({ place }) => [
+    normalizePlace(place.country),
+    normalizePlace(place.province),
+    normalizePlace(place.city),
+    normalizePlace(place.area),
+    place.latitude,
+    place.longitude,
+    place.timeZone ?? '',
+  ].join('|')))
+  return distinctLocations.size > 1 ? null : best.place
 }
 
 export async function resolveBirthTimeAsync(input: ResolveBirthTimeInput): Promise<ResolvedBirthTime> {
@@ -180,6 +195,8 @@ interface RemoteCitySearchResult {
 interface RemoteCityRecord {
   name?: string
   countryName?: string
+  stateName?: string | null
+  stateCode?: string | null
   latitude?: string | number
   longitude?: string | number
   timezone?: string
@@ -196,7 +213,7 @@ async function findRemoteBirthplace(input?: string): Promise<Birthplace | null> 
     try {
       const parts = (input ?? '').split(',').map((part) => part.trim()).filter(Boolean)
       const cityQuery = parts[0] ?? ''
-      const countryQuery = parts.slice(1).join(' ')
+      const qualifiers = parts.slice(1)
       if (cityQuery.length < 2) return null
 
       const searchUrl = new URL(`${REMOTE_CITY_API}/search`)
@@ -212,10 +229,10 @@ async function findRemoteBirthplace(input?: string): Promise<Birthplace | null> 
       const nameMatches = exactMatches.length > 0
         ? exactMatches
         : matches.filter((place) => normalizePlace(place.name).startsWith(cityName))
-      const countryMatches = countryQuery
-        ? nameMatches.filter((place) => countryMatchesQuery(place, countryQuery))
+      const qualifiedMatches = qualifiers.length
+        ? nameMatches.filter((place) => qualifiers.every((qualifier) => matchesAdministrativeQualifier(place, qualifier)))
         : nameMatches
-      const candidates = countryMatches.length > 0 ? countryMatches : countryQuery ? [] : nameMatches
+      const candidates = qualifiedMatches
       // Even within one country, names such as Springfield may identify many places.
       // Never select an arbitrary result; a state/country qualifier must narrow it to one city.
       if (candidates.length !== 1) return null
@@ -230,6 +247,8 @@ async function findRemoteBirthplace(input?: string): Promise<Birthplace | null> 
         name: city.name,
         city: city.name,
         country: city.countryName || selected.countryName,
+        province: city.stateName || selected.stateName || undefined,
+        aliases: [selected.name, city.name].filter((name, index, values) => !!name && values.indexOf(name) === index),
         latitude: Number(city.latitude),
         longitude: Number(city.longitude),
         timeZone: city.timezone,
@@ -253,8 +272,8 @@ async function findRemoteBirthplace(input?: string): Promise<Birthplace | null> 
   }
 }
 
-function countryMatchesQuery(place: RemoteCitySearchResult, query: string): boolean {
-  const normalized = normalizePlace(query)
+function matchesAdministrativeQualifier(place: RemoteCitySearchResult, qualifier: string): boolean {
+  const normalized = normalizePlace(qualifier)
   const aliases: Record<string, string[]> = {
     usa: ['us', 'unitedstates'],
     america: ['us', 'unitedstates'],
@@ -263,21 +282,17 @@ function countryMatchesQuery(place: RemoteCitySearchResult, query: string): bool
     england: ['gb', 'unitedkingdom'],
     uae: ['ae', 'unitedarabemirates'],
   }
-  const queryTokens = [
-    normalized,
-    ...query.split(/\s+/u).flatMap((part) => {
-      const token = normalizePlace(part)
-      return [token, ...(aliases[token] ?? [])]
-    }),
-  ].filter(Boolean)
-  const countryTokens = [
+  const accepted = [normalized, ...(aliases[normalized] ?? [])]
+  const countryValues = [
     normalizePlace(place.countryCode ?? undefined),
     normalizePlace(place.countryName ?? undefined),
-    ...(aliases[normalizePlace(place.countryCode)] ?? []),
   ].filter(Boolean)
-  const regionTokens = [normalizePlace(place.stateCode ?? undefined), normalizePlace(place.stateName ?? undefined)].filter(Boolean)
-  return countryTokens.some((token) => queryTokens.includes(token))
-    || regionTokens.some((token) => queryTokens.includes(token))
+  const regionValues = [
+    normalizePlace(place.stateCode ?? undefined),
+    normalizePlace(place.stateName ?? undefined),
+  ].filter(Boolean)
+  return countryValues.some((value) => accepted.includes(value))
+    || regionValues.some((value) => accepted.includes(value))
 }
 
 async function loadBirthplaceData(): Promise<Birthplace[]> {
