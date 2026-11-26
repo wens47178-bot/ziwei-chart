@@ -102,7 +102,7 @@ export default function App() {
                 </div>
                 <button className="recent-entry" onClick={() => setActivePage('chart')}>
                   <span>
-                    <strong>{birthInfo.year}年{birthInfo.month}月{birthInfo.day}日 · {birthInfo.hour}时</strong>
+                    <strong>{birthInfo.year}年{birthInfo.month}月{birthInfo.day}日 · {String(birthInfo.hour).padStart(2, '0')}:{String(birthInfo.minute ?? 0).padStart(2, '0')}</strong>
                     <small>{birthInfo.gender === 'male' ? '男' : '女'} · {birthInfo.birthplace || '未填写出生地'}</small>
                   </span>
                   <span className="recent-arrow">›</span>
