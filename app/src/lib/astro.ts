@@ -29,6 +29,8 @@ astro.config({
 export type Gender = 'male' | 'female'
 
 export interface BirthInfo {
+  name?: string
+  approximateTime?: boolean
   year: number
   month: number
   day: number
