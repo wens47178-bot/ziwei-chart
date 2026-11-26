@@ -418,7 +418,7 @@ export function ChartDisplay() {
       bg-gradient-to-br from-white/[0.04] to-transparent
       bg-white border border-slate-200 shadow-sm rounded-2xl
       shadow-sm
-      max-w-6xl mx-auto
+      max-w-none mx-auto
     ">
       {/* 顶部发光线 */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-px bg-gradient-to-r from-transparent via-star/50 to-transparent" />
