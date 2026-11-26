@@ -41,34 +41,42 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
     let active = true
     const trimmedBirthplace = birthplace.trim()
 
-    if (!trueSolarEnabled || !trimmedBirthplace) return
+    if (!trueSolarEnabled || trimmedBirthplace.length < 2) {
+      setMatchedBirthplace(null)
+      setMatchingBirthplace(false)
+      return
+    }
 
-    findBirthplaceAsync(trimmedBirthplace)
-      .then((place) => {
-        if (active) setMatchedBirthplace(place)
-      })
-      .catch(() => {
-        if (active) setMatchedBirthplace(null)
-      })
-      .finally(() => {
-        if (active) setMatchingBirthplace(false)
-      })
+    // Wait until the user pauses typing before calling the worldwide gazetteer.
+    const timer = window.setTimeout(() => {
+      findBirthplaceAsync(trimmedBirthplace)
+        .then((place) => {
+          if (active) setMatchedBirthplace(place)
+        })
+        .catch(() => {
+          if (active) setMatchedBirthplace(null)
+        })
+        .finally(() => {
+          if (active) setMatchingBirthplace(false)
+        })
+    }, 350)
 
     return () => {
       active = false
+      window.clearTimeout(timer)
     }
   }, [birthplace, trueSolarEnabled])
 
   const handleBirthplaceChange = (value: string) => {
     setBirthplace(value)
     setMatchedBirthplace(null)
-    setMatchingBirthplace(trueSolarEnabled && value.trim().length > 0)
+    setMatchingBirthplace(trueSolarEnabled && value.trim().length >= 2)
   }
 
   const handleTrueSolarToggle = (enabled: boolean) => {
     setTrueSolarEnabled(enabled)
     setMatchedBirthplace(null)
-    setMatchingBirthplace(enabled && birthplace.trim().length > 0)
+    setMatchingBirthplace(enabled && birthplace.trim().length >= 2)
   }
 
   const handleYearChange = (nextYear: number) => {
@@ -255,10 +263,12 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
               ? matchingBirthplace
                 ? '正在匹配出生地'
                 : matchedBirthplace
-                ? `已匹配 ${matchedBirthplace.name}${matchedBirthplace.country ? `（${matchedBirthplace.country}）` : ''}，系统会按当地时区校正真太阳时`
+                ? `已匹配 ${matchedBirthplace.name}${matchedBirthplace.province ? ` · ${matchedBirthplace.province}` : ''}${matchedBirthplace.country ? `（${matchedBirthplace.country}）` : ''}${matchedBirthplace.timeZone ? ` · ${matchedBirthplace.timeZone}` : ''}，系统会按当地时区校正真太阳时`
                 : birthplace.trim()
                   ? '暂未匹配该出生地，将按原时辰排盘'
-                  : '支持中国大陆地点库及全球城市检索；可输入中文、当地名称或英文城市名，重名城市请加上国家。联网检索不可用或地点未匹配时不会猜测时区'
+                  : birthplace.trim().length >= 2
+                    ? '暂未确认唯一出生地。请补充州、省或国家名称；未确认前不会进行真太阳时校正'
+                    : '支持全球城市与城镇检索；可输入中文、当地名称或英文城市名，建议使用“城市, 州/省, 国家”格式'
               : '已关闭真太阳时校正'
           }
           value={birthplace}
