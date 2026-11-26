@@ -1,0 +1,1698 @@
+[
+  {
+    "name": "Phnom Penh",
+    "city": "Phnom Penh",
+    "country": "Cambodia",
+    "latitude": 11.5564,
+    "longitude": 104.9282,
+    "timeZone": "Asia/Phnom_Penh",
+    "aliases": [
+      "金边",
+      "ភ្នំពេញ"
+    ]
+  },
+  {
+    "name": "Siem Reap",
+    "city": "Siem Reap",
+    "country": "Cambodia",
+    "latitude": 13.3671,
+    "longitude": 103.8448,
+    "timeZone": "Asia/Phnom_Penh",
+    "aliases": [
+      "暹粒"
+    ]
+  },
+  {
+    "name": "Bangkok",
+    "city": "Bangkok",
+    "country": "Thailand",
+    "latitude": 13.7563,
+    "longitude": 100.5018,
+    "timeZone": "Asia/Bangkok",
+    "aliases": [
+      "曼谷"
+    ]
+  },
+  {
+    "name": "Chiang Mai",
+    "city": "Chiang Mai",
+    "country": "Thailand",
+    "latitude": 18.7883,
+    "longitude": 98.9853,
+    "timeZone": "Asia/Bangkok",
+    "aliases": [
+      "清迈"
+    ]
+  },
+  {
+    "name": "Singapore",
+    "city": "Singapore",
+    "country": "Singapore",
+    "latitude": 1.3521,
+    "longitude": 103.8198,
+    "timeZone": "Asia/Singapore",
+    "aliases": [
+      "新加坡"
+    ]
+  },
+  {
+    "name": "Kuala Lumpur",
+    "city": "Kuala Lumpur",
+    "country": "Malaysia",
+    "latitude": 3.139,
+    "longitude": 101.6869,
+    "timeZone": "Asia/Kuala_Lumpur",
+    "aliases": [
+      "吉隆坡"
+    ]
+  },
+  {
+    "name": "George Town",
+    "city": "George Town",
+    "country": "Malaysia",
+    "latitude": 5.4141,
+    "longitude": 100.3288,
+    "timeZone": "Asia/Kuala_Lumpur",
+    "aliases": [
+      "槟城",
+      "乔治市"
+    ]
+  },
+  {
+    "name": "Jakarta",
+    "city": "Jakarta",
+    "country": "Indonesia",
+    "latitude": -6.2088,
+    "longitude": 106.8456,
+    "timeZone": "Asia/Jakarta",
+    "aliases": [
+      "雅加达"
+    ]
+  },
+  {
+    "name": "Denpasar",
+    "city": "Denpasar",
+    "country": "Indonesia",
+    "latitude": -8.6705,
+    "longitude": 115.2126,
+    "timeZone": "Asia/Makassar",
+    "aliases": [
+      "巴厘岛",
+      "登巴萨"
+    ]
+  },
+  {
+    "name": "Surabaya",
+    "city": "Surabaya",
+    "country": "Indonesia",
+    "latitude": -7.2575,
+    "longitude": 112.7521,
+    "timeZone": "Asia/Jakarta",
+    "aliases": [
+      "泗水"
+    ]
+  },
+  {
+    "name": "Manila",
+    "city": "Manila",
+    "country": "Philippines",
+    "latitude": 14.5995,
+    "longitude": 120.9842,
+    "timeZone": "Asia/Manila",
+    "aliases": [
+      "马尼拉"
+    ]
+  },
+  {
+    "name": "Cebu City",
+    "city": "Cebu City",
+    "country": "Philippines",
+    "latitude": 10.3157,
+    "longitude": 123.8854,
+    "timeZone": "Asia/Manila",
+    "aliases": [
+      "宿务"
+    ]
+  },
+  {
+    "name": "Hanoi",
+    "city": "Hanoi",
+    "country": "Vietnam",
+    "latitude": 21.0278,
+    "longitude": 105.8342,
+    "timeZone": "Asia/Ho_Chi_Minh",
+    "aliases": [
+      "河内"
+    ]
+  },
+  {
+    "name": "Ho Chi Minh City",
+    "city": "Ho Chi Minh City",
+    "country": "Vietnam",
+    "latitude": 10.8231,
+    "longitude": 106.6297,
+    "timeZone": "Asia/Ho_Chi_Minh",
+    "aliases": [
+      "胡志明市",
+      "西贡",
+      "Saigon"
+    ]
+  },
+  {
+    "name": "Da Nang",
+    "city": "Da Nang",
+    "country": "Vietnam",
+    "latitude": 16.0544,
+    "longitude": 108.2022,
+    "timeZone": "Asia/Ho_Chi_Minh",
+    "aliases": [
+      "岘港"
+    ]
+  },
+  {
+    "name": "Vientiane",
+    "city": "Vientiane",
+    "country": "Laos",
+    "latitude": 17.9757,
+    "longitude": 102.6331,
+    "timeZone": "Asia/Vientiane",
+    "aliases": [
+      "万象"
+    ]
+  },
+  {
+    "name": "Yangon",
+    "city": "Yangon",
+    "country": "Myanmar",
+    "latitude": 16.8409,
+    "longitude": 96.1735,
+    "timeZone": "Asia/Yangon",
+    "aliases": [
+      "仰光"
+    ]
+  },
+  {
+    "name": "Naypyidaw",
+    "city": "Naypyidaw",
+    "country": "Myanmar",
+    "latitude": 19.7633,
+    "longitude": 96.0785,
+    "timeZone": "Asia/Yangon",
+    "aliases": [
+      "内比都"
+    ]
+  },
+  {
+    "name": "Tokyo",
+    "city": "Tokyo",
+    "country": "Japan",
+    "latitude": 35.6762,
+    "longitude": 139.6503,
+    "timeZone": "Asia/Tokyo",
+    "aliases": [
+      "东京"
+    ]
+  },
+  {
+    "name": "Osaka",
+    "city": "Osaka",
+    "country": "Japan",
+    "latitude": 34.6937,
+    "longitude": 135.5023,
+    "timeZone": "Asia/Tokyo",
+    "aliases": [
+      "大阪"
+    ]
+  },
+  {
+    "name": "Kyoto",
+    "city": "Kyoto",
+    "country": "Japan",
+    "latitude": 35.0116,
+    "longitude": 135.7681,
+    "timeZone": "Asia/Tokyo",
+    "aliases": [
+      "京都"
+    ]
+  },
+  {
+    "name": "Sapporo",
+    "city": "Sapporo",
+    "country": "Japan",
+    "latitude": 43.0618,
+    "longitude": 141.3545,
+    "timeZone": "Asia/Tokyo",
+    "aliases": [
+      "札幌"
+    ]
+  },
+  {
+    "name": "Seoul",
+    "city": "Seoul",
+    "country": "South Korea",
+    "latitude": 37.5665,
+    "longitude": 126.978,
+    "timeZone": "Asia/Seoul",
+    "aliases": [
+      "首尔",
+      "汉城"
+    ]
+  },
+  {
+    "name": "Busan",
+    "city": "Busan",
+    "country": "South Korea",
+    "latitude": 35.1796,
+    "longitude": 129.0756,
+    "timeZone": "Asia/Seoul",
+    "aliases": [
+      "釜山"
+    ]
+  },
+  {
+    "name": "Taipei",
+    "city": "Taipei",
+    "country": "Taiwan",
+    "latitude": 25.033,
+    "longitude": 121.5654,
+    "timeZone": "Asia/Taipei",
+    "aliases": [
+      "台北"
+    ]
+  },
+  {
+    "name": "Kaohsiung",
+    "city": "Kaohsiung",
+    "country": "Taiwan",
+    "latitude": 22.6273,
+    "longitude": 120.3014,
+    "timeZone": "Asia/Taipei",
+    "aliases": [
+      "高雄"
+    ]
+  },
+  {
+    "name": "Hong Kong",
+    "city": "Hong Kong",
+    "country": "Hong Kong",
+    "latitude": 22.3193,
+    "longitude": 114.1694,
+    "timeZone": "Asia/Hong_Kong",
+    "aliases": [
+      "香港"
+    ]
+  },
+  {
+    "name": "Macau",
+    "city": "Macau",
+    "country": "Macau",
+    "latitude": 22.1987,
+    "longitude": 113.5439,
+    "timeZone": "Asia/Macau",
+    "aliases": [
+      "澳门",
+      "澳門"
+    ]
+  },
+  {
+    "name": "Ulaanbaatar",
+    "city": "Ulaanbaatar",
+    "country": "Mongolia",
+    "latitude": 47.9184,
+    "longitude": 106.9177,
+    "timeZone": "Asia/Ulaanbaatar",
+    "aliases": [
+      "乌兰巴托"
+    ]
+  },
+  {
+    "name": "Kathmandu",
+    "city": "Kathmandu",
+    "country": "Nepal",
+    "latitude": 27.7172,
+    "longitude": 85.324,
+    "timeZone": "Asia/Kathmandu",
+    "aliases": [
+      "加德满都"
+    ]
+  },
+  {
+    "name": "Dhaka",
+    "city": "Dhaka",
+    "country": "Bangladesh",
+    "latitude": 23.8103,
+    "longitude": 90.4125,
+    "timeZone": "Asia/Dhaka",
+    "aliases": [
+      "达卡"
+    ]
+  },
+  {
+    "name": "Delhi",
+    "city": "Delhi",
+    "country": "India",
+    "latitude": 28.6139,
+    "longitude": 77.209,
+    "timeZone": "Asia/Kolkata",
+    "aliases": [
+      "新德里",
+      "德里",
+      "New Delhi"
+    ]
+  },
+  {
+    "name": "Mumbai",
+    "city": "Mumbai",
+    "country": "India",
+    "latitude": 19.076,
+    "longitude": 72.8777,
+    "timeZone": "Asia/Kolkata",
+    "aliases": [
+      "孟买"
+    ]
+  },
+  {
+    "name": "Kolkata",
+    "city": "Kolkata",
+    "country": "India",
+    "latitude": 22.5726,
+    "longitude": 88.3639,
+    "timeZone": "Asia/Kolkata",
+    "aliases": [
+      "加尔各答"
+    ]
+  },
+  {
+    "name": "Bengaluru",
+    "city": "Bengaluru",
+    "country": "India",
+    "latitude": 12.9716,
+    "longitude": 77.5946,
+    "timeZone": "Asia/Kolkata",
+    "aliases": [
+      "班加罗尔",
+      "Bangalore"
+    ]
+  },
+  {
+    "name": "Karachi",
+    "city": "Karachi",
+    "country": "Pakistan",
+    "latitude": 24.8607,
+    "longitude": 67.0011,
+    "timeZone": "Asia/Karachi",
+    "aliases": [
+      "卡拉奇"
+    ]
+  },
+  {
+    "name": "Lahore",
+    "city": "Lahore",
+    "country": "Pakistan",
+    "latitude": 31.5204,
+    "longitude": 74.3587,
+    "timeZone": "Asia/Karachi",
+    "aliases": [
+      "拉合尔"
+    ]
+  },
+  {
+    "name": "Colombo",
+    "city": "Colombo",
+    "country": "Sri Lanka",
+    "latitude": 6.9271,
+    "longitude": 79.8612,
+    "timeZone": "Asia/Colombo",
+    "aliases": [
+      "科伦坡"
+    ]
+  },
+  {
+    "name": "Tashkent",
+    "city": "Tashkent",
+    "country": "Uzbekistan",
+    "latitude": 41.2995,
+    "longitude": 69.2401,
+    "timeZone": "Asia/Tashkent",
+    "aliases": [
+      "塔什干"
+    ]
+  },
+  {
+    "name": "Almaty",
+    "city": "Almaty",
+    "country": "Kazakhstan",
+    "latitude": 43.2383,
+    "longitude": 76.945,
+    "timeZone": "Asia/Almaty",
+    "aliases": [
+      "阿拉木图"
+    ]
+  },
+  {
+    "name": "Astana",
+    "city": "Astana",
+    "country": "Kazakhstan",
+    "latitude": 51.1694,
+    "longitude": 71.4491,
+    "timeZone": "Asia/Almaty",
+    "aliases": [
+      "阿斯塔纳",
+      "努尔苏丹"
+    ]
+  },
+  {
+    "name": "Bishkek",
+    "city": "Bishkek",
+    "country": "Kyrgyzstan",
+    "latitude": 42.8746,
+    "longitude": 74.5698,
+    "timeZone": "Asia/Bishkek",
+    "aliases": [
+      "比什凯克"
+    ]
+  },
+  {
+    "name": "Dubai",
+    "city": "Dubai",
+    "country": "United Arab Emirates",
+    "latitude": 25.2048,
+    "longitude": 55.2708,
+    "timeZone": "Asia/Dubai",
+    "aliases": [
+      "迪拜"
+    ]
+  },
+  {
+    "name": "Abu Dhabi",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates",
+    "latitude": 24.4539,
+    "longitude": 54.3773,
+    "timeZone": "Asia/Dubai",
+    "aliases": [
+      "阿布扎比"
+    ]
+  },
+  {
+    "name": "Riyadh",
+    "city": "Riyadh",
+    "country": "Saudi Arabia",
+    "latitude": 24.7136,
+    "longitude": 46.6753,
+    "timeZone": "Asia/Riyadh",
+    "aliases": [
+      "利雅得"
+    ]
+  },
+  {
+    "name": "Jeddah",
+    "city": "Jeddah",
+    "country": "Saudi Arabia",
+    "latitude": 21.4858,
+    "longitude": 39.1925,
+    "timeZone": "Asia/Riyadh",
+    "aliases": [
+      "吉达"
+    ]
+  },
+  {
+    "name": "Doha",
+    "city": "Doha",
+    "country": "Qatar",
+    "latitude": 25.2854,
+    "longitude": 51.531,
+    "timeZone": "Asia/Qatar",
+    "aliases": [
+      "多哈"
+    ]
+  },
+  {
+    "name": "Kuwait City",
+    "city": "Kuwait City",
+    "country": "Kuwait",
+    "latitude": 29.3759,
+    "longitude": 47.9774,
+    "timeZone": "Asia/Kuwait",
+    "aliases": [
+      "科威特城"
+    ]
+  },
+  {
+    "name": "Muscat",
+    "city": "Muscat",
+    "country": "Oman",
+    "latitude": 23.588,
+    "longitude": 58.3829,
+    "timeZone": "Asia/Muscat",
+    "aliases": [
+      "马斯喀特"
+    ]
+  },
+  {
+    "name": "Tehran",
+    "city": "Tehran",
+    "country": "Iran",
+    "latitude": 35.6892,
+    "longitude": 51.389,
+    "timeZone": "Asia/Tehran",
+    "aliases": [
+      "德黑兰"
+    ]
+  },
+  {
+    "name": "Istanbul",
+    "city": "Istanbul",
+    "country": "Turkey",
+    "latitude": 41.0082,
+    "longitude": 28.9784,
+    "timeZone": "Europe/Istanbul",
+    "aliases": [
+      "伊斯坦布尔"
+    ]
+  },
+  {
+    "name": "Ankara",
+    "city": "Ankara",
+    "country": "Turkey",
+    "latitude": 39.9334,
+    "longitude": 32.8597,
+    "timeZone": "Europe/Istanbul",
+    "aliases": [
+      "安卡拉"
+    ]
+  },
+  {
+    "name": "Tel Aviv",
+    "city": "Tel Aviv",
+    "country": "Israel",
+    "latitude": 32.0853,
+    "longitude": 34.7818,
+    "timeZone": "Asia/Jerusalem",
+    "aliases": [
+      "特拉维夫"
+    ]
+  },
+  {
+    "name": "Jerusalem",
+    "city": "Jerusalem",
+    "country": "Israel",
+    "latitude": 31.7683,
+    "longitude": 35.2137,
+    "timeZone": "Asia/Jerusalem",
+    "aliases": [
+      "耶路撒冷"
+    ]
+  },
+  {
+    "name": "Amman",
+    "city": "Amman",
+    "country": "Jordan",
+    "latitude": 31.9539,
+    "longitude": 35.9106,
+    "timeZone": "Asia/Amman",
+    "aliases": [
+      "安曼"
+    ]
+  },
+  {
+    "name": "London",
+    "city": "London",
+    "country": "United Kingdom",
+    "latitude": 51.5072,
+    "longitude": -0.1276,
+    "timeZone": "Europe/London",
+    "aliases": [
+      "伦敦"
+    ]
+  },
+  {
+    "name": "Manchester",
+    "city": "Manchester",
+    "country": "United Kingdom",
+    "latitude": 53.4808,
+    "longitude": -2.2426,
+    "timeZone": "Europe/London",
+    "aliases": [
+      "曼彻斯特"
+    ]
+  },
+  {
+    "name": "Edinburgh",
+    "city": "Edinburgh",
+    "country": "United Kingdom",
+    "latitude": 55.9533,
+    "longitude": -3.1883,
+    "timeZone": "Europe/London",
+    "aliases": [
+      "爱丁堡"
+    ]
+  },
+  {
+    "name": "Dublin",
+    "city": "Dublin",
+    "country": "Ireland",
+    "latitude": 53.3498,
+    "longitude": -6.2603,
+    "timeZone": "Europe/Dublin",
+    "aliases": [
+      "都柏林"
+    ]
+  },
+  {
+    "name": "Paris",
+    "city": "Paris",
+    "country": "France",
+    "latitude": 48.8566,
+    "longitude": 2.3522,
+    "timeZone": "Europe/Paris",
+    "aliases": [
+      "巴黎"
+    ]
+  },
+  {
+    "name": "Marseille",
+    "city": "Marseille",
+    "country": "France",
+    "latitude": 43.2965,
+    "longitude": 5.3698,
+    "timeZone": "Europe/Paris",
+    "aliases": [
+      "马赛"
+    ]
+  },
+  {
+    "name": "Berlin",
+    "city": "Berlin",
+    "country": "Germany",
+    "latitude": 52.52,
+    "longitude": 13.405,
+    "timeZone": "Europe/Berlin",
+    "aliases": [
+      "柏林"
+    ]
+  },
+  {
+    "name": "Munich",
+    "city": "Munich",
+    "country": "Germany",
+    "latitude": 48.1351,
+    "longitude": 11.582,
+    "timeZone": "Europe/Berlin",
+    "aliases": [
+      "慕尼黑"
+    ]
+  },
+  {
+    "name": "Frankfurt",
+    "city": "Frankfurt",
+    "country": "Germany",
+    "latitude": 50.1109,
+    "longitude": 8.6821,
+    "timeZone": "Europe/Berlin",
+    "aliases": [
+      "法兰克福"
+    ]
+  },
+  {
+    "name": "Amsterdam",
+    "city": "Amsterdam",
+    "country": "Netherlands",
+    "latitude": 52.3676,
+    "longitude": 4.9041,
+    "timeZone": "Europe/Amsterdam",
+    "aliases": [
+      "阿姆斯特丹"
+    ]
+  },
+  {
+    "name": "Brussels",
+    "city": "Brussels",
+    "country": "Belgium",
+    "latitude": 50.8503,
+    "longitude": 4.3517,
+    "timeZone": "Europe/Brussels",
+    "aliases": [
+      "布鲁塞尔"
+    ]
+  },
+  {
+    "name": "Zurich",
+    "city": "Zurich",
+    "country": "Switzerland",
+    "latitude": 47.3769,
+    "longitude": 8.5417,
+    "timeZone": "Europe/Zurich",
+    "aliases": [
+      "苏黎世"
+    ]
+  },
+  {
+    "name": "Geneva",
+    "city": "Geneva",
+    "country": "Switzerland",
+    "latitude": 46.2044,
+    "longitude": 6.1432,
+    "timeZone": "Europe/Zurich",
+    "aliases": [
+      "日内瓦"
+    ]
+  },
+  {
+    "name": "Vienna",
+    "city": "Vienna",
+    "country": "Austria",
+    "latitude": 48.2082,
+    "longitude": 16.3738,
+    "timeZone": "Europe/Vienna",
+    "aliases": [
+      "维也纳"
+    ]
+  },
+  {
+    "name": "Prague",
+    "city": "Prague",
+    "country": "Czechia",
+    "latitude": 50.0755,
+    "longitude": 14.4378,
+    "timeZone": "Europe/Prague",
+    "aliases": [
+      "布拉格"
+    ]
+  },
+  {
+    "name": "Warsaw",
+    "city": "Warsaw",
+    "country": "Poland",
+    "latitude": 52.2297,
+    "longitude": 21.0122,
+    "timeZone": "Europe/Warsaw",
+    "aliases": [
+      "华沙"
+    ]
+  },
+  {
+    "name": "Budapest",
+    "city": "Budapest",
+    "country": "Hungary",
+    "latitude": 47.4979,
+    "longitude": 19.0402,
+    "timeZone": "Europe/Budapest",
+    "aliases": [
+      "布达佩斯"
+    ]
+  },
+  {
+    "name": "Rome",
+    "city": "Rome",
+    "country": "Italy",
+    "latitude": 41.9028,
+    "longitude": 12.4964,
+    "timeZone": "Europe/Rome",
+    "aliases": [
+      "罗马"
+    ]
+  },
+  {
+    "name": "Milan",
+    "city": "Milan",
+    "country": "Italy",
+    "latitude": 45.4642,
+    "longitude": 9.19,
+    "timeZone": "Europe/Rome",
+    "aliases": [
+      "米兰"
+    ]
+  },
+  {
+    "name": "Madrid",
+    "city": "Madrid",
+    "country": "Spain",
+    "latitude": 40.4168,
+    "longitude": -3.7038,
+    "timeZone": "Europe/Madrid",
+    "aliases": [
+      "马德里"
+    ]
+  },
+  {
+    "name": "Barcelona",
+    "city": "Barcelona",
+    "country": "Spain",
+    "latitude": 41.3874,
+    "longitude": 2.1686,
+    "timeZone": "Europe/Madrid",
+    "aliases": [
+      "巴塞罗那"
+    ]
+  },
+  {
+    "name": "Lisbon",
+    "city": "Lisbon",
+    "country": "Portugal",
+    "latitude": 38.7223,
+    "longitude": -9.1393,
+    "timeZone": "Europe/Lisbon",
+    "aliases": [
+      "里斯本"
+    ]
+  },
+  {
+    "name": "Athens",
+    "city": "Athens",
+    "country": "Greece",
+    "latitude": 37.9838,
+    "longitude": 23.7275,
+    "timeZone": "Europe/Athens",
+    "aliases": [
+      "雅典"
+    ]
+  },
+  {
+    "name": "Stockholm",
+    "city": "Stockholm",
+    "country": "Sweden",
+    "latitude": 59.3293,
+    "longitude": 18.0686,
+    "timeZone": "Europe/Stockholm",
+    "aliases": [
+      "斯德哥尔摩"
+    ]
+  },
+  {
+    "name": "Oslo",
+    "city": "Oslo",
+    "country": "Norway",
+    "latitude": 59.9139,
+    "longitude": 10.7522,
+    "timeZone": "Europe/Oslo",
+    "aliases": [
+      "奥斯陆"
+    ]
+  },
+  {
+    "name": "Copenhagen",
+    "city": "Copenhagen",
+    "country": "Denmark",
+    "latitude": 55.6761,
+    "longitude": 12.5683,
+    "timeZone": "Europe/Copenhagen",
+    "aliases": [
+      "哥本哈根"
+    ]
+  },
+  {
+    "name": "Helsinki",
+    "city": "Helsinki",
+    "country": "Finland",
+    "latitude": 60.1699,
+    "longitude": 24.9384,
+    "timeZone": "Europe/Helsinki",
+    "aliases": [
+      "赫尔辛基"
+    ]
+  },
+  {
+    "name": "Reykjavik",
+    "city": "Reykjavik",
+    "country": "Iceland",
+    "latitude": 64.1466,
+    "longitude": -21.9426,
+    "timeZone": "Atlantic/Reykjavik",
+    "aliases": [
+      "雷克雅未克"
+    ]
+  },
+  {
+    "name": "Moscow",
+    "city": "Moscow",
+    "country": "Russia",
+    "latitude": 55.7558,
+    "longitude": 37.6173,
+    "timeZone": "Europe/Moscow",
+    "aliases": [
+      "莫斯科"
+    ]
+  },
+  {
+    "name": "Saint Petersburg",
+    "city": "Saint Petersburg",
+    "country": "Russia",
+    "latitude": 59.9311,
+    "longitude": 30.3609,
+    "timeZone": "Europe/Moscow",
+    "aliases": [
+      "圣彼得堡"
+    ]
+  },
+  {
+    "name": "Kyiv",
+    "city": "Kyiv",
+    "country": "Ukraine",
+    "latitude": 50.4501,
+    "longitude": 30.5234,
+    "timeZone": "Europe/Kyiv",
+    "aliases": [
+      "基辅",
+      "Kiev"
+    ]
+  },
+  {
+    "name": "Bucharest",
+    "city": "Bucharest",
+    "country": "Romania",
+    "latitude": 44.4268,
+    "longitude": 26.1025,
+    "timeZone": "Europe/Bucharest",
+    "aliases": [
+      "布加勒斯特"
+    ]
+  },
+  {
+    "name": "Sofia",
+    "city": "Sofia",
+    "country": "Bulgaria",
+    "latitude": 42.6977,
+    "longitude": 23.3219,
+    "timeZone": "Europe/Sofia",
+    "aliases": [
+      "索非亚"
+    ]
+  },
+  {
+    "name": "Cairo",
+    "city": "Cairo",
+    "country": "Egypt",
+    "latitude": 30.0444,
+    "longitude": 31.2357,
+    "timeZone": "Africa/Cairo",
+    "aliases": [
+      "开罗"
+    ]
+  },
+  {
+    "name": "Alexandria",
+    "city": "Alexandria",
+    "country": "Egypt",
+    "latitude": 31.2001,
+    "longitude": 29.9187,
+    "timeZone": "Africa/Cairo",
+    "aliases": [
+      "亚历山大"
+    ]
+  },
+  {
+    "name": "Casablanca",
+    "city": "Casablanca",
+    "country": "Morocco",
+    "latitude": 33.5731,
+    "longitude": -7.5898,
+    "timeZone": "Africa/Casablanca",
+    "aliases": [
+      "卡萨布兰卡"
+    ]
+  },
+  {
+    "name": "Marrakesh",
+    "city": "Marrakesh",
+    "country": "Morocco",
+    "latitude": 31.6295,
+    "longitude": -7.9811,
+    "timeZone": "Africa/Casablanca",
+    "aliases": [
+      "马拉喀什"
+    ]
+  },
+  {
+    "name": "Algiers",
+    "city": "Algiers",
+    "country": "Algeria",
+    "latitude": 36.7538,
+    "longitude": 3.0588,
+    "timeZone": "Africa/Algiers",
+    "aliases": [
+      "阿尔及尔"
+    ]
+  },
+  {
+    "name": "Tunis",
+    "city": "Tunis",
+    "country": "Tunisia",
+    "latitude": 36.8065,
+    "longitude": 10.1815,
+    "timeZone": "Africa/Tunis",
+    "aliases": [
+      "突尼斯市"
+    ]
+  },
+  {
+    "name": "Lagos",
+    "city": "Lagos",
+    "country": "Nigeria",
+    "latitude": 6.5244,
+    "longitude": 3.3792,
+    "timeZone": "Africa/Lagos",
+    "aliases": [
+      "拉各斯"
+    ]
+  },
+  {
+    "name": "Accra",
+    "city": "Accra",
+    "country": "Ghana",
+    "latitude": 5.6037,
+    "longitude": -0.187,
+    "timeZone": "Africa/Accra",
+    "aliases": [
+      "阿克拉"
+    ]
+  },
+  {
+    "name": "Dakar",
+    "city": "Dakar",
+    "country": "Senegal",
+    "latitude": 14.7167,
+    "longitude": -17.4677,
+    "timeZone": "Africa/Dakar",
+    "aliases": [
+      "达喀尔"
+    ]
+  },
+  {
+    "name": "Nairobi",
+    "city": "Nairobi",
+    "country": "Kenya",
+    "latitude": -1.2921,
+    "longitude": 36.8219,
+    "timeZone": "Africa/Nairobi",
+    "aliases": [
+      "内罗毕"
+    ]
+  },
+  {
+    "name": "Addis Ababa",
+    "city": "Addis Ababa",
+    "country": "Ethiopia",
+    "latitude": 8.9806,
+    "longitude": 38.7578,
+    "timeZone": "Africa/Addis_Ababa",
+    "aliases": [
+      "亚的斯亚贝巴"
+    ]
+  },
+  {
+    "name": "Kampala",
+    "city": "Kampala",
+    "country": "Uganda",
+    "latitude": 0.3476,
+    "longitude": 32.5825,
+    "timeZone": "Africa/Kampala",
+    "aliases": [
+      "坎帕拉"
+    ]
+  },
+  {
+    "name": "Kigali",
+    "city": "Kigali",
+    "country": "Rwanda",
+    "latitude": -1.9441,
+    "longitude": 30.0619,
+    "timeZone": "Africa/Kigali",
+    "aliases": [
+      "基加利"
+    ]
+  },
+  {
+    "name": "Dar es Salaam",
+    "city": "Dar es Salaam",
+    "country": "Tanzania",
+    "latitude": -6.7924,
+    "longitude": 39.2083,
+    "timeZone": "Africa/Dar_es_Salaam",
+    "aliases": [
+      "达累斯萨拉姆"
+    ]
+  },
+  {
+    "name": "Johannesburg",
+    "city": "Johannesburg",
+    "country": "South Africa",
+    "latitude": -26.2041,
+    "longitude": 28.0473,
+    "timeZone": "Africa/Johannesburg",
+    "aliases": [
+      "约翰内斯堡"
+    ]
+  },
+  {
+    "name": "Cape Town",
+    "city": "Cape Town",
+    "country": "South Africa",
+    "latitude": -33.9249,
+    "longitude": 18.4241,
+    "timeZone": "Africa/Johannesburg",
+    "aliases": [
+      "开普敦"
+    ]
+  },
+  {
+    "name": "Durban",
+    "city": "Durban",
+    "country": "South Africa",
+    "latitude": -29.8587,
+    "longitude": 31.0218,
+    "timeZone": "Africa/Johannesburg",
+    "aliases": [
+      "德班"
+    ]
+  },
+  {
+    "name": "Luanda",
+    "city": "Luanda",
+    "country": "Angola",
+    "latitude": -8.839,
+    "longitude": 13.2894,
+    "timeZone": "Africa/Luanda",
+    "aliases": [
+      "罗安达"
+    ]
+  },
+  {
+    "name": "Maputo",
+    "city": "Maputo",
+    "country": "Mozambique",
+    "latitude": -25.9692,
+    "longitude": 32.5732,
+    "timeZone": "Africa/Maputo",
+    "aliases": [
+      "马普托"
+    ]
+  },
+  {
+    "name": "New York",
+    "city": "New York",
+    "country": "United States",
+    "latitude": 40.7128,
+    "longitude": -74.006,
+    "timeZone": "America/New_York",
+    "aliases": [
+      "纽约"
+    ]
+  },
+  {
+    "name": "Los Angeles",
+    "city": "Los Angeles",
+    "country": "United States",
+    "latitude": 34.0522,
+    "longitude": -118.2437,
+    "timeZone": "America/Los_Angeles",
+    "aliases": [
+      "洛杉矶"
+    ]
+  },
+  {
+    "name": "San Francisco",
+    "city": "San Francisco",
+    "country": "United States",
+    "latitude": 37.7749,
+    "longitude": -122.4194,
+    "timeZone": "America/Los_Angeles",
+    "aliases": [
+      "旧金山"
+    ]
+  },
+  {
+    "name": "Seattle",
+    "city": "Seattle",
+    "country": "United States",
+    "latitude": 47.6062,
+    "longitude": -122.3321,
+    "timeZone": "America/Los_Angeles",
+    "aliases": [
+      "西雅图"
+    ]
+  },
+  {
+    "name": "Chicago",
+    "city": "Chicago",
+    "country": "United States",
+    "latitude": 41.8781,
+    "longitude": -87.6298,
+    "timeZone": "America/Chicago",
+    "aliases": [
+      "芝加哥"
+    ]
+  },
+  {
+    "name": "Houston",
+    "city": "Houston",
+    "country": "United States",
+    "latitude": 29.7604,
+    "longitude": -95.3698,
+    "timeZone": "America/Chicago",
+    "aliases": [
+      "休斯敦"
+    ]
+  },
+  {
+    "name": "Dallas",
+    "city": "Dallas",
+    "country": "United States",
+    "latitude": 32.7767,
+    "longitude": -96.797,
+    "timeZone": "America/Chicago",
+    "aliases": [
+      "达拉斯"
+    ]
+  },
+  {
+    "name": "Denver",
+    "city": "Denver",
+    "country": "United States",
+    "latitude": 39.7392,
+    "longitude": -104.9903,
+    "timeZone": "America/Denver",
+    "aliases": [
+      "丹佛"
+    ]
+  },
+  {
+    "name": "Phoenix",
+    "city": "Phoenix",
+    "country": "United States",
+    "latitude": 33.4484,
+    "longitude": -112.074,
+    "timeZone": "America/Phoenix",
+    "aliases": [
+      "凤凰城"
+    ]
+  },
+  {
+    "name": "Miami",
+    "city": "Miami",
+    "country": "United States",
+    "latitude": 25.7617,
+    "longitude": -80.1918,
+    "timeZone": "America/New_York",
+    "aliases": [
+      "迈阿密"
+    ]
+  },
+  {
+    "name": "Atlanta",
+    "city": "Atlanta",
+    "country": "United States",
+    "latitude": 33.749,
+    "longitude": -84.388,
+    "timeZone": "America/New_York",
+    "aliases": [
+      "亚特兰大"
+    ]
+  },
+  {
+    "name": "Boston",
+    "city": "Boston",
+    "country": "United States",
+    "latitude": 42.3601,
+    "longitude": -71.0589,
+    "timeZone": "America/New_York",
+    "aliases": [
+      "波士顿"
+    ]
+  },
+  {
+    "name": "Washington",
+    "city": "Washington",
+    "country": "United States",
+    "latitude": 38.9072,
+    "longitude": -77.0369,
+    "timeZone": "America/New_York",
+    "aliases": [
+      "华盛顿特区",
+      "Washington DC"
+    ]
+  },
+  {
+    "name": "Toronto",
+    "city": "Toronto",
+    "country": "Canada",
+    "latitude": 43.6532,
+    "longitude": -79.3832,
+    "timeZone": "America/Toronto",
+    "aliases": [
+      "多伦多"
+    ]
+  },
+  {
+    "name": "Vancouver",
+    "city": "Vancouver",
+    "country": "Canada",
+    "latitude": 49.2827,
+    "longitude": -123.1207,
+    "timeZone": "America/Vancouver",
+    "aliases": [
+      "温哥华"
+    ]
+  },
+  {
+    "name": "Montreal",
+    "city": "Montreal",
+    "country": "Canada",
+    "latitude": 45.5019,
+    "longitude": -73.5674,
+    "timeZone": "America/Toronto",
+    "aliases": [
+      "蒙特利尔"
+    ]
+  },
+  {
+    "name": "Calgary",
+    "city": "Calgary",
+    "country": "Canada",
+    "latitude": 51.0447,
+    "longitude": -114.0719,
+    "timeZone": "America/Edmonton",
+    "aliases": [
+      "卡尔加里"
+    ]
+  },
+  {
+    "name": "Mexico City",
+    "city": "Mexico City",
+    "country": "Mexico",
+    "latitude": 19.4326,
+    "longitude": -99.1332,
+    "timeZone": "America/Mexico_City",
+    "aliases": [
+      "墨西哥城"
+    ]
+  },
+  {
+    "name": "Guadalajara",
+    "city": "Guadalajara",
+    "country": "Mexico",
+    "latitude": 20.6597,
+    "longitude": -103.3496,
+    "timeZone": "America/Mexico_City",
+    "aliases": [
+      "瓜达拉哈拉"
+    ]
+  },
+  {
+    "name": "Havana",
+    "city": "Havana",
+    "country": "Cuba",
+    "latitude": 23.1136,
+    "longitude": -82.3666,
+    "timeZone": "America/Havana",
+    "aliases": [
+      "哈瓦那"
+    ]
+  },
+  {
+    "name": "Santo Domingo",
+    "city": "Santo Domingo",
+    "country": "Dominican Republic",
+    "latitude": 18.4861,
+    "longitude": -69.9312,
+    "timeZone": "America/Santo_Domingo",
+    "aliases": [
+      "圣多明各"
+    ]
+  },
+  {
+    "name": "Panama City",
+    "city": "Panama City",
+    "country": "Panama",
+    "latitude": 8.9824,
+    "longitude": -79.5199,
+    "timeZone": "America/Panama",
+    "aliases": [
+      "巴拿马城"
+    ]
+  },
+  {
+    "name": "Bogota",
+    "city": "Bogota",
+    "country": "Colombia",
+    "latitude": 4.711,
+    "longitude": -74.0721,
+    "timeZone": "America/Bogota",
+    "aliases": [
+      "波哥大"
+    ]
+  },
+  {
+    "name": "Medellin",
+    "city": "Medellin",
+    "country": "Colombia",
+    "latitude": 6.2442,
+    "longitude": -75.5812,
+    "timeZone": "America/Bogota",
+    "aliases": [
+      "麦德林"
+    ]
+  },
+  {
+    "name": "Lima",
+    "city": "Lima",
+    "country": "Peru",
+    "latitude": -12.0464,
+    "longitude": -77.0428,
+    "timeZone": "America/Lima",
+    "aliases": [
+      "利马"
+    ]
+  },
+  {
+    "name": "Santiago",
+    "city": "Santiago",
+    "country": "Chile",
+    "latitude": -33.4489,
+    "longitude": -70.6693,
+    "timeZone": "America/Santiago",
+    "aliases": [
+      "圣地亚哥（智利）"
+    ]
+  },
+  {
+    "name": "Buenos Aires",
+    "city": "Buenos Aires",
+    "country": "Argentina",
+    "latitude": -34.6037,
+    "longitude": -58.3816,
+    "timeZone": "America/Argentina/Buenos_Aires",
+    "aliases": [
+      "布宜诺斯艾利斯"
+    ]
+  },
+  {
+    "name": "Cordoba",
+    "city": "Cordoba",
+    "country": "Argentina",
+    "latitude": -31.4201,
+    "longitude": -64.1888,
+    "timeZone": "America/Argentina/Cordoba",
+    "aliases": [
+      "科尔多瓦（阿根廷）"
+    ]
+  },
+  {
+    "name": "Sao Paulo",
+    "city": "Sao Paulo",
+    "country": "Brazil",
+    "latitude": -23.5505,
+    "longitude": -46.6333,
+    "timeZone": "America/Sao_Paulo",
+    "aliases": [
+      "圣保罗"
+    ]
+  },
+  {
+    "name": "Rio de Janeiro",
+    "city": "Rio de Janeiro",
+    "country": "Brazil",
+    "latitude": -22.9068,
+    "longitude": -43.1729,
+    "timeZone": "America/Sao_Paulo",
+    "aliases": [
+      "里约热内卢"
+    ]
+  },
+  {
+    "name": "Brasilia",
+    "city": "Brasilia",
+    "country": "Brazil",
+    "latitude": -15.7939,
+    "longitude": -47.8828,
+    "timeZone": "America/Sao_Paulo",
+    "aliases": [
+      "巴西利亚"
+    ]
+  },
+  {
+    "name": "Quito",
+    "city": "Quito",
+    "country": "Ecuador",
+    "latitude": -0.1807,
+    "longitude": -78.4678,
+    "timeZone": "America/Guayaquil",
+    "aliases": [
+      "基多"
+    ]
+  },
+  {
+    "name": "Caracas",
+    "city": "Caracas",
+    "country": "Venezuela",
+    "latitude": 10.4806,
+    "longitude": -66.9036,
+    "timeZone": "America/Caracas",
+    "aliases": [
+      "加拉加斯"
+    ]
+  },
+  {
+    "name": "Montevideo",
+    "city": "Montevideo",
+    "country": "Uruguay",
+    "latitude": -34.9011,
+    "longitude": -56.1645,
+    "timeZone": "America/Montevideo",
+    "aliases": [
+      "蒙得维的亚"
+    ]
+  },
+  {
+    "name": "Asuncion",
+    "city": "Asuncion",
+    "country": "Paraguay",
+    "latitude": -25.2637,
+    "longitude": -57.5759,
+    "timeZone": "America/Asuncion",
+    "aliases": [
+      "亚松森"
+    ]
+  },
+  {
+    "name": "La Paz",
+    "city": "La Paz",
+    "country": "Bolivia",
+    "latitude": -16.4897,
+    "longitude": -68.1193,
+    "timeZone": "America/La_Paz",
+    "aliases": [
+      "拉巴斯"
+    ]
+  },
+  {
+    "name": "Sydney",
+    "city": "Sydney",
+    "country": "Australia",
+    "latitude": -33.8688,
+    "longitude": 151.2093,
+    "timeZone": "Australia/Sydney",
+    "aliases": [
+      "悉尼"
+    ]
+  },
+  {
+    "name": "Melbourne",
+    "city": "Melbourne",
+    "country": "Australia",
+    "latitude": -37.8136,
+    "longitude": 144.9631,
+    "timeZone": "Australia/Melbourne",
+    "aliases": [
+      "墨尔本"
+    ]
+  },
+  {
+    "name": "Brisbane",
+    "city": "Brisbane",
+    "country": "Australia",
+    "latitude": -27.4698,
+    "longitude": 153.0251,
+    "timeZone": "Australia/Brisbane",
+    "aliases": [
+      "布里斯班"
+    ]
+  },
+  {
+    "name": "Perth",
+    "city": "Perth",
+    "country": "Australia",
+    "latitude": -31.9505,
+    "longitude": 115.8605,
+    "timeZone": "Australia/Perth",
+    "aliases": [
+      "珀斯"
+    ]
+  },
+  {
+    "name": "Adelaide",
+    "city": "Adelaide",
+    "country": "Australia",
+    "latitude": -34.9285,
+    "longitude": 138.6007,
+    "timeZone": "Australia/Adelaide",
+    "aliases": [
+      "阿德莱德"
+    ]
+  },
+  {
+    "name": "Hobart",
+    "city": "Hobart",
+    "country": "Australia",
+    "latitude": -42.8821,
+    "longitude": 147.3272,
+    "timeZone": "Australia/Hobart",
+    "aliases": [
+      "霍巴特"
+    ]
+  },
+  {
+    "name": "Auckland",
+    "city": "Auckland",
+    "country": "New Zealand",
+    "latitude": -36.8509,
+    "longitude": 174.7645,
+    "timeZone": "Pacific/Auckland",
+    "aliases": [
+      "奥克兰"
+    ]
+  },
+  {
+    "name": "Wellington",
+    "city": "Wellington",
+    "country": "New Zealand",
+    "latitude": -41.2865,
+    "longitude": 174.7762,
+    "timeZone": "Pacific/Auckland",
+    "aliases": [
+      "惠灵顿"
+    ]
+  },
+  {
+    "name": "Suva",
+    "city": "Suva",
+    "country": "Fiji",
+    "latitude": -18.1248,
+    "longitude": 178.4501,
+    "timeZone": "Pacific/Fiji",
+    "aliases": [
+      "苏瓦"
+    ]
+  },
+  {
+    "name": "Port Moresby",
+    "city": "Port Moresby",
+    "country": "Papua New Guinea",
+    "latitude": -9.4438,
+    "longitude": 147.1803,
+    "timeZone": "Pacific/Port_Moresby",
+    "aliases": [
+      "莫尔兹比港"
+    ]
+  }
+]
