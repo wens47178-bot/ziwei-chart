@@ -148,6 +148,75 @@ describe('resolveBirthTime', () => {
     expect(result.correctedShichen).toBe(WU_SHICHEN)
   })
 
+  it('applies China historical daylight-saving offset before longitude and equation-of-time correction', () => {
+    const result = resolveBirthTime({
+      year: 1988,
+      month: 7,
+      day: 1,
+      hour: 12,
+      minute: 0,
+      birthplace: BEIJING,
+      enabled: true,
+      birthplaces: BIRTHPLACE_DATA,
+    })
+
+    expect(result.timeZone).toBe('Asia/Shanghai')
+    expect(result.utcOffsetMinutes).toBe(540)
+    expect(result.dstAdjustmentMinutes).toBe(60)
+    expect(result.correctionMinutes).toBe(
+      result.longitudeCorrectionMinutes + result.equationOfTimeMinutes - 60,
+    )
+    expect(result.hour).toBe(10)
+  })
+
+  it('does not apply a daylight-saving adjustment outside the historical DST period', () => {
+    const result = resolveBirthTime({
+      year: 1992,
+      month: 7,
+      day: 1,
+      hour: 12,
+      birthplace: BEIJING,
+      enabled: true,
+      birthplaces: BIRTHPLACE_DATA,
+    })
+
+    expect(result.utcOffsetMinutes).toBe(480)
+    expect(result.dstAdjustmentMinutes).toBe(0)
+  })
+
+  it('rejects a nonexistent local time during a historical spring-forward transition', () => {
+    expect(() => resolveBirthTime({
+      year: 1988,
+      month: 4,
+      day: 17,
+      hour: 2,
+      minute: 30,
+      birthplace: BEIJING,
+      enabled: true,
+      birthplaces: BIRTHPLACE_DATA,
+    })).toThrow(/does not exist/)
+  })
+
+  it('flags repeated local times during a historical fall-back transition', () => {
+    const result = resolveBirthTime({
+      year: 1988,
+      month: 9,
+      day: 11,
+      hour: 1,
+      minute: 30,
+      birthplace: BEIJING,
+      enabled: true,
+      birthplaces: BIRTHPLACE_DATA,
+    })
+
+    expect(result.ambiguousLocalTime).toBe(true)
+    expect(result.utcOffsetMinutes).toBe(540)
+  })
+
+  it('does not use birthplace records with placeholder zero coordinates', () => {
+    expect(findBirthplaceInData('石河子市', BIRTHPLACE_DATA)).toBeNull()
+  })
+
   it('keeps the original time when true solar correction is disabled', async () => {
     const result = await resolveBirthTimeAsync({
       year: 1990,
