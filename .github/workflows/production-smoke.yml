@@ -45,14 +45,19 @@ jobs:
               await page.getByRole('navigation',{name:'命盘功能'}).waitFor();
             }
             await page.getByRole('button',{name:'星曜图鉴',exact:true}).first().click();
-            const stars = page.getByRole('button',{name:/^(大耗|恩光|八座|地劫|地空|文昌|左辅)$/});
-            await stars.first().waitFor({timeout:30000});
-            const count = await stars.count();
-            for (let i=0;i<count;i++) {
-              await stars.nth(i).click();
-              await page.getByText('传统紫微斗数象征释义：',{exact:false}).first().waitFor({timeout:10000});
-              if(await page.getByText('知识库暂未收录这颗星曜',{exact:false}).isVisible()) throw Error('Missing star profile');
+            const names = '八座 大耗 地劫 地空 恩光 蜚廉 封诰 凤阁 孤辰 寡宿 红鸾 华盖 火星 劫杀 截空 解神 巨门 廉贞 铃星 龙池 龙德 禄存 年解 破军 破碎 七杀 擎羊 三台 台辅 太阳 太阴 贪狼 天才 天厨 天德 天福 天府 天官 天贵 天机 天空 天哭 天魁 天梁 天马 天伤 天使 天寿 天同 天巫 天喜 天相 天刑 天虚 天姚 天月 天钺 陀罗 文昌 文曲 武曲 咸池 旬空 阴煞 右弼 月德 紫微 左辅'.split(' ');
+            await page.getByText('STAR PROFILE',{exact:true}).waitFor({timeout:30000});
+            let checked = 0;
+            for (const name of names) {
+              const button = page.getByRole('button',{name,exact:true});
+              if (!(await button.count())) continue;
+              await button.first().click();
+              await page.getByRole('heading',{name,exact:true}).waitFor({timeout:10000});
+              if(await page.getByText('知识库暂未收录这颗星曜',{exact:false}).isVisible()) throw Error('Missing star profile: '+name);
+              checked++;
             }
+            if (checked < 14) throw Error('Insufficient star coverage: '+checked);
+            console.log('Verified visible natal star profiles: '+checked);
             await page.screenshot({path:'star-atlas.png',fullPage:true});
             await page.setViewportSize({width:390,height:844});
             await page.screenshot({path:'chart-mobile.png',fullPage:true});
