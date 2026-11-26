@@ -118,29 +118,29 @@ describe('findBirthplace', () => {
         json: async () => ({
           data: [{
             type: 'city',
-            name: 'Reykjavik',
+            name: 'Akureyri',
             countryCode: 'IS',
             countryName: 'Iceland',
-            geonameId: 3413829,
+            geonameId: 2633274,
           }],
         }),
       })
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          name: 'Reykjavik',
+          name: 'Akureyri',
           countryName: 'Iceland',
           latitude: '64.1466',
           longitude: '-21.9426',
-          timezone: 'Atlantic/Reykjavik',
+          timezone: 'Atlantic/Akureyri',
         }),
       })
     vi.stubGlobal('fetch', fetchMock)
 
-    const place = await findBirthplaceAsync('Reykjavik, Iceland')
+    const place = await findBirthplaceAsync('Akureyri, Iceland')
 
-    expect(place?.name).toBe('Reykjavik')
-    expect(place?.timeZone).toBe('Atlantic/Reykjavik')
+    expect(place?.name).toBe('Akureyri')
+    expect(place?.timeZone).toBe('Atlantic/Akureyri')
     expect(place?.latitude).toBeCloseTo(64.1466)
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
