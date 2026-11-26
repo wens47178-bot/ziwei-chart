@@ -315,9 +315,9 @@ ${guidanceContext}
         <div
           className="
             prose max-w-none prose-slate
-            text-text-secondary text-lg lg:text-xl leading-loose
+            text-text-secondary text-base leading-8
           "
-          style={{ fontFamily: 'var(--font-brush)' }}
+          style={{ fontFamily: 'var(--font-sans)' }}
         >
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
