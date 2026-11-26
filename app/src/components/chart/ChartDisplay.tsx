@@ -7,7 +7,7 @@
    - 命主/身主 + 纳音五行
    ============================================================ */
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useChartStore } from '@/stores'
 import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
 
@@ -311,6 +311,25 @@ function parsePalaces(chart: FunctionalAstrolabe): PalaceData[] {
 export function ChartDisplay() {
   const { chart, birthInfo } = useChartStore()
   const [selectedPalace, setSelectedPalace] = useState<string | null>(null)
+  const chartRef = useRef<HTMLDivElement>(null)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState('')
+  const exportChart = async () => {
+    if (!chartRef.current || exporting) return
+    setExporting(true)
+    setExportError('')
+    try {
+      const { default: html2canvas } = await import('html2canvas')
+      const node = chartRef.current
+      const canvas = await html2canvas(node, { backgroundColor: '#ffffff', scale: 2, width: node.scrollWidth, height: node.scrollHeight })
+      const link = document.createElement('a')
+      link.download = '天衍-紫微命盘.png'
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } catch {
+      setExportError('导出失败，请重试')
+    } finally { setExporting(false) }
+  }
   const [showMinor, setShowMinor] = useState(true)
   const [showAdjective, setShowAdjective] = useState(true)
 
@@ -359,9 +378,10 @@ export function ChartDisplay() {
 
       <div className="mb-2 flex items-center justify-between gap-2 text-xs text-neutral-600"><span>{selected ? `${selected.name} · 三方四正` : "点击任一宫位查看三方四正"}</span>{selected && <button type="button" onClick={() => setSelectedPalace(null)} className="text-blue-700">取消选择</button>}</div>
       <div className="mb-2 flex flex-wrap items-center gap-3 text-xs text-neutral-700"><label className="flex items-center gap-1"><input type="checkbox" checked={showMinor} onChange={e => setShowMinor(e.target.checked)} />辅星</label><label className="flex items-center gap-1"><input type="checkbox" checked={showAdjective} onChange={e => setShowAdjective(e.target.checked)} />杂曜</label><button type="button" className="ml-auto text-blue-700" onClick={() => { setShowMinor(true); setShowAdjective(true); setSelectedPalace(null) }}>恢复完整盘面</button></div>
+      <div className="mb-2 flex items-center justify-end gap-2"><span role="status" className="text-xs text-red-700">{exportError}</span><button type="button" disabled={exporting} onClick={exportChart} className="rounded border border-neutral-300 px-3 py-1 text-xs disabled:opacity-50">{exporting ? "正在导出…" : "保存命盘图片"}</button></div>
       <div className="overflow-x-auto">
       {/* 4x4 网格 */}
-      <div className="grid min-w-[540px] grid-cols-4 auto-rows-fr gap-px overflow-hidden rounded-xl border border-neutral-300 bg-neutral-300">
+      <div ref={chartRef} className="grid min-w-[540px] grid-cols-4 auto-rows-fr gap-px overflow-hidden rounded-xl border border-neutral-300 bg-neutral-300">
         {/* Row 0 */}
         {grid[0].map((p, c) => renderPalace(p, `0-${c}`))}
 
