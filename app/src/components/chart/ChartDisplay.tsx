@@ -392,16 +392,18 @@ export function ChartDisplay() {
     <div className="
       relative bg-white max-w-none mx-auto
     ">
-      <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">{(['origin','decadal','yearly','both'] as const).map((key,i) => <button key={key} type="button" aria-pressed={layer === key} onClick={() => setLayer(key)} className={layer === key ? 'rounded bg-neutral-900 px-2 py-1 text-white' : 'rounded border px-2 py-1'}>{['本命','大限','流年','叠盘'][i]}</button>)}<input aria-label="运限年份" type="number" min={1} max={9999} value={year} onChange={e => setYear(Number(e.target.value))} className="w-20 rounded border px-1 py-1" />{layer !== 'origin' && !horoscope && <span>无法取得运限资料</span>}</div>
-      <div className="mb-1 grid grid-cols-4 text-center text-[10px] text-neutral-500"><span>南偏东</span><span>正南方</span><span>南偏西</span><span>西偏南</span></div>
+      <details className="mb-1 text-xs"><summary className="cursor-pointer text-neutral-500">盘面设置 · 运限 · 导出</summary><div className="flex flex-wrap items-center gap-2 py-1">{(['origin','decadal','yearly','both'] as const).map((key,i) => <button key={key} type="button" aria-pressed={layer === key} onClick={() => setLayer(key)} className={layer === key ? 'rounded bg-neutral-900 px-2 py-1 text-white' : 'rounded border px-2 py-1'}>{['本命','大限','流年','叠盘'][i]}</button>)}<input aria-label="运限年份" type="number" min={1} max={9999} value={year} onChange={e => setYear(Number(e.target.value))} className="w-20 rounded border px-1 py-1" />{layer !== 'origin' && !horoscope && <span>无法取得运限资料</span>}</div>
+      
 
       <div className="mb-2 flex items-center justify-between gap-2 text-xs text-neutral-600"><span>{selected ? `${selected.name} · 三方四正` : "点击任一宫位查看三方四正"}</span>{selected && <button type="button" onClick={() => setSelectedPalace(null)} className="text-blue-700">取消选择</button>}</div>
       <div className="mb-2 flex flex-wrap items-center gap-3 text-xs text-neutral-700"><label className="flex items-center gap-1"><input type="checkbox" checked={showMinor} onChange={e => setShowMinor(e.target.checked)} />辅星</label><label className="flex items-center gap-1"><input type="checkbox" checked={showAdjective} onChange={e => setShowAdjective(e.target.checked)} />杂曜</label><button type="button" className="ml-auto text-blue-700" onClick={() => { setShowMinor(true); setShowAdjective(true); setSelectedPalace(null) }}>恢复完整盘面</button></div>
       <div className="mb-2 flex items-center justify-end gap-2"><span role="status" className="text-xs text-red-700">{exportError}</span><button type="button" disabled={exporting} onClick={exportChart} className="rounded border border-neutral-300 px-3 py-1 text-xs disabled:opacity-50">{exporting ? "正在导出…" : "保存命盘图片"}</button></div>
       <label className="mb-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={showFlying} onChange={e => setShowFlying(e.target.checked)} />宫干飞化箭头（选择来源宫）</label>
+      </details>
+      <div className="grid grid-cols-4 text-center text-[10px] text-neutral-500"><span>南偏东</span><span>正南方</span><span>南偏西</span><span>西偏南</span></div>
       <div className="overflow-x-auto">
       {/* 4x4 网格 */}
-      <div ref={chartRef} className="relative grid min-w-[540px] grid-cols-4 auto-rows-fr gap-px overflow-hidden rounded-xl border border-neutral-300 bg-neutral-300">
+      <div ref={chartRef} className="relative grid min-w-[460px] grid-cols-4 auto-rows-fr gap-px overflow-hidden rounded-xl border border-neutral-300 bg-neutral-300">
         {/* Row 0 */}
         {grid[0].map((p, c) => renderPalace(p, `0-${c}`))}
 
@@ -437,7 +439,7 @@ export function ChartDisplay() {
       <div className="mt-1 grid grid-cols-4 text-center text-[10px] text-neutral-500"><span>东偏北</span><span>北偏东</span><span>正北方</span><span>北偏西</span></div>
       {showFlying && selected && <div className="mt-2 space-y-1 text-xs">{flights.map((f,i) => <div key={i}>{f.sourcePalace} · {f.star}{f.transformation} → {f.targetPalace ?? '未定位'}{f.targetPalace === f.sourcePalace ? '（同宫）' : ''}</div>)}</div>}
       {/* 图例 */}
-      <div className="flex flex-wrap items-center justify-center gap-4 mt-3 pt-3 border-t border-slate-200 text-[10px]">
+      <div className="flex flex-wrap items-center justify-center gap-2 mt-1 pt-1 border-t border-slate-200 text-[10px]">
         <div className="flex items-center gap-1">
           <span className="w-2 h-2 rounded-full bg-[#ad3028]" />
           <span className="text-text-muted">命宫</span>
