@@ -676,11 +676,11 @@ export async function* streamHostedAI(messages: ChatMessage[]): AsyncGenerator<s
     let buffer = ''
 
     const consumeEvent = (event: string): string | null => {
-      const data = event.split(/\\r?\\n/)
+      const data = event.split(/\r?\n/)
         .filter((line) => line.startsWith('data:'))
         .map((line) => line.slice(5).trim())
         .filter(Boolean)
-        .join('\\n')
+        .join('\n')
       if (!data || data === '[DONE]') return null
       const payload = JSON.parse(data) as { text?: string; error?: string }
       if (payload.error) throw new Error(payload.error)
@@ -691,7 +691,7 @@ export async function* streamHostedAI(messages: ChatMessage[]): AsyncGenerator<s
       const { done, value } = await reader.read()
       if (done) break
       buffer += decoder.decode(value, { stream: true })
-      const events = buffer.split(/\\r?\\n\\r?\\n/)
+      const events = buffer.split(/\r?\n\r?\n/)
       buffer = events.pop() || ''
       for (const event of events) {
         const text = consumeEvent(event)
