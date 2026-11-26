@@ -271,11 +271,11 @@ function countryMatchesQuery(place: RemoteCitySearchResult, query: string): bool
     }),
   ].filter(Boolean)
   const countryTokens = [
-    normalizePlace(place.countryCode),
-    normalizePlace(place.countryName),
+    normalizePlace(place.countryCode ?? undefined),
+    normalizePlace(place.countryName ?? undefined),
     ...(aliases[normalizePlace(place.countryCode)] ?? []),
   ].filter(Boolean)
-  const regionTokens = [normalizePlace(place.stateCode), normalizePlace(place.stateName)].filter(Boolean)
+  const regionTokens = [normalizePlace(place.stateCode ?? undefined), normalizePlace(place.stateName ?? undefined)].filter(Boolean)
   return countryTokens.some((token) => queryTokens.includes(token))
     || regionTokens.some((token) => queryTokens.includes(token))
 }
