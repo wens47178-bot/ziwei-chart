@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react'
 import { Button, Input, Select } from '@/components/ui'
-import { generateChart, type BirthInfo, type Gender } from '@/lib/astro'
+import { generateChart, getLunarMonthLength, getSolarDateFromLunar, hasLunarLeapMonth, type BirthInfo, type Gender } from '@/lib/astro'
 import { clampDayToMonth, getDayOptions, getMonthOptions, getYearOptions } from '@/lib/birth-date'
 import { searchBirthplacesAsync, resolveBirthTimeAsync, type Birthplace } from '@/lib/true-solar-time'
 import { useChartStore } from '@/stores'
@@ -22,6 +22,8 @@ const GENDER_OPTIONS = [
 export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
   const { setBirthInfo, setChart } = useChartStore()
 
+  const [dateType, setDateType] = useState<'solar' | 'lunar'>('solar')
+  const [isLeapMonth, setIsLeapMonth] = useState(false)
   const [year, setYear] = useState(1990)
   const [month, setMonth] = useState(1)
   const [day, setDay] = useState(1)
@@ -36,7 +38,9 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
-  const dayOptions = getDayOptions(year, month)
+  const leapMonthAvailable = dateType === 'lunar' && hasLunarLeapMonth(year, month)
+  const lunarMonthLength = dateType === 'lunar' ? getLunarMonthLength(year, month, isLeapMonth && leapMonthAvailable) : 30
+  const dayOptions = dateType === 'solar' ? getDayOptions(year, month) : Array.from({ length: lunarMonthLength }, (_, index) => ({ value: index + 1, label: `${index + 1}日` }))
 
   useEffect(() => {
     let active = true
@@ -79,11 +83,13 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
 
   const handleYearChange = (nextYear: number) => {
     setYear(nextYear)
+    setIsLeapMonth(false)
     setDay((currentDay) => clampDayToMonth(nextYear, month, currentDay))
   }
 
   const handleMonthChange = (nextMonth: number) => {
     setMonth(nextMonth)
+    setIsLeapMonth(false)
     setDay((currentDay) => clampDayToMonth(year, nextMonth, currentDay))
   }
 
@@ -93,16 +99,20 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
     setSubmitError('')
 
     try {
-      const safeDay = clampDayToMonth(year, month, day)
-      const resolvedBirthTime = await resolveBirthTimeAsync({
-        year,
-        month,
-        day: safeDay,
+      if (dateType === 'lunar' && isLeapMonth && !hasLunarLeapMonth(year, month)) throw new RangeError(`该年份没有闰${month}月，请取消闰月选项或核对出生日期。`)
+      const safeDay = dateType === 'solar' ? clampDayToMonth(year, month, day) : Math.min(day, lunarMonthLength)
+      const solarDate = dateType === 'lunar'
+        ? getSolarDateFromLunar(year, month, safeDay, isLeapMonth, hour, gender)
+        : { year, month, day: safeDay }
+      const resolvedBirthTime = trueSolarEnabled ? await resolveBirthTimeAsync({
+        year: solarDate.year,
+        month: solarDate.month,
+        day: solarDate.day,
         hour,
         minute,
         birthplace,
         enabled: trueSolarEnabled,
-      })
+      }) : undefined
       const birthInfo: BirthInfo = {
         year,
         month,
@@ -110,6 +120,8 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
         hour,
         minute,
         gender,
+        dateType,
+        isLeapMonth: dateType === 'lunar' && isLeapMonth,
         birthplace: birthplace.trim() || undefined,
         trueSolarEnabled,
         resolvedBirthTime,
@@ -125,7 +137,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
         error instanceof RangeError
           ? error.message.includes('does not exist')
             ? '该历史日期当地时钟曾向前调整，这个出生时间不存在，请核对出生记录。'
-            : '出生日期或时间无效，请检查后重试。'
+            : error.message || '出生日期或时间无效，请检查后重试。'
           : '排盘失败，请稍后重试。'
       )
     } finally {
@@ -159,16 +171,11 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
       <div className="space-y-6">
         {/* 出生日期区块 */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <span className="text-sm text-[#716b5e] font-medium">出生日期</span>
-            <span
-              className="
-                text-xs px-3 py-1 rounded-full
-                bg-[#f5f3ef] text-[#766b56] border border-[#e4dfd5]
-              "
-            >
-              阳历
-            </span>
+            <div className="flex rounded-xl border border-[#e4dfd5] bg-[#f7f5f1] p-1">
+              {(['solar', 'lunar'] as const).map((type) => <button key={type} type="button" onClick={() => { setDateType(type); setIsLeapMonth(false); setDay(1) }} className={`rounded-lg px-4 py-2 text-sm transition ${dateType === type ? 'bg-[#28251f] text-white shadow-sm' : 'text-[#766b56] hover:bg-white'}`}>{type === 'solar' ? '阳历' : '农历'}</button>)}
+            </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <Select
@@ -177,7 +184,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
               onChange={(e) => handleYearChange(Number(e.target.value))}
             />
             <Select
-              options={MONTH_OPTIONS}
+              options={MONTH_OPTIONS.map((option) => ({ ...option, label: dateType === 'lunar' ? `农历${option.value}月` : option.label }))}
               value={month}
               onChange={(e) => handleMonthChange(Number(e.target.value))}
             />
@@ -187,6 +194,11 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
               onChange={(e) => setDay(Number(e.target.value))}
             />
           </div>
+          {dateType === 'lunar' && <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#e9e5dc] bg-[#faf9f6] px-4 py-3">
+            <div><p className="text-sm text-[#5f594e]">闰月设置</p><p className="mt-1 text-xs text-[#918879]">{leapMonthAvailable ? '该年存在此月份的闰月，如出生于闰月请勾选' : '该年份没有闰此月，无法选择闰月'}</p></div>
+            <label className={`flex items-center gap-2 text-sm ${leapMonthAvailable ? 'text-[#625b50]' : 'text-[#b7b1a8]'}`}><input type="checkbox" checked={isLeapMonth} disabled={!leapMonthAvailable} onChange={(event) => setIsLeapMonth(event.target.checked)} className="h-4 w-4 accent-[#8f7956]" />闰{month}月</label>
+          </div>}
+          <p className="text-xs text-[#918879]">{dateType === 'solar' ? '按公历年月日输入，系统直接按阳历排盘。' : '按农历年月日输入；日期天数会按该年该月的实际大小限制。闰月只有在该年确实存在时才能选择。启用真太阳时会先换算为对应公历日期。'}</p>
         </div>
 
         {/* 精确出生时间 */}
@@ -384,7 +396,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
         <svg className="w-3.5 h-3.5 text-star-light" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
         </svg>
-        请输入阳历（公历）日期，系统会自动转为农历排盘
+        可输入阳历或农历日期；农历闰月请准确勾选，出生地用于真太阳时校正
       </p>
 
     </form>
