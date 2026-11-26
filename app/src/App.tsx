@@ -1,20 +1,23 @@
 /* 天衍：参考图驱动的独立功能工作台 */
-import { useState, type ReactNode } from 'react'
+import { lazy, Suspense, useState, type ReactNode } from 'react'
 import { Analytics } from '@vercel/analytics/react'
-import { BirthForm } from '@/components/BirthForm'
-import { ChartDisplay } from '@/components/chart'
-import { AIInterpretation } from '@/components/AIInterpretation'
+import '@/perf-lazy-load.css'
 import { SettingsPanel } from '@/components/SettingsPanel'
-import { YearlyFortune } from '@/components/fortune'
-import { LifeKLine } from '@/components/kline'
-import { MatchAnalysis } from '@/components/match'
-import { ShareCard } from '@/components/share'
-import { AdvancedAnalysis, type AdvancedMode } from '@/components/AdvancedAnalysis'
-import { LunarMonthlyKLine } from '@/components/kline/LunarMonthlyKLine'
 import { useChartStore } from '@/stores'
 import { HomeLanding } from '@/components/HomeLanding'
-import { AcademicCenter } from '@/components/AcademicCenter'
-import { XiaoLiuRen } from '@/components/XiaoLiuRen'
+import type { AdvancedMode } from '@/components/AdvancedAnalysis'
+
+const BirthForm = lazy(() => import('@/components/BirthForm').then((module) => ({ default: module.BirthForm })))
+const ChartDisplay = lazy(() => import('@/components/chart').then((module) => ({ default: module.ChartDisplay })))
+const AIInterpretation = lazy(() => import('@/components/AIInterpretation').then((module) => ({ default: module.AIInterpretation })))
+const YearlyFortune = lazy(() => import('@/components/fortune').then((module) => ({ default: module.YearlyFortune })))
+const LifeKLine = lazy(() => import('@/components/kline').then((module) => ({ default: module.LifeKLine })))
+const MatchAnalysis = lazy(() => import('@/components/match').then((module) => ({ default: module.MatchAnalysis })))
+const ShareCard = lazy(() => import('@/components/share').then((module) => ({ default: module.ShareCard })))
+const AdvancedAnalysis = lazy(() => import('@/components/AdvancedAnalysis').then((module) => ({ default: module.AdvancedAnalysis })))
+const LunarMonthlyKLine = lazy(() => import('@/components/kline/LunarMonthlyKLine').then((module) => ({ default: module.LunarMonthlyKLine })))
+const AcademicCenter = lazy(() => import('@/components/AcademicCenter').then((module) => ({ default: module.AcademicCenter })))
+const XiaoLiuRen = lazy(() => import('@/components/XiaoLiuRen').then((module) => ({ default: module.XiaoLiuRen })))
 
 export type PageKey = 'birth' | 'chart' | 'palaces' | 'sihua' | 'decadal' | 'stars' | 'patterns' | 'trines' | 'fortune' | 'lunar' | 'kline' | 'match' | 'ai' | 'share' | 'academy' | 'xiaoliuren'
 type PageMeta = { key: PageKey; label: string; en: string; title: string; subtitle: string; note: string; icon: string }
@@ -131,7 +134,7 @@ export default function App() {
             <div className="workspace-actions"><button className="workspace-settings" onClick={() => setActivePage("home")}>← 返回首页</button><button className="workspace-settings" onClick={() => setShowSettings(true)}>偏好设置 <span>↗</span></button></div>
           </div>
           <div className={activePage === 'birth' ? 'workspace-content birth-workspace' : 'workspace-content'}>
-            {renderWorkspace()}
+            <Suspense fallback={<div className="workspace-loading">正在载入功能内容…</div>}>{renderWorkspace()}</Suspense>
           </div>
         </section>
       </main>
