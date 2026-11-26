@@ -110,7 +110,7 @@ const REPORT_TABS = [
 function normalizeReportHeading(line: string): string {
   return line.trim()
     .replace(/^#{1,6}\s+/, '')
-    .replace(/[*_\`]/g, '')
+    .replace(/[*_`]/g, '')
     .replace(/[：:。；;]+$/, '')
     .trim()
 }
