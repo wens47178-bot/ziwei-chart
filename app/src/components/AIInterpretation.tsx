@@ -85,7 +85,7 @@ const SYSTEM_PROMPT = `# Role
 ## 命格金句
 - 用2–4句话凝练总结，避免空泛鸡汤。
 
-每个主题都采用“先讲人话结论 → 盘面依据 → 可能表现 → 实际建议”的顺序。重要结论必须引用真实宫位、星曜、亮度、四化或三方四正；不得编造数据。术语首次出现时紧跟白话解释。优势和挑战都要讲清楚，避免宿命论。`
+每个主题都采用“先讲人话结论 → 盘面依据 → 可能表现 → 实际建议”的顺序。除命格金句外，每章必须清楚区分结论、盘面依据、现实表现与建议；不能把一段泛泛性格描述复制到多个主题。重要结论必须引用真实宫位、星曜、亮度、四化或三方四正；不得编造数据。术语首次出现时紧跟白话解释。优势和挑战都要讲清楚，避免宿命论。若某主题缺少足够盘面依据，明确说明“盘面不足以判断”并解释缺少什么，不得用套话凑章节。`
 
 
 const REPORT_TABS = [
@@ -107,13 +107,23 @@ const REPORT_TABS = [
   { id: '命格金句', label: '命格金句' },
 ] as const
 
+function normalizeReportHeading(line: string): string {
+  return line.trim()
+    .replace(/^#{1,6}\s+/, '')
+    .replace(/[*_\`]/g, '')
+    .replace(/[：:。；;]+$/, '')
+    .trim()
+}
+
 function getReportSection(markdown: string, sectionId: string): string {
   const lines = markdown.split('\n')
-  const headingIndex = lines.findIndex((line) => line.trim().replace(/^##\s+/, '').trim() === sectionId)
+  const headingIndex = lines.findIndex((line) =>
+    /^##\s+/.test(line.trim()) && normalizeReportHeading(line) === sectionId
+  )
   if (headingIndex < 0) return ''
   const content: string[] = []
   for (let i = headingIndex + 1; i < lines.length; i++) {
-    if (/^##\s+/.test(lines[i])) break
+    if (/^##\s+/.test(lines[i].trim())) break
     content.push(lines[i])
   }
   return content.join('\n').trim()
@@ -325,7 +335,9 @@ ${guidanceContext}
 
   if (!chart) return null
 
-  const isStructuredReport = displayText.includes('## 命格总评')
+  const isStructuredReport = /^##\\s+命格总评\\s*$/m.test(displayText)
+  const availableReportTabs = REPORT_TABS.filter((tab) => getReportSection(displayText, tab.id).length > 0)
+  const missingReportTabs = REPORT_TABS.filter((tab) => !availableReportTabs.some((available) => available.id === tab.id))
   const activeContent = getReportSection(displayText, activeTab)
 
   return (
@@ -354,6 +366,17 @@ ${guidanceContext}
         )}
 
         {error && <div className="p-3 rounded-lg bg-rose-50 text-rose-700 text-sm mb-4 border border-rose-100">{error}</div>}
+
+        {displayText && isStructuredReport && (
+          <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-[#faf9f6] px-3 py-2 text-xs">
+            <span className="font-semibold text-[#66563d]">报告完整度：{availableReportTabs.length}/{REPORT_TABS.length} 个主题</span>
+            {loading
+              ? <span className="text-[#8c806c]">正在逐项生成</span>
+              : missingReportTabs.length > 0
+                ? <span className="text-amber-700">尚缺：{missingReportTabs.map((tab) => tab.label).join('、')}。可点击“重新分析”补齐。</span>
+                : <span className="text-emerald-700">全部主题均已生成</span>}
+          </div>
+        )}
 
         {!currentSettings.apiKey && !displayText && (
           <div className="text-slate-500 text-sm py-10 text-center">
