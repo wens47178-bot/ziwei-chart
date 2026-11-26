@@ -209,6 +209,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
               <p className="text-text-muted">说明：时区规则来自 IANA 时区数据库；1970 年以前部分地区的历史民用时间记录可能不完整，早年出生时间需结合当地历史资料核对</p>
             </div>
           </details>
+      <div className="mb-2 flex items-center justify-between gap-2 text-xs text-neutral-600"><span>{selected ? `${selected.name} · 三方四正` : "点击任一宫位查看三方四正"}</span>{selected && <button type="button" onClick={() => setSelectedPalace(null)} className="text-blue-700">取消选择</button>}</div>
         )}
         {showUnmatched && (
           <p>
@@ -396,7 +397,6 @@ export function ChartDisplay({ activeLayer }: { activeLayer?: 'origin' | 'decada
       <details className="mb-1 text-xs"><summary className="cursor-pointer text-neutral-500">盘面设置 · 运限 · 导出</summary><div className="flex flex-wrap items-center gap-2 py-1">{activeLayer === undefined && (['origin','decadal','yearly','both'] as const).map((key,i) => <button key={key} type="button" aria-pressed={layer === key} onClick={() => setLayer(key)} className={layer === key ? 'rounded bg-neutral-900 px-2 py-1 text-white' : 'rounded border px-2 py-1'}>{['本命','大限','流年','叠盘'][i]}</button>)}<input aria-label="运限年份" type="number" min={1} max={9999} value={year} onChange={e => setYear(Number(e.target.value))} className="w-20 rounded border px-1 py-1" />{layer !== 'origin' && !horoscope && <span>无法取得运限资料</span>}</div>
       
 
-      <div className="mb-2 flex items-center justify-between gap-2 text-xs text-neutral-600"><span>{selected ? `${selected.name} · 三方四正` : "点击任一宫位查看三方四正"}</span>{selected && <button type="button" onClick={() => setSelectedPalace(null)} className="text-blue-700">取消选择</button>}</div>
       <div className="mb-2 flex flex-wrap items-center gap-3 text-xs text-neutral-700"><label className="flex items-center gap-1"><input type="checkbox" checked={showMinor} onChange={e => setShowMinor(e.target.checked)} />辅星</label><label className="flex items-center gap-1"><input type="checkbox" checked={showAdjective} onChange={e => setShowAdjective(e.target.checked)} />杂曜</label><button type="button" className="ml-auto text-blue-700" onClick={() => { setShowMinor(true); setShowAdjective(true); setSelectedPalace(null) }}>恢复完整盘面</button></div>
       <div className="mb-2 flex items-center justify-end gap-2"><span role="status" className="text-xs text-red-700">{exportError}</span><button type="button" disabled={exporting} onClick={exportChart} className="rounded border border-neutral-300 px-3 py-1 text-xs disabled:opacity-50">{exporting ? "正在导出…" : "保存命盘图片"}</button></div>
       <label className="mb-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={showFlying} onChange={e => setShowFlying(e.target.checked)} />宫干飞化箭头（选择来源宫）</label>
