@@ -258,7 +258,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
                 ? `已匹配 ${matchedBirthplace.name}${matchedBirthplace.country ? `（${matchedBirthplace.country}）` : ''}，系统会按当地时区校正真太阳时`
                 : birthplace.trim()
                   ? '暂未匹配该出生地，将按原时辰排盘'
-                  : '已覆盖中国大陆及 150 余个海外主要城市；建议输入城市名，必要时加上国家。未匹配时不会执行校正'
+                  : '支持中国大陆地点库及全球城市检索；可输入中文、当地名称或英文城市名，重名城市请加上国家。联网检索不可用或地点未匹配时不会猜测时区'
               : '已关闭真太阳时校正'
           }
           value={birthplace}
