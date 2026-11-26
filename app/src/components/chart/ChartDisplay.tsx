@@ -90,9 +90,9 @@ interface PalaceData {
 
 interface StarTagProps { star: StarData; tone?: string }
 function StarTag({ star, tone = 'text-[#2457a7]' }: StarTagProps) {
-  const colors: Record<string,string> = { 禄: 'bg-[#27834a]', 权: 'bg-[#a52b24]', 科: 'bg-[#2457a7]', 忌: 'bg-[#333333]' }
+  const colors: Record<string,string> = { 禄: 'bg-[#27834a]', 权: 'bg-[#a52b24]', 科: 'bg-[#2457a7]', 忌: 'bg-[#c93636]' }
   return <span className="flex shrink-0 flex-col items-center leading-none">
-    <span className={`font-medium text-[12px] sm:text-[14px] ${tone}`} style={{writingMode:'vertical-rl', textOrientation:'upright'}}>{star.name}</span>
+    <span className={`font-semibold text-[12px] sm:text-[14px] ${tone}`} style={{writingMode:'vertical-rl', textOrientation:'upright'}}>{star.name}</span>
     {star.brightness && <span className="text-[9px] text-neutral-700">{BRIGHTNESS_MAP[star.brightness] || star.brightness}</span>}
     {star.mutagen && <span className={`mt-1 rounded px-0.5 py-0.5 text-[10px] text-white ${colors[star.mutagen] || 'bg-neutral-600'}`}>{star.mutagen}</span>}
   </span>
@@ -115,14 +115,14 @@ function PalaceCard({
 
   return (
     <button type="button" onClick={onClick} aria-pressed={!!isSelected}
-      className={`relative flex h-full min-h-[150px] sm:min-h-[190px] min-w-0 flex-col bg-white p-1.5 text-left hover:bg-neutral-50 ${isSelected ? 'ring-2 ring-inset ring-blue-500' : ''}`}>
-      <div className="flex flex-wrap content-start items-start gap-x-0.5 gap-y-1">
+      className={`relative flex h-full min-h-[170px] sm:min-h-[205px] min-w-0 flex-col bg-white p-1.5 text-left hover:bg-neutral-50 ${isSelected ? 'ring-2 ring-inset ring-blue-500' : ''}`}>
+      <div className="flex flex-wrap content-start items-start gap-x-[3px] gap-y-1">
         {majorStars.map((star,i) => <StarTag key={i} star={star} tone="text-[#ad3028]" />)}
         {minorStars.map((star,i) => <StarTag key={i} star={star} tone="text-[#6744a0]" />)}
         {adjectiveStars.map((name,i) => <StarTag key={i} star={{name}} />)}
       </div>
       <div className="mt-auto flex items-end justify-between gap-1 pt-3">
-        <div className="flex flex-col text-[9px] leading-tight text-neutral-500"><span className="text-teal-700">{changsheng12}</span><span>{boshi12}</span></div>
+        <div className="flex flex-col text-[10px] leading-tight text-neutral-500"><span className="text-teal-700">{changsheng12}</span><span>{boshi12}</span></div>
         <div className="text-right leading-tight"><div className="text-[10px] text-neutral-500">{decadalRange}</div><div className="text-[12px] text-neutral-900">{stem}{branch}</div><div className={`text-[13px] font-semibold text-[#ad3028] ${isLife ? 'rounded border border-red-300 bg-red-50 px-1' : ''}`}>{name}{isBody ? '·身' : ''}</div></div>
       </div>
     </button>
@@ -144,6 +144,10 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
   // 计算年柱纳音
   const yearGanZhi = chart.chineseDate?.split(' ')[0] || ''
   const nayin = getNayin(yearGanZhi)
+  const pillars = (chart.chineseDate || '').trim().split(/\s+/).filter(Boolean)
+  const polarity = '甲丙戊庚壬'.includes(yearGanZhi.charAt(0)) ? '阳' : '阴'
+  const lifeBranch = chart.palaces.find(p => p.name === '命宫')?.earthlyBranch
+  const bodyBranch = chart.palaces.find(p => p.isBodyPalace)?.earthlyBranch
   const resolvedTime = birthInfo.resolvedBirthTime
   const showCorrection = birthInfo.trueSolarEnabled && resolvedTime?.applied
   const showUnmatched = birthInfo.trueSolarEnabled && birthInfo.birthplace && !resolvedTime?.applied
@@ -165,11 +169,16 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
         天衍 · 紫微斗数
       </h3>
 
+      <div className="mb-3 flex items-center gap-3 text-sm font-semibold text-neutral-800"><span>{yearGanZhi ? polarity : ''}{gender}</span><span>{chart.fiveElementsClass}</span></div>
+      {pillars.length === 4 && <div className="mb-3 w-full border-y border-dashed border-neutral-200 py-2">
+        <div className="grid grid-cols-4 text-center text-[10px] text-neutral-500">{['年柱','月柱','日柱','时柱'].map(label => <span key={label}>{label}</span>)}</div>
+        <div className="grid grid-cols-4 text-center font-mono text-sm font-semibold">{pillars.map((pillar,i) => <div key={i}><div className="text-[#2457a7]">{pillar.charAt(0)}</div><div className="text-[#ad3028]">{pillar.slice(1)}</div></div>)}</div>
+      </div>}
       {/* 信息列表 */}
       <div className="text-xs lg:text-sm text-text-secondary space-y-1.5 text-center">
         <p><span className="text-text-muted">原始阳历</span> <span className="text-text">{solarDate} {formatTime(birthInfo.hour, birthInfo.minute ?? 0)}</span></p>
         <p><span className="text-text-muted">农历</span> <span className="text-text">{chart.lunarDate}</span></p>
-        <p><span className="text-text-muted">干支</span> <span className="text-text font-mono">{chart.chineseDate}</span></p>
+        {pillars.length !== 4 && <p><span className="text-text-muted">干支</span> <span className="text-text font-mono">{chart.chineseDate}</span></p>}
         <p><span className="text-text-muted">最终时辰</span> <span className="text-text">{chart.time} {chart.timeRange}</span></p>
         {showCorrection && resolvedTime && (
           <details className="w-full text-left rounded-lg border border-slate-200 bg-[#faf9f7] px-3 py-2">
@@ -204,7 +213,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
         {!birthInfo.trueSolarEnabled && (
           <p><span className="text-text-muted">时间校正</span> <span className="text-text-muted">已关闭，按原始出生时间排盘</span></p>
         )}
-        <p><span className="text-text-muted">性别</span> <span className="text-text">{gender}</span></p>
+        <p><span className="text-text-muted">命宫</span> {lifeBranch || "—"}　<span className="text-text-muted">身宫</span> {bodyBranch || "—"}</p>
         {nayin && (
           <p><span className="text-text-muted">纳音</span> <span className="text-gold">{nayin}</span></p>
         )}
@@ -212,7 +221,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
 
       {/* 五行局 + 命主身主 */}
       <div className="mt-3 pt-3 border-t border-slate-200 w-full">
-        <div className="flex justify-center gap-2 mb-2">
+        <div className="hidden">
           <span className="
             px-2 py-0.5 rounded-full text-xs
             bg-gradient-to-r from-star/20 to-gold/20
@@ -330,11 +339,10 @@ export function ChartDisplay() {
     <div className="
       relative bg-white max-w-none mx-auto
     ">
-      {/* 顶部发光线 */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-px bg-gradient-to-r from-transparent via-star/50 to-transparent" />
+      <div className="mb-1 grid grid-cols-4 text-center text-[10px] text-neutral-500"><span>南偏东</span><span>正南方</span><span>南偏西</span><span>西偏南</span></div>
 
       {/* 4x4 网格 */}
-      <div className="grid grid-cols-4 gap-px overflow-hidden rounded-xl border border-neutral-300 bg-neutral-300">
+      <div className="grid grid-cols-4 auto-rows-fr gap-px overflow-hidden rounded-xl border border-neutral-300 bg-neutral-300">
         {/* Row 0 */}
         {grid[0].map((p, c) => renderPalace(p, `0-${c}`))}
 
@@ -353,21 +361,22 @@ export function ChartDisplay() {
         {grid[3].map((p, c) => renderPalace(p, `3-${c}`))}
       </div>
 
+      <div className="mt-1 grid grid-cols-4 text-center text-[10px] text-neutral-500"><span>东偏北</span><span>北偏东</span><span>正北方</span><span>北偏西</span></div>
       {/* 图例 */}
       <div className="flex flex-wrap items-center justify-center gap-4 mt-3 pt-3 border-t border-slate-200 text-[10px]">
         <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-gold" />
+          <span className="w-2 h-2 rounded-full bg-[#ad3028]" />
           <span className="text-text-muted">命宫</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-star-light" />
+          <span className="w-2 h-2 rounded-full bg-[#6744a0]" />
           <span className="text-text-muted">身宫</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-fortune">禄</span>
-          <span className="text-gold">权</span>
-          <span className="text-[#92784e]">科</span>
-          <span className="text-misfortune">忌</span>
+          <span className="text-[#27834a]">禄</span>
+          <span className="text-[#a52b24]">权</span>
+          <span className="text-[#2457a7]">科</span>
+          <span className="text-[#c93636]">忌</span>
           <span className="text-text-muted">四化</span>
         </div>
         <div className="flex items-center gap-1">
