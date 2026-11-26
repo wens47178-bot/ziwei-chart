@@ -264,11 +264,9 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
                 ? '正在匹配出生地'
                 : matchedBirthplace
                 ? `已匹配 ${matchedBirthplace.name}${matchedBirthplace.province ? ` · ${matchedBirthplace.province}` : ''}${matchedBirthplace.country ? `（${matchedBirthplace.country}）` : ''}${matchedBirthplace.timeZone ? ` · ${matchedBirthplace.timeZone}` : ''}，系统会按当地时区校正真太阳时`
-                : birthplace.trim()
-                  ? '暂未匹配该出生地，将按原时辰排盘'
-                  : birthplace.trim().length >= 2
-                    ? '暂未确认唯一出生地。请补充州、省或国家名称；未确认前不会进行真太阳时校正'
-                    : '支持全球城市与城镇检索；可输入中文、当地名称或英文城市名，建议使用“城市, 州/省, 国家”格式'
+                : birthplace.trim().length >= 2
+                  ? '暂未确认唯一出生地。请补充州、省或国家名称；未确认前不会进行真太阳时校正'
+                  : '支持全球城市与城镇检索；可输入中文、当地名称或英文城市名，建议使用“城市, 州/省, 国家”格式'
               : '已关闭真太阳时校正'
           }
           value={birthplace}
