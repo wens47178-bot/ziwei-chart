@@ -238,7 +238,7 @@ const videos: Record<string,{id:string;title:string}[]> = {
     }
   ]
 }
-const originalTexts: Record<string,string> = {"紫微斗数全书":"https://zh.wikisource.org/wiki/紫微斗數全書","滴天髓":"https://zh.wikisource.org/wiki/滴天髓","梅花易数":"https://zh.wikisource.org/wiki/梅花易數","增删卜易":"https://zh.wikisource.org/wiki/增刪卜易","三命通会":"https://zh.wikisource.org/wiki/三命通會","周易":"https://zh.wikisource.org/wiki/周易","葬书":"https://zh.wikisource.org/wiki/葬書","青囊经":"https://zh.wikisource.org/wiki/青囊經","六壬大全":"https://zh.wikisource.org/zh-hant/六壬大全_(四庫全書本)/全覽","遁甲演义":"https://zh.wikisource.org/zh-hant/遁甲演義_(四庫全書本)/全覽"}
+const originalTexts: Record<string,string> = {"紫微斗数全书":"https://zh.wikisource.org/wiki/紫微斗數全書","滴天髓":"https://zh.wikisource.org/wiki/滴天髓","梅花易数":"https://zh.wikisource.org/wiki/梅花易數","增删卜易":"https://zh.wikisource.org/wiki/增刪卜易","三命通会":"https://zh.wikisource.org/wiki/三命通會","周易":"https://zh.wikisource.org/wiki/周易","葬书":"https://zh.wikisource.org/wiki/葬書","青囊经":"https://zh.wikisource.org/wiki/青囊經","六壬大全":"https://zh.wikisource.org/zh-hant/六壬大全_(四庫全書本)/全覽","遁甲演义":"https://zh.wikisource.org/zh-hant/遁甲演義_(四庫全書本)/全覽","渊海子平":"https://zh.wikisource.org/zh-hans/渊海子平大全","穷通宝鉴":"https://zh.wikisource.org/wiki/穷通宝鉴","卜筮正宗":"https://zh.wikisource.org/zh-hans/卜筮正宗（河潞武子龄校本）"}
 function CourseShelf(){
  const [group,setGroup]=useState(0)
  const [topic,setTopic]=useState<number|null>(null)
@@ -272,6 +272,7 @@ books.push(...[
   {id:'reading.qingnang',title:'青囊经',url:originalTexts['青囊经'],note:'上中下卷原文及古注。'},
   {id:'reading.liuren',title:'六壬大全',url:originalTexts['六壬大全'],note:'四库全书本，全览阅读。'},
   {id:'reading.dunjia',title:'遁甲演义',url:originalTexts['遁甲演义'],note:'四库全书本，全览阅读。'},
+  ...['渊海子平','穷通宝鉴','卜筮正宗'].map(title=>({id:'reading.'+title,title,url:originalTexts[title],note:'公开古籍原文阅读。'})),
 ].map(book=>({...book,type:'classic' as const,author:undefined})))
 books.sort((a,b)=>Number(Boolean(b.url))-Number(Boolean(a.url)))
 const readingPaths = [
