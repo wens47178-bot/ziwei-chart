@@ -41,11 +41,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
   useEffect(() => {
     let active = true
     const trimmedBirthplace = birthplace.trim()
-    if (!trueSolarEnabled || trimmedBirthplace.length < 2 || matchedBirthplace) {
-      setBirthplaceSuggestions([])
-      setMatchingBirthplace(false)
-      return
-    }
+    if (!trueSolarEnabled || trimmedBirthplace.length < 2 || matchedBirthplace) return
 
     // Search both domestic and overseas cities as the user types.
     const timer = window.setTimeout(() => {
