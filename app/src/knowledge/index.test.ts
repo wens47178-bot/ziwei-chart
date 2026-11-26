@@ -79,7 +79,7 @@ describe('palace relationship and flying transformation context', () => {
   it('does not silently generate yearly forecasts inside a natal-only report context', () => {
     const context = extractKnowledge(chartWithPalaces([
       { name: '命宫', index: 0, majorStars: [] },
-    ]), 1990)
+    ]))
 
     expect(context.流年).toEqual([])
     expect(buildPromptContext(context)).not.toContain('近年流年信息')
