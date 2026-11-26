@@ -37,8 +37,20 @@ jobs:
             await page.getByRole('button',{name:'开始排盘',exact:true}).click();
             await page.getByRole('navigation',{name:'命盘功能'}).waitFor({timeout:60000});
             await page.getByRole('button',{name:'命盘分析',exact:true}).waitFor();
+            await page.getByRole('button',{name:/命宫/}).first().click();
+            await page.getByRole('button',{name:'取消选择',exact:true}).waitFor();
+            await page.screenshot({path:'palace-relations.png',fullPage:true});
+            await page.getByRole('button',{name:'取消选择',exact:true}).click();
+            await page.getByText('盘面设置 · 运限 · 导出',{exact:true}).click();
+            const download = page.waitForEvent('download',{timeout:60000});
+            await page.getByRole('button',{name:'保存命盘图片',exact:true}).click();
+            await (await download).saveAs('exported-chart.png');
             await page.screenshot({path:'chart-desktop.png',fullPage:true});
             await page.getByRole('button',{name:'AI 对话',exact:true}).click();
+            await page.getByRole('textbox',{name:'命盘追问'}).fill('请简要解释本命盘的命宫主星，不需要预测。');
+            await page.getByRole('button',{name:'发送',exact:true}).click({timeout:120000});
+            await page.locator('div.mb-2.rounded-lg.bg-neutral-50.p-3.text-sm').filter({hasText:/[\\u4e00-\\u9fff]/}).first().waitFor({timeout:120000});
+            await page.getByRole('button',{name:'发送',exact:true}).waitFor({timeout:120000});
             await page.screenshot({path:'chart-ai.png',fullPage:true});
             for (const label of ['大限','流年','流月','本命']) {
               await page.getByRole('navigation',{name:'命盘功能'}).getByRole('button',{name:label,exact:true}).click();
