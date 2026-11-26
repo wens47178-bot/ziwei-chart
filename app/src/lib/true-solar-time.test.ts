@@ -35,7 +35,7 @@ describe('birth date and time validation', () => {
     })).toThrow(RangeError)
   })
 
-  it('rejects invalid month and hour values', () => {
+  it('rejects invalid month, hour, and minute values', () => {
     expect(() => resolveBirthTime({
       year: 2024,
       month: 13,
@@ -48,6 +48,14 @@ describe('birth date and time validation', () => {
       month: 1,
       day: 1,
       hour: 24,
+      enabled: false,
+    })).toThrow(RangeError)
+    expect(() => resolveBirthTime({
+      year: 2024,
+      month: 1,
+      day: 1,
+      hour: 12,
+      minute: 60,
       enabled: false,
     })).toThrow(RangeError)
   })
@@ -115,6 +123,25 @@ describe('resolveBirthTime', () => {
     expect(lateZi.originalShichen).toBe(ZI_SHICHEN)
     expect(earlyZi.day).toBe(2)
     expect(lateZi.day).toBe(1)
+  })
+
+  it('preserves the entered minute and uses it in true-solar-time date arithmetic', async () => {
+    const result = await resolveBirthTimeAsync({
+      year: 1990,
+      month: 1,
+      day: 1,
+      hour: 12,
+      minute: 59,
+      birthplace: CHENGDU,
+      enabled: true,
+    })
+
+    expect(result.applied).toBe(true)
+    expect(result.correctionMinutes).toBeLessThan(-60)
+    expect(result.hour).toBe(11)
+    expect(result.minute).toBeGreaterThan(45)
+    expect(result.minute).toBeLessThan(60)
+    expect(result.correctedShichen).toBe(WU_SHICHEN)
   })
 
   it('keeps the original time when true solar correction is disabled', async () => {
