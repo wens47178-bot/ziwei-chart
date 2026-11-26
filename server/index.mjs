@@ -5,6 +5,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY || ''
 const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite'
 const ALLOWED_ORIGINS = new Set([
   'https://tianyan-ziwei-main.onrender.com',
+  'https://tianyan.onrender.com',
   'https://ouranic.cn',
   'https://www.ouranic.cn',
   'http://localhost:5173',
