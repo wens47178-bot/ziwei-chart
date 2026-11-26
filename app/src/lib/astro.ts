@@ -38,6 +38,7 @@ export interface BirthInfo {
   birthplace?: string
   trueSolarEnabled?: boolean
   resolvedBirthTime?: ResolvedBirthTime
+  dateType?: 'solar' | 'lunar'
   isLeapMonth?: boolean
   fixLeap?: boolean
 }
@@ -47,7 +48,29 @@ export interface BirthInfo {
    ------------------------------------------------------------ */
 
 export function generateChart(info: BirthInfo): FunctionalAstrolabe {
-  const { gender, fixLeap = true } = info
+  const { gender, fixLeap = true, dateType = 'solar', isLeapMonth = false } = info
+  const dateStr = `${info.year}-${info.month}-${info.day}`
+  const timeIndex = info.resolvedBirthTime?.timeIndex ?? getTimeIndex(info.hour, info.minute ?? 0)
+  const genderName = gender === 'male' ? '男' : '女'
+
+  // Lunar dates are native inputs to iztro. If true-solar correction is enabled,
+  // first resolve the lunar date to its Gregorian civil date, then correct local time.
+  if (dateType === 'lunar') {
+    const lunarChart = astro.byLunar(dateStr, timeIndex, genderName, isLeapMonth, fixLeap)
+    if (!info.resolvedBirthTime && !(info.trueSolarEnabled ?? true)) return lunarChart
+    if (!info.resolvedBirthTime && (info.trueSolarEnabled ?? true)) {
+      const [solarYear, solarMonth, solarDay] = lunarChart.solarDate.split('-').map(Number)
+      const resolved = resolveBirthTime({
+        year: solarYear, month: solarMonth, day: solarDay,
+        hour: info.hour, minute: info.minute ?? 0,
+        birthplace: info.birthplace, enabled: info.trueSolarEnabled ?? true,
+      })
+      return astro.bySolar(`${resolved.year}-${resolved.month}-${resolved.day}`, resolved.timeIndex, genderName, fixLeap)
+    }
+    const resolved = info.resolvedBirthTime
+    return astro.bySolar(`${resolved.year}-${resolved.month}-${resolved.day}`, resolved.timeIndex, genderName, fixLeap)
+  }
+
   const resolvedTime = info.resolvedBirthTime ?? resolveBirthTime({
     year: info.year,
     month: info.month,
@@ -58,11 +81,20 @@ export function generateChart(info: BirthInfo): FunctionalAstrolabe {
     enabled: info.trueSolarEnabled ?? true,
   })
 
-  const dateStr = `${resolvedTime.year}-${resolvedTime.month}-${resolvedTime.day}`
-  const timeIndex = resolvedTime.timeIndex
-  const genderName = gender === 'male' ? '男' : '女'
+  return astro.bySolar(`${resolvedTime.year}-${resolvedTime.month}-${resolvedTime.day}`, resolvedTime.timeIndex, genderName, fixLeap)
+}
 
-  return astro.bySolar(dateStr, timeIndex, genderName, fixLeap)
+export function getTimeIndex(hour: number, minute = 0): number {
+  // 00:00–00:59 is early Zi (0); 23:00–23:59 is late Zi (12).
+  if (hour === 0) return 0
+  if (hour === 23) return 12
+  return Math.floor((hour + 1) / 2)
+}
+
+export function getSolarDateFromLunar(year: number, month: number, day: number, isLeapMonth = false, hour = 12, gender: Gender = 'male', fixLeap = true): { year: number; month: number; day: number } {
+  const chart = astro.byLunar(`${year}-${month}-${day}`, getTimeIndex(hour), gender === 'male' ? '男' : '女', isLeapMonth, fixLeap)
+  const [solarYear, solarMonth, solarDay] = chart.solarDate.split('-').map(Number)
+  return { year: solarYear, month: solarMonth, day: solarDay }
 }
 
 /* ------------------------------------------------------------
