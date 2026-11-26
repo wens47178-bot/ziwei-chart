@@ -328,6 +328,15 @@ ${guidanceContext}
     }
   }, [chart, aiInterpretation, handleInterpret])
 
+  const exportReport = () => {
+    const url = URL.createObjectURL(new Blob(['\uFEFF', '# 天衍 · 命盘分析\n\n', displayText], { type: 'text/markdown;charset=utf-8' }))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = '天衍-命盘分析报告.md'
+    link.click()
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+
   if (!chart) return null
 
   const isStructuredReport = /^##\s+命格总评\s*$/m.test(displayText)
@@ -348,6 +357,10 @@ ${guidanceContext}
             {loading ? '分析中…' : displayText ? '重新分析' : '重新生成报告'}
           </Button>
         </div>
+
+        {displayText && !loading && !animating && (
+          <div className="mb-3 flex flex-wrap justify-end gap-2"><button type="button" onClick={exportReport} className="rounded border border-neutral-300 px-3 py-1.5 text-xs">导出完整报告</button></div>
+        )}
 
         {displayText && (
           <nav className="flex flex-wrap gap-1.5 rounded-xl bg-[#f2f2f2] p-2 mb-5" aria-label="命盘分析主题">
