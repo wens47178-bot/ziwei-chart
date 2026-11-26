@@ -55,7 +55,12 @@ export function XiaoLiuRen() {
   const [readingError, setReadingError] = useState('')
   const [readingBusy, setReadingBusy] = useState(false)
   const readingId = useRef(0)
-  const counts = [cast?.month ?? month, cast?.day ?? day, (cast?.hour ?? hour) + 1]
+  const resultRef = useRef<HTMLElement>(null)
+  useEffect(() => { if (cast && step === 0 && tick === 0) resultRef.current?.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'}) }, [cast, step, tick])
+  const monthCount = cast?.month ?? month
+  const dayCount = cast?.day ?? day
+  const hourCount = (cast?.hour ?? hour) + 1
+  const counts = [monthCount, dayCount, hourCount]
   const starts = [0, result.monthPalaceIndex, result.dayPalaceIndex]
   const explain = async (entry: Cast) => {
     const id = ++readingId.current
@@ -68,9 +73,9 @@ export function XiaoLiuRen() {
   }
   useEffect(() => {
     if (!cast || step >= 3) return
-    const timer = window.setTimeout(() => { if (tick + 1 >= counts[step]) { setTick(0); setStep(value => value + 1) } else setTick(value => value + 1) }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 20 : Math.max(100, 1100 / counts[step]))
+    const timer = window.setTimeout(() => { if (tick + 1 >= [monthCount, dayCount, hourCount][step]) { setTick(0); setStep(value => value + 1) } else setTick(value => value + 1) }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 20 : Math.max(100, 1600 / [monthCount, dayCount, hourCount][step]))
     return () => window.clearTimeout(timer)
-  }, [cast, step, tick, counts[0], counts[1], counts[2]])
+  }, [cast, step, tick, monthCount, dayCount, hourCount])
   const highlighted = step < 3 ? (starts[step] + tick) % 6 : result.resultIndex
   const monthName = XIAO_LIU_REN_PALACES[result.monthPalaceIndex].name
   const dayName = XIAO_LIU_REN_PALACES[result.dayPalaceIndex].name
@@ -111,7 +116,7 @@ export function XiaoLiuRen() {
         <button type="submit" disabled={!question.trim() || casting} className="mt-4 w-full rounded-xl bg-neutral-900 px-5 py-3 font-semibold text-white disabled:opacity-50">{casting ? "正在起课…" : cast ? "重新起课" : "开始起课"}</button>
       </form>
 
-      {cast && <section className="xiaoliuren-result-card" aria-live="polite">
+      {cast && <section ref={resultRef} className="xiaoliuren-result-card scroll-mt-24" aria-live="polite">
         <div className="xiaoliuren-card-heading"><div><small>02 / THE RESULT</small><h3>本课落宫</h3></div><span>常见六宫掌诀法</span></div>
         <p className="mb-4 break-words text-sm text-neutral-600">所问事项：{cast.question}</p>
         {casting ? <div role="status" className="rounded-xl bg-neutral-50 p-6 text-center"><div className="mx-auto mb-3 h-10 w-10 rounded-full border-2 border-neutral-200 border-t-amber-700 motion-safe:animate-spin" /><p>{["正月起大安 · 正在数月","月宫起初一 · 正在数日","日宫起子时 · 正在数时"][step]} · {tick + 1}/{counts[step]}</p><div className="mt-4 grid grid-cols-3 gap-2">{XIAO_LIU_REN_PALACES.map((p,i)=><div key={p.name} className={i===highlighted ? "rounded-xl border-2 border-amber-600 bg-amber-100 p-4 font-bold text-amber-900 transition-all" : "rounded-xl border border-neutral-200 bg-white p-4 text-neutral-500"}>{p.name}</div>)}</div></div> : <div className="xiaoliuren-result-main">
