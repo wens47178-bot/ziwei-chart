@@ -76,7 +76,9 @@ export function findBirthplace(input?: string): Birthplace | null {
 
 export async function findBirthplaceAsync(input?: string): Promise<Birthplace | null> {
   const birthplaces = await loadBirthplaceData()
-  return findBirthplaceInData(input, birthplaces)
+  const localMatch = findBirthplaceInData(input, birthplaces)
+  if (localMatch) return localMatch
+  return findRemoteBirthplace(input)
 }
 
 export function findBirthplaceInData(input: string | undefined, birthplaces: Birthplace[]): Birthplace | null {
@@ -94,6 +96,10 @@ export function findBirthplaceInData(input: string | undefined, birthplaces: Bir
 
 export async function resolveBirthTimeAsync(input: ResolveBirthTimeInput): Promise<ResolvedBirthTime> {
   const birthplaces = await loadBirthplaceData()
+  if (input.enabled && input.birthplace && !findBirthplaceInData(input.birthplace, birthplaces)) {
+    const remoteMatch = await findRemoteBirthplace(input.birthplace)
+    if (remoteMatch) birthplaces.push(remoteMatch)
+  }
   return resolveBirthTime({ ...input, birthplaces })
 }
 
@@ -155,6 +161,108 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
     crossedDate: isDifferentDate(input, correctedDate),
     location,
   }
+}
+
+const REMOTE_CITY_API = 'https://api.geocoded.me/v2'
+const remoteBirthplaceCache = new Map<string, Birthplace | null>()
+const remoteBirthplaceRequests = new Map<string, Promise<Birthplace | null>>()
+
+interface RemoteCitySearchResult {
+  type?: string
+  name?: string
+  countryCode?: string
+  countryName?: string
+  geonameId?: number | null
+}
+
+interface RemoteCityRecord {
+  name?: string
+  countryName?: string
+  latitude?: string | number
+  longitude?: string | number
+  timezone?: string
+}
+
+async function findRemoteBirthplace(input?: string): Promise<Birthplace | null> {
+  const normalizedInput = normalizePlace(input)
+  if (!normalizedInput) return null
+  if (remoteBirthplaceCache.has(normalizedInput)) return remoteBirthplaceCache.get(normalizedInput) ?? null
+  const pending = remoteBirthplaceRequests.get(normalizedInput)
+  if (pending) return pending
+
+  const request = (async () => {
+    try {
+      const parts = (input ?? '').split(',').map((part) => part.trim()).filter(Boolean)
+      const cityQuery = parts[0] ?? ''
+      const countryQuery = parts.slice(1).join(' ')
+      if (cityQuery.length < 2) return null
+
+      const searchUrl = new URL(`${REMOTE_CITY_API}/search`)
+      searchUrl.searchParams.set('q', cityQuery)
+      searchUrl.searchParams.set('type', 'city')
+      searchUrl.searchParams.set('limit', '20')
+      const searchResponse = await fetch(searchUrl)
+      if (!searchResponse.ok) return null
+      const searchPayload = await searchResponse.json() as { data?: RemoteCitySearchResult[] }
+      const matches = (searchPayload.data ?? []).filter((place) => place.type === 'city' && place.name && place.geonameId)
+      const cityName = normalizePlace(cityQuery)
+      const exactMatches = matches.filter((place) => normalizePlace(place.name) === cityName)
+      const nameMatches = exactMatches.length > 0
+        ? exactMatches
+        : matches.filter((place) => normalizePlace(place.name).startsWith(cityName))
+      const countryMatches = countryQuery
+        ? nameMatches.filter((place) => countryMatchesQuery(place, countryQuery))
+        : nameMatches
+      const candidates = countryMatches.length > 0 ? countryMatches : countryQuery ? [] : nameMatches
+      const distinctCountries = new Set(candidates.map((place) => place.countryCode ?? place.countryName))
+      if (distinctCountries.size !== 1 || candidates.length === 0) return null
+
+      const selected = candidates[0]
+      const detailUrl = new URL(`${REMOTE_CITY_API}/cities/${selected.geonameId}`)
+      const detailResponse = await fetch(detailUrl)
+      if (!detailResponse.ok) return null
+      const city = await detailResponse.json() as RemoteCityRecord
+      if (!city.name || !city.timezone) return null
+      const location: Birthplace = {
+        name: city.name,
+        city: city.name,
+        country: city.countryName || selected.countryName,
+        latitude: Number(city.latitude),
+        longitude: Number(city.longitude),
+        timeZone: city.timezone,
+      }
+      if (!isUsableCoordinate(location)) return null
+      // Reject timezone identifiers unavailable in the current runtime rather than guessing.
+      new Intl.DateTimeFormat('en-US', { timeZone: location.timeZone }).format(new Date(0))
+      return location
+    } catch {
+      return null
+    }
+  })()
+
+  remoteBirthplaceRequests.set(normalizedInput, request)
+  try {
+    const result = await request
+    remoteBirthplaceCache.set(normalizedInput, result)
+    return result
+  } finally {
+    remoteBirthplaceRequests.delete(normalizedInput)
+  }
+}
+
+function countryMatchesQuery(place: RemoteCitySearchResult, query: string): boolean {
+  const normalized = normalizePlace(query)
+  const aliases: Record<string, string[]> = {
+    usa: ['us', 'unitedstates'],
+    america: ['us', 'unitedstates'],
+    uk: ['gb', 'unitedkingdom'],
+    britain: ['gb', 'unitedkingdom'],
+    england: ['gb', 'unitedkingdom'],
+    uae: ['ae', 'unitedarabemirates'],
+  }
+  const accepted = [normalized, ...(aliases[normalized] ?? [])]
+  return accepted.includes(normalizePlace(place.countryCode))
+    || accepted.includes(normalizePlace(place.countryName))
 }
 
 async function loadBirthplaceData(): Promise<Birthplace[]> {
