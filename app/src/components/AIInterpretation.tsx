@@ -149,7 +149,7 @@ const MarkdownComponents = {
   h2: ({ children }: { children?: React.ReactNode }) => (
     <h2 className={String(children).includes('命主优点')
       ? 'text-xl font-semibold text-[#5f5037] mt-5 mb-3 rounded-xl border border-[#e9dfcc] bg-[#faf7f0] px-4 py-3'
-      : 'text-xl font-semibold text-amber-800 mt-5 mb-2'}>{children}</h2>
+      : 'text-xl font-semibold text-neutral-900 mt-5 mb-2'}>{children}</h2>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
     <h3 className="text-lg font-medium text-[#8a7653] mt-4 mb-2">{children}</h3>
@@ -158,7 +158,7 @@ const MarkdownComponents = {
     <p className="mb-3 leading-relaxed">{children}</p>
   ),
   strong: ({ children }: { children?: React.ReactNode }) => (
-    <strong className="text-gold font-semibold">{children}</strong>
+    <strong className="text-neutral-900 font-semibold">{children}</strong>
   ),
   ul: ({ children }: { children?: React.ReactNode }) => (
     <ul className="list-none space-y-1.5 mb-3 pl-4">{children}</ul>
@@ -182,7 +182,7 @@ const MarkdownComponents = {
    AI 解读面板组件
    ------------------------------------------------------------ */
 
-export function AIInterpretation() {
+export function AIInterpretation({ view = 'both' }: { view?: 'report' | 'chat' | 'both' } = {}) {
   const { chart, birthInfo } = useChartStore()
   const { aiInterpretation, setAiInterpretation } = useContentCacheStore()
 
@@ -346,10 +346,10 @@ ${guidanceContext}
 
   /* 排盘后自动生成报告；已有缓存则直接展示，避免重复消耗模型额度。 */
   useEffect(() => {
-    if (chart && !aiInterpretation && !loadingRef.current && !error) {
+    if (view !== 'chat' && chart && !aiInterpretation && !loadingRef.current && !error) {
       void handleInterpret()
     }
-  }, [chart, aiInterpretation, handleInterpret, error])
+  }, [chart, aiInterpretation, handleInterpret, error, view])
 
   const printReport = () => {
     const target = window.open('', '_blank')
@@ -390,11 +390,11 @@ ${guidanceContext}
   const activeContent = getReportSection(displayText, activeTab)
 
   return (
-    <div className="relative bg-white border border-[#e9e5dc] rounded-2xl shadow-sm overflow-hidden">
-      <div className="h-1 w-full bg-gradient-to-r from-[#d8c6a2] via-[#a98b5c] to-[#d8c6a2]" />
-      <div className="p-5 lg:p-7">
-        <div className="flex items-center justify-between gap-3 mb-5">
-          <div>
+    <div className="relative bg-white min-w-0">
+      
+      <div className="p-0">
+        <div hidden={view === "chat"} className="flex items-center justify-end gap-3 mb-2">
+          <div hidden>
             <p className="text-xs tracking-[0.2em] text-[#9a8056] mb-1">TIANYAN · NATAL ANALYSIS</p>
             <h2 className="text-xl lg:text-2xl font-semibold text-[#262626]" style={{ fontFamily: 'var(--font-serif)' }}>命盘分析</h2>
           </div>
@@ -403,7 +403,7 @@ ${guidanceContext}
           </Button>
         </div>
 
-        {displayText && !loading && !animating && (
+        {view !== "chat" && displayText && !loading && !animating && (
           <div className="mb-3 flex flex-wrap justify-end gap-2"><button type="button" onClick={exportReport} className="rounded border border-neutral-300 px-3 py-1.5 text-xs">导出完整报告</button><button type="button" onClick={printReport} className="rounded border border-neutral-300 px-3 py-1.5 text-xs">打印 / 保存 PDF</button></div>
         )}
 
@@ -432,7 +432,7 @@ ${guidanceContext}
         )}
 
         {displayText && (
-          <div className="min-h-[420px]">
+          <div className="min-h-0">
             {!isStructuredReport ? (
               <div className="prose max-w-none prose-slate text-text-secondary text-[15px] lg:text-base leading-8">
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={MarkdownComponents}>{displayText}</ReactMarkdown>
@@ -456,13 +456,13 @@ ${guidanceContext}
           </div>
         )}
 
-        <section className="mt-6 border-t border-neutral-200 pt-4">
+        <section hidden={view === "report"} className="mt-2 pt-4">
           <h3 className="mb-3 font-semibold">AI 命盘追问</h3>
           {dialog.map((message, i) => <div key={i} className="mb-2 rounded-lg bg-neutral-50 p-3 text-sm"><strong>{message.role === 'user' ? '你' : '天衍 AI'}</strong><ReactMarkdown>{message.content}</ReactMarkdown></div>)}
           {answer && <div className="mb-2 rounded-lg bg-neutral-50 p-3 text-sm"><ReactMarkdown>{answer}</ReactMarkdown></div>}
           <form className="flex gap-2" onSubmit={e => { e.preventDefault(); void ask() }}><input aria-label="命盘追问" value={question} onChange={e => setQuestion(e.target.value)} maxLength={1000} placeholder="输入想进一步了解的问题" className="min-w-0 flex-1 rounded border border-neutral-300 px-3 py-2 text-sm" /><button type="submit" disabled={asking || !question.trim() || loading} className="rounded bg-neutral-900 px-3 text-sm text-white disabled:opacity-50">{asking ? '回答中' : '发送'}</button></form>
         </section>
-        {loading && !displayText && (
+        {view !== "chat" && loading && !displayText && (
           <div className="flex items-center justify-center gap-3 text-text-muted py-12">
             <div className="w-5 h-5 border-2 border-star border-t-transparent rounded-full animate-spin" />
             <span>正在分析命盘并整理各主题报告…</span>
