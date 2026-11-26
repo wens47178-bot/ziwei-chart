@@ -12,6 +12,7 @@ export interface Birthplace {
   area?: string
   longitude: number
   latitude?: number
+  timeZone?: string
 }
 
 export interface ResolveBirthTimeInput {
@@ -38,6 +39,12 @@ export interface ResolvedBirthTime {
   originalShichen: string
   correctedShichen: string
   correctionMinutes: number
+  longitudeCorrectionMinutes: number
+  equationOfTimeMinutes: number
+  timeZone: string | null
+  utcOffsetMinutes: number | null
+  dstAdjustmentMinutes: number
+  ambiguousLocalTime: boolean
   applied: boolean
   crossedDate: boolean
   location: Birthplace | null
@@ -45,6 +52,8 @@ export interface ResolvedBirthTime {
 
 const BEIJING_STANDARD_LONGITUDE = 120
 const MINUTES_PER_LONGITUDE_DEGREE = 4
+const CHINA_TIME_ZONE = 'Asia/Shanghai'
+const CHINA_STANDARD_OFFSET_MINUTES = 8 * 60
 
 const SHICHEN_NAMES = [
   '子时',
@@ -75,6 +84,7 @@ export function findBirthplaceInData(input: string | undefined, birthplaces: Bir
   if (!normalized) return null
 
   const ranked = birthplaces
+    .filter((place) => isUsableCoordinate(place))
     .map((place) => ({ place, score: scoreBirthplaceMatch(normalized, place) }))
     .filter((candidate) => candidate.score > 0)
     .sort((left, right) => right.score - left.score)
@@ -97,8 +107,26 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
   // Birth input is a wall-clock time, not a timestamp in the browser's timezone.
   // Use UTC calendar arithmetic so DST and the viewer's timezone cannot shift the chart.
   const baseDate = createUtcCalendarDate(input.year, input.month, input.day, input.hour, input.minute ?? 0)
+  const localClock = shouldApply
+    ? resolveLocalClockOffset(input, location.timeZone ?? CHINA_TIME_ZONE)
+    : null
+  const dstAdjustmentMinutes = localClock
+    ? localClock.offsetMinutes - CHINA_STANDARD_OFFSET_MINUTES
+    : 0
+  // Convert historical daylight-saving wall time back to China's UTC+8 standard clock first.
+  const standardClockDate = new Date(baseDate.getTime() - dstAdjustmentMinutes * 60_000)
+  const longitudeCorrectionMinutes = shouldApply
+    ? (location.longitude - BEIJING_STANDARD_LONGITUDE) * MINUTES_PER_LONGITUDE_DEGREE
+    : 0
+  const equationOfTimeMinutes = shouldApply
+    ? getEquationOfTimeMinutes(
+      standardClockDate.getUTCFullYear(),
+      standardClockDate.getUTCMonth() + 1,
+      standardClockDate.getUTCDate(),
+    )
+    : 0
   const correctionMinutes = shouldApply
-    ? getTrueSolarCorrectionMinutes(input.year, input.month, input.day, location.longitude)
+    ? longitudeCorrectionMinutes + equationOfTimeMinutes - dstAdjustmentMinutes
     : 0
   const correctedDate = new Date(baseDate.getTime() + correctionMinutes * 60_000)
   const timeIndex = shouldApply
@@ -116,6 +144,12 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
     originalShichen,
     correctedShichen,
     correctionMinutes: Math.round(correctionMinutes),
+    longitudeCorrectionMinutes: Math.round(longitudeCorrectionMinutes),
+    equationOfTimeMinutes: Math.round(equationOfTimeMinutes),
+    timeZone: localClock ? (location.timeZone ?? CHINA_TIME_ZONE) : null,
+    utcOffsetMinutes: localClock ? Math.round(localClock.offsetMinutes) : null,
+    dstAdjustmentMinutes: Math.round(dstAdjustmentMinutes),
+    ambiguousLocalTime: localClock?.ambiguous ?? false,
     applied: shouldApply,
     crossedDate: isDifferentDate(input, correctedDate),
     location,
@@ -193,9 +227,81 @@ function isSpecificToken(value: string): boolean {
   return value.length >= 2
 }
 
-function getTrueSolarCorrectionMinutes(year: number, month: number, day: number, longitude: number): number {
-  const longitudeCorrection = (longitude - BEIJING_STANDARD_LONGITUDE) * MINUTES_PER_LONGITUDE_DEGREE
-  return longitudeCorrection + getEquationOfTimeMinutes(year, month, day)
+function isUsableCoordinate(place: Birthplace): boolean {
+  return Number.isFinite(place.longitude)
+    && place.longitude >= -180
+    && place.longitude <= 180
+    && Number.isFinite(place.latitude)
+    && (place.latitude ?? 0) >= -90
+    && (place.latitude ?? 0) <= 90
+    && !(place.longitude === 0 && place.latitude === 0)
+}
+
+function resolveLocalClockOffset(
+  input: ResolveBirthTimeInput,
+  timeZone: string,
+): { offsetMinutes: number; ambiguous: boolean } {
+  const wallClockUtc = createUtcCalendarDate(
+    input.year,
+    input.month,
+    input.day,
+    input.hour,
+    input.minute ?? 0,
+  ).getTime()
+  const offsets = new Set<number>()
+
+  // Sample a wide window to collect both sides of a historical DST transition.
+  for (let hours = -36; hours <= 36; hours += 3) {
+    offsets.add(getUtcOffsetMinutes(new Date(wallClockUtc + hours * 3_600_000), timeZone))
+  }
+
+  const candidates = Array.from(offsets)
+    .map((offsetMinutes) => ({
+      offsetMinutes,
+      utcTime: wallClockUtc - offsetMinutes * 60_000,
+    }))
+    .filter(({ utcTime }) => matchesWallClock(new Date(utcTime), input, timeZone))
+    .sort((left, right) => left.utcTime - right.utcTime)
+
+  if (candidates.length === 0) {
+    throw new RangeError('The entered local birth time does not exist because the local clock moved forward.')
+  }
+
+  // If clocks moved back and the time occurred twice, use the first occurrence and expose the ambiguity.
+  return {
+    offsetMinutes: candidates[0].offsetMinutes,
+    ambiguous: candidates.length > 1,
+  }
+}
+
+function getUtcOffsetMinutes(date: Date, timeZone: string): number {
+  const value = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    timeZoneName: 'longOffset',
+  }).formatToParts(date).find((part) => part.type === 'timeZoneName')?.value
+  const match = /^GMT(?:(\\+|-)(\\d{2}):(\\d{2})(?::(\\d{2}))?)?$/.exec(value ?? '')
+  if (!match) throw new RangeError(`Unable to resolve the historical UTC offset for ${timeZone}.`)
+  if (!match[1]) return 0
+  const sign = match[1] === '+' ? 1 : -1
+  return sign * (Number(match[2]) * 60 + Number(match[3]) + Number(match[4] ?? 0) / 60)
+}
+
+function matchesWallClock(date: Date, input: ResolveBirthTimeInput, timeZone: string): boolean {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date)
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]))
+  return Number(values.year) === input.year
+    && Number(values.month) === input.month
+    && Number(values.day) === input.day
+    && Number(values.hour) === input.hour
+    && Number(values.minute) === (input.minute ?? 0)
 }
 
 function getEquationOfTimeMinutes(year: number, month: number, day: number): number {
