@@ -104,23 +104,25 @@ function StarTag({ star, tone = 'text-[#2457a7]' }: StarTagProps) {
 
 interface PalaceCardProps extends PalaceData {
   isSelected?: boolean
+  relation?: '三合' | '对宫'
   onClick?: () => void
 }
 
 function PalaceCard({
   name, stem, branch, majorStars, minorStars, adjectiveStars, decadal,
-  boshi12, changsheng12, isLife, isBody, isSelected, onClick
+  boshi12, changsheng12, isLife, isBody, isSelected, relation, onClick
 }: PalaceCardProps) {
   const decadalRange = decadal?.range ? `${decadal.range[0]}-${decadal.range[1]}` : ''
 
   return (
     <button type="button" onClick={onClick} aria-pressed={!!isSelected}
-      className={`relative flex h-full min-h-[170px] sm:min-h-[205px] min-w-0 flex-col bg-white p-1.5 text-left hover:bg-neutral-50 ${isSelected ? 'ring-2 ring-inset ring-blue-500' : ''}`}>
+      className={`relative flex h-full min-h-[170px] sm:min-h-[205px] min-w-0 flex-col bg-white p-1.5 text-left hover:bg-neutral-50 ${relation ? 'bg-blue-50/70' : ''} ${isSelected ? 'ring-2 ring-inset ring-blue-500' : ''}`}>
       <div className="flex flex-wrap content-start items-start gap-x-[3px] gap-y-1">
         {majorStars.map((star,i) => <StarTag key={i} star={star} tone="text-[#ad3028]" />)}
         {minorStars.map((star,i) => <StarTag key={i} star={star} tone="text-[#6744a0]" />)}
         {adjectiveStars.map((name,i) => <StarTag key={i} star={{name}} />)}
       </div>
+      {relation && <span className="mt-1 self-start rounded bg-blue-100 px-1 text-[10px] text-blue-800">{relation}</span>}
       <div className="mt-auto flex items-end justify-between gap-1 pt-3">
         <div className="flex flex-col text-[10px] leading-tight text-neutral-500"><span className="text-teal-700">{changsheng12}</span><span>{boshi12}</span></div>
         <div className="text-right leading-tight"><div className="text-[10px] text-neutral-500">{decadalRange}</div><div className="text-[12px] text-neutral-900">{stem}{branch}</div><div className={`text-[13px] font-semibold text-[#ad3028] ${isLife ? 'rounded border border-red-300 bg-red-50 px-1' : ''}`}>{name}{isBody ? '·身' : ''}</div></div>
@@ -323,6 +325,15 @@ export function ChartDisplay() {
   const solarDate = `${birthInfo.year}年${birthInfo.month}月${birthInfo.day}日`
   const gender = birthInfo.gender === 'male' ? '男' : '女'
 
+  const branches = '子丑寅卯辰巳午未申酉戌亥'
+  const selected = palaceData.find(p => p.name === selectedPalace)
+  const selectedIndex = selected ? branches.indexOf(selected.branch) : -1
+  const relationFor = (branch: string): '三合' | '对宫' | undefined => {
+    const index = branches.indexOf(branch)
+    if (selectedIndex < 0 || index < 0) return undefined
+    const distance = (index - selectedIndex + 12) % 12
+    return distance === 6 ? '对宫' : distance === 4 || distance === 8 ? '三合' : undefined
+  }
   const renderPalace = (palace: PalaceData | null, key: string) => {
     if (!palace) return <div key={key} />
     return (
@@ -330,6 +341,7 @@ export function ChartDisplay() {
         key={key}
         {...palace}
         isSelected={selectedPalace === palace.name}
+        relation={relationFor(palace.branch)}
         onClick={() => setSelectedPalace(selectedPalace === palace.name ? null : palace.name)}
       />
     )
@@ -341,8 +353,10 @@ export function ChartDisplay() {
     ">
       <div className="mb-1 grid grid-cols-4 text-center text-[10px] text-neutral-500"><span>南偏东</span><span>正南方</span><span>南偏西</span><span>西偏南</span></div>
 
+      <div className="mb-2 flex items-center justify-between gap-2 text-xs text-neutral-600"><span>{selected ? `${selected.name} · 三方四正` : "点击任一宫位查看三方四正"}</span>{selected && <button type="button" onClick={() => setSelectedPalace(null)} className="text-blue-700">取消选择</button>}</div>
+      <div className="overflow-x-auto">
       {/* 4x4 网格 */}
-      <div className="grid grid-cols-4 auto-rows-fr gap-px overflow-hidden rounded-xl border border-neutral-300 bg-neutral-300">
+      <div className="grid min-w-[540px] grid-cols-4 auto-rows-fr gap-px overflow-hidden rounded-xl border border-neutral-300 bg-neutral-300">
         {/* Row 0 */}
         {grid[0].map((p, c) => renderPalace(p, `0-${c}`))}
 
@@ -361,6 +375,7 @@ export function ChartDisplay() {
         {grid[3].map((p, c) => renderPalace(p, `3-${c}`))}
       </div>
 
+      </div>
       <div className="mt-1 grid grid-cols-4 text-center text-[10px] text-neutral-500"><span>东偏北</span><span>北偏东</span><span>正北方</span><span>北偏西</span></div>
       {/* 图例 */}
       <div className="flex flex-wrap items-center justify-center gap-4 mt-3 pt-3 border-t border-slate-200 text-[10px]">
