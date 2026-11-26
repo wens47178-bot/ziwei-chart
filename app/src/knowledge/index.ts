@@ -88,7 +88,7 @@ export interface KnowledgeContext {
    从命盘提取知识上下文
    ------------------------------------------------------------ */
 
-export function extractKnowledge(chart: FunctionalAstrolabe, _birthYear?: number): KnowledgeContext {
+export function extractKnowledge(chart: FunctionalAstrolabe): KnowledgeContext {
   const context: KnowledgeContext = {
     命宫主星: [],
     身宫主星: [],
