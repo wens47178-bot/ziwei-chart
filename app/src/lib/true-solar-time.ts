@@ -245,7 +245,7 @@ async function findRemoteBirthplace(input?: string): Promise<Birthplace | null> 
         city: city.name,
         country: city.countryName || selected.countryName,
         province: city.stateName || selected.stateName || undefined,
-        aliases: [selected.name, city.name].filter((name, index, values) => !!name && values.indexOf(name) === index),
+        aliases: [selected.name, city.name].filter((name, index, values): name is string => !!name && values.indexOf(name) === index),
         latitude: Number(city.latitude),
         longitude: Number(city.longitude),
         timeZone: city.timezone,
