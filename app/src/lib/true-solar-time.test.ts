@@ -107,6 +107,7 @@ describe('resolveBirthTime', () => {
       month: 1,
       day: 2,
       hour: 0,
+      minute: 59,
       enabled: false,
     })
     const lateZi = resolveBirthTime({
@@ -114,9 +115,12 @@ describe('resolveBirthTime', () => {
       month: 1,
       day: 1,
       hour: 23,
+      minute: 59,
       enabled: false,
     })
 
+    expect(earlyZi.minute).toBe(59)
+    expect(lateZi.minute).toBe(59)
     expect(earlyZi.timeIndex).toBe(0)
     expect(lateZi.timeIndex).toBe(12)
     expect(earlyZi.originalShichen).toBe(ZI_SHICHEN)
@@ -199,6 +203,7 @@ describe('resolveBirthTime', () => {
       month: 1,
       day: 1,
       hour: 2,
+      minute: 5,
       birthplace: URUMQI,
       enabled: true,
     })
