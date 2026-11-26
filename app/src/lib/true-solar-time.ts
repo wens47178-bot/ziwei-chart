@@ -170,14 +170,12 @@ export function shichenNameForTimeIndex(timeIndex: number): string {
 }
 
 function normalizePlace(input?: string): string {
-  return (input ?? '').trim().replace(/\s+/g, '')
+  return (input ?? '').trim().toLocaleLowerCase().replace(/[\s\p{P}\p{S}]+/gu, '')
 }
 
 function scoreBirthplaceMatch(input: string, place: Birthplace): number {
   const fullTokens = [
     joinPlace(place.province, place.city, place.area),
-    joinPlace(place.city, place.country),
-    joinPlace(place.country, place.city),
     joinPlace(place.province, place.city),
     joinPlace(place.city, place.area),
     joinPlace(place.city, place.country),
@@ -211,6 +209,8 @@ function getPlaceTokens(place: Birthplace): string[] {
     joinPlace(place.province, place.city),
     joinPlace(place.city, place.area),
     joinPlace(place.province, place.city, place.area),
+    joinPlace(place.city, place.country),
+    joinPlace(place.country, place.city),
   ]
 
   return Array.from(new Set(rawTokens.filter((token): token is string => !!token).map(normalizePlace)))
