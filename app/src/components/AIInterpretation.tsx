@@ -335,7 +335,7 @@ ${guidanceContext}
 
   if (!chart) return null
 
-  const isStructuredReport = /^##\\s+命格总评\\s*$/m.test(displayText)
+  const isStructuredReport = /^##\s+命格总评\s*$/m.test(displayText)
   const availableReportTabs = REPORT_TABS.filter((tab) => getReportSection(displayText, tab.id).length > 0)
   const missingReportTabs = REPORT_TABS.filter((tab) => !availableReportTabs.some((available) => available.id === tab.id))
   const activeContent = getReportSection(displayText, activeTab)
