@@ -52,6 +52,7 @@ export function generateChart(info: BirthInfo): FunctionalAstrolabe {
     month: info.month,
     day: info.day,
     hour: info.hour,
+    minute: info.minute ?? 0,
     birthplace: info.birthplace,
     enabled: info.trueSolarEnabled ?? true,
   })
