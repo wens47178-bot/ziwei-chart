@@ -41,11 +41,7 @@ export function BirthForm({ onSuccess }: { onSuccess?: () => void }) {
     let active = true
     const trimmedBirthplace = birthplace.trim()
 
-    if (!trueSolarEnabled || trimmedBirthplace.length < 2) {
-      setMatchedBirthplace(null)
-      setMatchingBirthplace(false)
-      return
-    }
+    if (!trueSolarEnabled || trimmedBirthplace.length < 2) return
 
     // Wait until the user pauses typing before calling the worldwide gazetteer.
     const timer = window.setTimeout(() => {
