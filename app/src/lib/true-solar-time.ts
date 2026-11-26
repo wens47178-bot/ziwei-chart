@@ -287,8 +287,8 @@ function getStandardUtcOffsetMinutes(year: number, timeZone: string): number {
   const offsets = Array.from({ length: 12 }, (_, index) =>
     getUtcOffsetMinutes(createUtcCalendarDate(year, index + 1, 15, 12), timeZone),
   )
-  // The lower annual offset is the non-DST baseline in ordinary modern civil-time rules,
-  // including southern-hemisphere zones whose daylight time falls in January.
+  // Used only to explain the seasonal offset; the correction itself uses the exact offset
+  // resolved for the entered wall-clock time, including political offset changes.
   return Math.min(...offsets)
 }
 
