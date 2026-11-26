@@ -103,6 +103,7 @@ describe('findBirthplace', () => {
     expect(findBirthplaceInData('Phnom Penh, Cambodia', GLOBAL_BIRTHPLACE_DATA)?.timeZone).toBe('Asia/Phnom_Penh')
     expect(findBirthplaceInData('New York, USA', GLOBAL_BIRTHPLACE_DATA)?.timeZone).toBe('America/New_York')
     expect(findBirthplaceInData('东京', GLOBAL_BIRTHPLACE_DATA)?.timeZone).toBe('Asia/Tokyo')
+    expect(findBirthplaceInData('United States', GLOBAL_BIRTHPLACE_DATA)).toBeNull()
   })
 
   it('returns null when the birthplace cannot be matched', () => {
