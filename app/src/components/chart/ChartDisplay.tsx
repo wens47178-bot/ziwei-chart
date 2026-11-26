@@ -118,8 +118,8 @@ function PalaceCard({
   const decadalRange = decadal?.range ? `${decadal.range[0]}-${decadal.range[1]}` : ''
 
   return (
-    <button type="button" onClick={onClick} aria-pressed={!!isSelected}
-      className={`relative flex h-full min-h-[170px] sm:min-h-[205px] min-w-0 flex-col p-1.5 text-left hover:bg-neutral-50 ${relation ? 'bg-blue-50' : 'bg-white'} ${isSelected ? 'ring-2 ring-inset ring-blue-500' : ''}`}>
+    <button type="button" onClick={onClick} aria-label={`${name}宫位`} aria-pressed={!!isSelected}
+      className={`relative flex h-full min-h-[150px] sm:min-h-[185px] lg:min-h-[170px] xl:min-h-[195px] min-w-0 flex-col p-1.5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600 hover:bg-neutral-50 ${relation ? 'bg-blue-50' : 'bg-white'} ${isSelected ? 'ring-2 ring-inset ring-blue-500' : ''}`}>
       <div className="flex flex-wrap content-start items-start gap-x-[3px] gap-y-1">
         {majorStars.map((star,i) => <StarTag key={i} star={star} tone="text-[#ad3028]" />)}
         {minorStars.map((star,i) => <StarTag key={i} star={star} tone="text-[#6744a0]" />)}
