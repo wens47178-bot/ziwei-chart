@@ -263,13 +263,14 @@ function countryMatchesQuery(place: RemoteCitySearchResult, query: string): bool
     england: ['gb', 'unitedkingdom'],
     uae: ['ae', 'unitedarabemirates'],
   }
+  const queryTokens = [normalized, ...(aliases[normalized] ?? [])]
   const countryTokens = [
     normalizePlace(place.countryCode),
     normalizePlace(place.countryName),
     ...(aliases[normalizePlace(place.countryCode)] ?? []),
   ].filter(Boolean)
   const regionTokens = [normalizePlace(place.stateCode), normalizePlace(place.stateName)].filter(Boolean)
-  return countryTokens.some((token) => normalized.includes(token))
+  return countryTokens.some((token) => queryTokens.some((queryToken) => queryToken.includes(token)))
     || regionTokens.some((token) => normalized.includes(token))
 }
 
